@@ -1,53 +1,46 @@
 # Front-GeoTrack-4Sem2024
 
-### 🖥️ Repositório de Back-end
+### 🖥️ Back-end Repository
    - [GeoTrackServer](https://github.com/iNineBD/GeoTrackServer-4Sem2024).
-     
+
 <br>
 <p align="center">
-    <a href="#equipe">Equipe</a> |
-    <a href="#context">Contextualização</a>  |
-    <a href="#requisito">Requisitos do Cliente</a>  |
-    <a href="#backlog">Product Backlog</a>  |
-    <a href="#entregas">Sprints</a>  |
-    <a href="#tecnologias">Tecnologias</a> 
+    <a href="#team">Team</a> |
+    <a href="#context">Context</a> |
+    <a href="#backlog">Product Backlog</a> |
+    <a href="#deliveries">Sprints</a> |
+    <a href="#technologies">Technologies</a>
 </p>
 <div align="center"><hr width=70%></div>
 
-<span id="equipe">
+<span id="team">
 
-## ◻️ Equipe
+## ◻️ Team
 
 <div align="left">
   
-  | **FUNÇÃO** | **NOME** | **REDES SOCIAIS** |
+  | **FUNCTION** | **NAME** | **SOCIAL MEDIA** |
   | :---: | :--- | :---: |
   | Product Owner | João Matheus Lamão | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/joaomatheuslamao) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/JoaoMatheusLamao) | 
-  | Scrum  Master | André Bernardes | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/andre-oliveira2004) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/Andre-Bernardes200) | 
+  | Scrum Master | André Bernardes | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/andre-oliveira2004) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/Andre-Bernardes200) | 
   | Developer | Ana Raquel Machado | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/ana-sasaki-19a2031b8/) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/Anaraquely) |
-  | Developer | Eduardo Farias | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/eduardofariasp/) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/eduardofpaula) |
   | Developer | Beatriz Akemi | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/beatriz-bonatto-263530156) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/BeatrizBonatto) |  
   | Developer | Caio Sousa | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/caio-sousa-75b631124) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/Caio-sousaFatec) |   
+  | Developer | Eduardo Farias | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/eduardofariasp/) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/eduardofpaula) |
   | Developer | Lucas Henrique de Oliveira | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/lucas-henrique-9a557620b) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/LucasHCOliveira7) |
   | Developer | Naiara Santos | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/naiara-santos-73b83a186) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/NaiaraSantos3) |
+  | Developer | Alita Amancio | [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/alitaamancio/) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/AlitaAmancio) |
 </div>
 
 <div align="left"><hr width=70%></div>
 
 <span id="context">
 
-## ◻️ Contextualização
+## ◻️ Context
 
-> A empresa enfrenta o desafio de armazenar e consultar dados de geolocalização em tempo real, gerados continuamente por dispositivos IoT, como wearables, tags e smartphones. Esses dados são essenciais para o monitoramento de pessoas e ativos, exigindo um sistema que consiga lidar com grandes volumes de informações de forma escalável, confiável e segura.
+> The company confront the challenge of stock and querying real-time geolocation data, continuously generated by IoT devices such as wearables, tags, and smartphones. This data is essential for monitoring people and assets, requiring a system that can manage large volumes of information in a scalable, dependable, and secure way.
 >
-> Para superar esses obstáculos, propomos o desenvolvimento de uma solução que automatize a gestão e a configuração dos dados de geolocalização. Esta solução permitirá à empresa acelerar a implantação de suas operações, garantindo a integridade, consistência e segurança das informações, ao mesmo tempo em que reduz a necessidade de intervenção de técnicos especializados. Com isso, a empresa poderá otimizar o monitoramento e rastreamento em tempo real, tornando suas operações mais ágeis e eficazes.
-
-## ◻️ Requisitos do Cliente
-<div align="left"><hr width=70%></div>
-
-<span id="requisito">
-  
-Em desenvolvimento
+> To defeat these obstacles, we propose developing a solution that automates the management and configuration of geolocation data. This solution will allow the company to speed up the deployment of the operations, ensuring the integrity, consistency, and security of the information, while reducing the need for specialized technicians' intervention. As a result, the company will optimize real-time monitoring and tracking, making the operations more agile and efficient.
 
 <div align="left"><hr width=70%></div>
 
@@ -55,26 +48,26 @@ Em desenvolvimento
         
 ## ◻️ Product Backlog
 
-Em desenvolvimento
+In development
 
 <div align="left"><hr width=70%></div>
 
-<span id="entregas">
+<span id="deliveries">
 
 ## ◻️ Sprints
 
-| SPRINTS | PERÍODOS | DESCRIÇÃO |
+| SPRINTS | PERIODS | DESCRIPTION |
 |:-------:|:-----:|:---------:|
-| Sprint 1| 09/09/2024 à 29/09/2024 | - |
-| Sprint 2 | 30/09/2024 à 20/09/2024 | - |
-| Sprint 3 | 21/10/2024 à 10/11/2024 | - |
-| Sprint 4 | 11/11/2024 à 01/12/2024 | - |
+| Sprint 1| 09/09/2024 to 29/09/2024 | - |
+| Sprint 2 | 30/09/2024 to 20/09/2024 | - |
+| Sprint 3 | 21/10/2024 to 10/11/2024 | - |
+| Sprint 4 | 11/11/2024 to 01/12/2024 | - |
 
 <div align="left"><hr width=70%></div>
 
-<span id="tecnologias">
+<span id="technologies">
 
-## ◻️ Tecnologias
+## ◻️ Technologies
 
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
