@@ -42,7 +42,6 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 0;
 }
 
 :global(.ol-zoom-in) {
@@ -56,4 +55,7 @@ export default {
     right: 2em;
     position: fixed;
 }
+
+
+
 </style>
