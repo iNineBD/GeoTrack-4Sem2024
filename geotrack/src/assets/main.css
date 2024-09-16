@@ -7,6 +7,7 @@
   font-weight: normal;
 }
 
+/*   variação global de hover, responsável por inserir hover "nativo" em todo "a"  
 a,
 .green {
   text-decoration: none;
@@ -19,7 +20,7 @@ a,
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
   }
-}
+} */
 
 @media (min-width: 1024px) {
   body {
