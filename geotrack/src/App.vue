@@ -1,10 +1,12 @@
 <script lang="ts">
 import MapView from './components/MapView.vue';
+import SideMenu from './components/SideMenu.vue';
 
 export default {
   name: 'App',
   components: {
     MapView,
+    SideMenu,
   },
 };
 </script>
@@ -12,9 +14,7 @@ export default {
 <template>
   <div id="app">
     <MapView />
-    <div class="content">
-      <h1>GeoTrack - Mapa Interativo</h1>
-    </div>
+    <SideMenu />
   </div>
 </template>
 
@@ -37,5 +37,6 @@ export default {
   background-color: rgba(0, 0, 0, 0.2);
   padding: 10px 20px;
   font-size: 1rem;
+  overflow: hidden;
 }
 </style>
