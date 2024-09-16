@@ -65,11 +65,8 @@ export default {
 }
 
 .menu-itens li {
-  margin-bottom: 35px;
+  margin-bottom: 15px;
   text-align: center;
-}
-.sidebar-link:hover img {
-  filter: invert(1) brightness(2);
 }
 
 .sidebar-link {
@@ -79,19 +76,24 @@ export default {
   transition: background-color 0.4s ease;
 }
 
+h6 {
+  margin: 0.5rem 0 0 0;
+}
+
+
 .sidebar-link:hover {
   outline: 3px solid rgba(0, 0, 255, 0.5);
   background-color: rgba(0, 0, 255, 0.5);
   border-radius: 5px;
 }
 
-h6 {
-  margin: 0.5rem 0 0 0;
+.sidebar-link:hover img {
+  filter: invert(1) brightness(2);
 }
 
-
+/* treatment of svg images to adapt their size and smaller differentiations */
 #home-image, #filter-image, #logout-image{
-  width: 4vh;
+  width: 3vh;
   height: auto;
   transition: filter 0.2s ease; 
 }
