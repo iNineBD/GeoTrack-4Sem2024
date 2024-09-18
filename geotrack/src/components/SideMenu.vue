@@ -13,10 +13,21 @@
         <h6>Home</h6>
       </li>
       <li>
-        <a href="#" class="sidebar-link">
+        <a href="#" class="sidebar-link" @click="showDropdown = !showDropdown">
           <img id="filter-image" src="/src/assets/images/filter.svg" alt="filter icon" />
         </a>
         <h6>Filtrar</h6>
+        <select v-if="showDropdown" v-model="selectedUser">
+          <option v-for="user in listUsers" :key="user.id" :value="user.id">
+            {{ user.name }}
+          </option> 
+        </select>
+
+        <select v-if="showDropdown" v-model="selectDevices">
+          <option v-for=" Device in listDevices" :key="Device.idDevice" :value="Device.idDevice">
+            {{ Device.name }}
+          </option>
+        </select>
       </li>
     </ul>
     <div id="logout">
@@ -30,7 +41,46 @@
 
 <script>
 export default {
-  name: 'SideMenu'
+  name: 'SideMenu',
+  data() {
+    return {
+      showDropdown: false,
+      selectedUser: null,
+      listUsers: [
+      {
+            "id": 3144,
+            "name": "DANIEL ANTONIO GONZALEZ TOCUYO"
+        },
+        {
+            "id": 1435,
+            "name": "DARWIN YOEL FRANCO VASQUEZ"
+        },
+        {
+            "id": 4304,
+            "name": "DOMINGOS LAZARO NUNES DE CARVALHO"
+        },
+        {
+            "id": 1515,
+            "name": "DONIZETI CANHETE DA SILVA "
+        },
+        {
+            "id": 8573,
+            "name": "ESTER DE FREITAS DE LIMA"
+        }
+        // ... outros usuários
+      ],
+      selectDevices:null,
+      listDevices: [
+      {
+            "idDevice": 30,
+            "name": "CARD"
+        }
+      ]
+
+
+
+    }
+  }
 }
 </script>
 
