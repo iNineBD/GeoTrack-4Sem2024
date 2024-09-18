@@ -16,10 +16,8 @@ const initialView = {
 export default {
   name: 'MapView',
   setup() {
-    //createde reference for the map
     const map = ref<Map | null>(null)
 
-    //initialize the map
     onMounted(() => {
       map.value = new Map({
         target: 'map',
@@ -28,21 +26,20 @@ export default {
             source: new OSM()
           })
         ],
-        view: new View(initialView), // create a new instance of the view
+        view: new View(initialView),
         controls: defaultControls().extend([
-          new Zoom() // Add the zoom control
+          new Zoom()
         ])
       })
     })
 
-    // Função para voltar à visão inicial
     const goHome = () => {
       if (map.value) {
         const view = map.value.getView()
         view.animate({
-          center: initialView.center,  // Define initial center
-          zoom: initialView.zoom,      // Define initial zoom
-          duration: 1000               // animation duration (in ms)
+          center: initialView.center,
+          zoom: initialView.zoom,
+          duration: 1000
         })
       }
     }
@@ -56,8 +53,9 @@ export default {
 
 <template>
   <div id="map" class="map"></div>
-  <!-- Botão Home -->
-  <button id="home" @click="goHome">Home</button>
+  <button id="home-button" @click="goHome">
+    <img id="home-icon" src="/src/assets/images/home-map-pin.svg" alt="voltar ao início">
+  </button>
 </template>
 
 <style scoped>
@@ -72,17 +70,39 @@ export default {
 :global(.ol-zoom-in) {
   bottom: 6em;
   right: 2em;
+  width: 3.5vh;
+  height: auto;
   position: fixed;
 }
 
 :global(.ol-zoom-out) {
   bottom: 4.5em;
   right: 2em;
+  width: 3.5vh;
+  height: auto;
   position: fixed;
 }
-#home {
-  bottom: 8.5em;
-  right: 2em;
+
+#home-button {
+  bottom: 9.0em; /* Ajustado para ficar um pouco acima do botão de zoom-in */
+  right: 2.3em;
+  width: 3.2vh;
+  height: auto;
   position: fixed;
+  border-radius: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#home-icon {
+  width: 3.2vh; /* Mesmo tamanho dos botões de zoom */
+  height: auto;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2); /* Sombra leve */
 }
 </style>
