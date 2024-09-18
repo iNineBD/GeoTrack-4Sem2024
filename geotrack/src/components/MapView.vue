@@ -7,10 +7,10 @@ import OSM from 'ol/source/OSM'
 import { fromLonLat } from 'ol/proj'
 import { defaults as defaultControls, Zoom } from 'ol/control'
 
-// Definir a visão inicial
+
 const initialView = {
-  center: fromLonLat([-45.88671, -23.21978]), // Coordenadas iniciais
-  zoom: 12 // Zoom inicial
+  center: fromLonLat([-45.88671, -23.21978]), // Initial coordenate
+  zoom: 12 // Initial zoom
 }
 
 export default {
@@ -84,7 +84,7 @@ export default {
 }
 
 #home-button {
-  bottom: 9.0em; /* Ajustado para ficar um pouco acima do botão de zoom-in */
+  bottom: 9.0em;
   right: 2.3em;
   width: 3.2vh;
   height: auto;
@@ -99,10 +99,10 @@ export default {
 }
 
 #home-icon {
-  width: 3.2vh; /* Mesmo tamanho dos botões de zoom */
+  width: 3.2vh; 
   height: auto;
   background-color: white;
   border-radius: 5px;
-  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2); /* Sombra leve */
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2); 
 }
 </style>
