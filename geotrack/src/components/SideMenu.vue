@@ -17,15 +17,13 @@
           <img id="filter-image" src="/src/assets/images/filter.svg" alt="filter icon" />
         </a>
         <h6>Filtrar</h6>
-        <select v-if="showDropdown" v-model="selectedUser" @change="fetchData">
-          <option value=""> Selecione um Usuário </option>
-          <option v-for="user in listUsers" :key="user.id" :value="user.id"> 
+        <select v-if="showDropdown" v-model="selectedUser">
+          <option v-for="user in listUsers" :key="user.id" :value="user.id">
             {{ user.name }}
           </option> 
         </select>
 
         <select v-if="showDropdown" v-model="selectDevices">
-          <option value=""> Selecione um Dispositivo </option>
           <option v-for=" Device in listDevices" :key="Device.idDevice" :value="Device.idDevice">
             {{ Device.name }}
           </option>
@@ -48,70 +46,42 @@ export default {
     return {
       showDropdown: false,
       selectedUser: null,
-      selectedDevice: null,
-      listUsers: [],        // Lista de usuários vazia inicialmente
-      listDevices: [],      // Lista de dispositivos vazia inicialmente
-      currentPage: 1,       // Página inicial padrão
-      totalPages: 1,        // Total de páginas padrão
-    };
-  },
-  mounted() {
-    this.fetchUsers();
-    this.fetchDevices();
-  },
-  methods: {
-    
-    async fetchUsers() {
-      try {
-        const response = await fetch(`/api/users?page=${this.currentPage}`);
-        const data = await response.json();
-        
+      listUsers: [
+      {
+            "id": 3144,
+            "name": "DANIEL ANTONIO GONZALEZ TOCUYO"
+        },
+        {
+            "id": 1435,
+            "name": "DARWIN YOEL FRANCO VASQUEZ"
+        },
+        {
+            "id": 4304,
+            "name": "DOMINGOS LAZARO NUNES DE CARVALHO"
+        },
+        {
+            "id": 1515,
+            "name": "DONIZETI CANHETE DA SILVA "
+        },
+        {
+            "id": 8573,
+            "name": "ESTER DE FREITAS DE LIMA"
+        }
+        // ... outros usuários
+      ],
+      selectDevices:null,
+      listDevices: [
+      {
+            "idDevice": 30,
+            "name": "CARD"
+        }
+      ]
 
-        this.listUsers = data.listUsers;   
-        this.currentPage = data.currentePage;  
-        this.totalPages = data.totalPages; 
-      } catch (error) {
-        console.error('Erro ao buscar usuários:', error);
-      }
-    },
 
 
-    async fetchDevices() {
-      try {
-        const response = await fetch(`/api/devices?page=${this.currentPage}`);
-        const data = await response.json();
-        
-        // Atualizando a lista de dispositivos e os dados de paginação
-        this.listDevices = data.listDevices;   // Mapeando o campo 'listDevices' do JSON
-        this.currentPage = data.currentPage;
-        this.totalPages = data.totalPages;
-      } catch (error) {
-        console.error('Erro ao buscar dispositivos:', error);
-      }
-    },
-
-    // Método para buscar dados com base nos filtros selecionados
-    async fetchData() {
-      try {
-        const response = await fetch(`/api/data?userId=${this.selectedUser}&deviceId=${this.selectedDevice}&page=${this.currentPage}`);
-        const data = await response.json();
-        console.log('Dados filtrados:', data);  // Manipular os dados retornados
-      } catch (error) {
-        console.error('Erro ao buscar dados filtrados:', error);
-      }
-    },
-  },
-  watch: {
-    // Observa mudanças no usuário selecionado e busca os dados filtrados
-    selectedUser() {
-      this.fetchData();
-    },
-    // Observa mudanças no dispositivo selecionado e busca os dados filtrados
-    selectedDevice() {
-      this.fetchData();
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style scoped>
