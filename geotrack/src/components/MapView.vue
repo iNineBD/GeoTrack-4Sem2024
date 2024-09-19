@@ -13,49 +13,6 @@ const initialView = {
 }
 
 export default {
-  // name: 'MapView',
-  // props: {
-  //   geoJsonData: {
-  //     type: Object,
-  //     required: false
-  //   }
-  // },
-  //   setup(props, { expose }) {
-  //     const mapRef = ref<Map | null>(null)
-
-  //     onMounted(() => {
-  //       const mapInstance = new Map({
-  //         target: 'map',
-  //         layers: [
-  //           new TileLayer({
-  //             source: new OSM()
-  //           })
-  //         ],
-  //         view: new View({
-  //           center: fromLonLat([-45.88671, -23.21978]),
-  //           zoom: 12
-  //         }),
-  //         controls: defaultControls().extend([
-  //           new Zoom() // Adiciona o controle de zoom manualmente
-  //         ])
-  //       })
-
-  //       mapRef.value = mapInstance
-  //       console.log('Map initialized:', mapRef.value)
-
-  //       // Expor a instância do mapa apenas após ser inicializada
-  //       nextTick(() => {
-  //         expose({
-  //           map: mapInstance
-  //         })
-  //       })
-  //     })
-
-  //     return {
-  //       mapRef
-  //     }
-  //   }
-  // }
   name: 'MapView',
   props: {
     geoJsonData: {
