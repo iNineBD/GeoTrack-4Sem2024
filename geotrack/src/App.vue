@@ -1,22 +1,75 @@
 <script lang="ts">
-import MapView from './components/MapView.vue';
-import SideMenu from './components/SideMenu.vue';
-import FilterComponent from './components/FilterComponent.vue';
+import MapView from './components/MapView.vue'
+import MapMarkers from './components/MapMarkers.vue'
+import SideMenu from './components/SideMenu.vue'
+import { onMounted, ref } from 'vue'
+import axios from 'axios'
 
+interface GeoJsonData {
+  user: string
+  device: string
+  geojson: {
+    type: string
+    features: Array<{
+      type: string
+      properties: Record<string, any>
+      geometry: {
+        type: string
+        coordinates: number[][]
+      }
+    }>
+  }
+}
 export default {
   name: 'App',
   components: {
     MapView,
-    SideMenu,
-    FilterComponent
+    MapMarkers,
+    SideMenu
   },
-};
+  setup() {
+    const geoJsonData = ref<GeoJsonData | null>(null)
+
+    const fetchGeoJsonData = async () => {
+      try {
+        const requestData = {
+          user: 5432,
+          device: 9,
+          dataInicio: '2024-01-30T03:59:30.000Z',
+          dataFim: '2024-08-08T12:14:22.000Z'
+        }
+
+        const response = await axios.post('http://localhost:8080/stop-point', requestData)
+
+        geoJsonData.value = {
+          user: response.data.user,
+          device: response.data.device,
+          geojson: response.data.geoJsonDTO
+        }
+      } catch (error) {
+        console.error('Error fetching points from the backend:', error)
+      }
+    }
+
+    onMounted(() => {
+      fetchGeoJsonData()
+    })
+
+    return {
+      geoJsonData,
+      fetchGeoJsonData
+    }
+  }
+}
 </script>
 
 <template>
   <div id="app">
-    <FilterComponent/>
-    <MapView />
+    <MapView>
+      <template #default="{ map }">
+        <MapMarkers v-if="map && geoJsonData" :map="map" :geoJsonData="geoJsonData" />
+      </template>
+    </MapView>
     <SideMenu />
   </div>
 </template>
