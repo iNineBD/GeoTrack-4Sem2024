@@ -20,7 +20,6 @@ interface GeoJsonData {
     }>
   }
 }
-
 export default {
   name: 'App',
   components: {
