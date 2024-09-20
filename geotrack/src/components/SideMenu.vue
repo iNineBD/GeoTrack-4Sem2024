@@ -12,78 +12,22 @@
         </a>
         <h6>Home</h6>
       </li>
+      
       <li>
-        <a href="#" class="sidebar-link" @click="showDropdown = !showDropdown">
+        <a href="#" class="sidebar-link">
           <img id="filter-image" src="/src/assets/images/filter.svg" alt="filter icon" />
         </a>
         <h6>Filtrar</h6>
-        <select v-if="showDropdown" v-model="selectedUser">
-          <option v-for="user in listUsers" :key="user.id" :value="user.id">
-            {{ user.name }}
-          </option> 
-        </select>
-
-        <select v-if="showDropdown" v-model="selectDevices">
-          <option v-for=" Device in listDevices" :key="Device.idDevice" :value="Device.idDevice">
-            {{ Device.name }}
-          </option>
-        </select>
-      </li>
-    </ul>
-    <div id="logout">
+     </li>
+     </ul>
+     <div id="logout">
       <a href="#" class="sidebar-link">
-        <img id="logout-image" src="/src/assets/images/logout.svg" alt="logout icon" />
-      </a>
+        <img id="logout-image" src="/src/assets/images/logout.svg" alt="logout icon" /></a>
       <h6>Logout</h6>
     </div>
-  </div>
+    </div>
+
 </template>
-
-<script>
-export default {
-  name: 'SideMenu',
-  data() {
-    return {
-      showDropdown: false,
-      selectedUser: null,
-      listUsers: [
-      {
-            "id": 3144,
-            "name": "DANIEL ANTONIO GONZALEZ TOCUYO"
-        },
-        {
-            "id": 1435,
-            "name": "DARWIN YOEL FRANCO VASQUEZ"
-        },
-        {
-            "id": 4304,
-            "name": "DOMINGOS LAZARO NUNES DE CARVALHO"
-        },
-        {
-            "id": 1515,
-            "name": "DONIZETI CANHETE DA SILVA "
-        },
-        {
-            "id": 8573,
-            "name": "ESTER DE FREITAS DE LIMA"
-        }
-        // ... outros usuários
-      ],
-      selectDevices:null,
-      listDevices: [
-      {
-            "idDevice": 30,
-            "name": "CARD"
-        }
-      ]
-
-
-
-    }
-  }
-}
-</script>
-
 <style scoped>
 .side-menu {
   position: absolute;
@@ -130,7 +74,6 @@ h6 {
   margin: 0.5rem 0 0 0;
 }
 
-
 .sidebar-link:hover {
   outline: 3px solid rgba(0, 0, 255, 0.5);
   background-color: rgba(0, 0, 255, 0.5);
@@ -142,10 +85,12 @@ h6 {
 }
 
 /* treatment of svg images to adapt their size and smaller differentiations */
-#home-image, #filter-image, #logout-image{
+#home-image,
+#filter-image,
+#logout-image {
   width: 3vh;
   height: auto;
-  transition: filter 0.2s ease; 
+  transition: filter 0.2s ease;
 }
 
 #geotrack-image {
@@ -153,13 +98,10 @@ h6 {
   height: auto;
 }
 
-
 #logout {
   margin-top: auto;
   text-align: center;
   width: 100%;
   padding-bottom: 2rem;
 }
-
-
 </style>

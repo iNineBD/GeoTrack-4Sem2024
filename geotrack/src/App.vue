@@ -1,18 +1,21 @@
 <script lang="ts">
 import MapView from './components/MapView.vue';
 import SideMenu from './components/SideMenu.vue';
+import FilterComponent from './components/FilterComponent.vue';
 
 export default {
   name: 'App',
   components: {
     MapView,
     SideMenu,
+    FilterComponent
   },
 };
 </script>
 
 <template>
   <div id="app">
+    <FilterComponent/>
     <MapView />
     <SideMenu />
   </div>
