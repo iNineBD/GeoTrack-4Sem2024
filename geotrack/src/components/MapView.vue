@@ -1,127 +1,88 @@
-<script lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
-import 'ol/ol.css'
-import { Map, View } from 'ol'
-import TileLayer from 'ol/layer/Tile'
-import OSM from 'ol/source/OSM'
-import { fromLonLat } from 'ol/proj'
-import { defaults as defaultControls, Zoom } from 'ol/control'
+<template>
+  <div id="map" class="map"></div>
+  <div v-for="(avatar, index) in avatars" :key="index" :id="'avatar-' + index" class="avatar-marker">
+    <v-tooltip :open-on-hover="true" :text="`${avatar.fullName} (${avatar.coords})`">
+      <template v-slot:activator="{ props }">
+        <v-avatar v-bind="props" :color="avatar.color">
+          <span class="text-h5">{{ avatar.initials }}</span>
+        </v-avatar>
+      </template>
+    </v-tooltip>
+  </div>
+</template>
 
-const initialView = {
-  center: fromLonLat([-45.88671, -23.21978]), // Initial coordenate
-  zoom: 12 // Initial zoom
-}
+<script lang="ts">
+import { onMounted, ref } from 'vue';
+import 'ol/ol.css';
+import { Map, View, Overlay } from 'ol';
+import TileLayer from 'ol/layer/Tile';
+import OSM from 'ol/source/OSM';
+import { fromLonLat } from 'ol/proj';
+import { defaults as defaultControls, Zoom } from 'ol/control';
 
 export default {
   name: 'MapView',
-  props: {
-    geoJsonData: {
-      type: Object,
-      required: false
-    }
-  },
-  setup(props, { expose }) {
-    const mapRef = ref<Map | null>(null)
+  setup() {
+    const avatars = ref([
+      { initials: 'AK', fullName: 'Ali Khodr', color: 'primary', coords: [-45.88671, -23.21978] },
+      { initials: 'CJ', fullName: 'Carlos José', color: 'primary', coords: [-45.88000, -23.22000] },
+      { initials: 'LM', fullName: 'Leonardo Maicon', color: 'primary', coords: [-45.89000, -23.21800] },
+    ]);
 
     onMounted(() => {
-      const mapInstance = new Map({
+      const map = new Map({
         target: 'map',
         layers: [
           new TileLayer({
-            source: new OSM()
-          })
+            source: new OSM(),
+          }),
         ],
-        view: new View(initialView),
-        controls: defaultControls().extend([new Zoom()])
-      })
+        view: new View({
+          center: fromLonLat([-45.88671, -23.21978]),
+          zoom: 13,
+        }),
+        controls: defaultControls().extend([new Zoom()]),
+      });
 
-      mapRef.value = mapInstance
+      avatars.value.forEach((avatar, index) => {
+        const avatarMarker = new Overlay({
+          element: document.getElementById('avatar-' + index)!, // Elemento HTML do avatar
+          position: fromLonLat(avatar.coords), // Coordenadas do marcador
+          positioning: 'center-center', // Posicionamento centralizado
+        });
 
-      // Expor a instância do mapa apenas após ser inicializada
-      nextTick(() => {
-        expose({
-          map: mapInstance
-        })
-      })
-    })
+        map.addOverlay(avatarMarker); // Adiciona o marcador ao mapa
+      });
+    });
 
-    const goHome = () => {
-      if (mapRef.value) {
-        const view = mapRef.value.getView()
-        view.animate({
-          center: initialView.center,
-          zoom: initialView.zoom,
-          duration: 1000
-        })
-      }
-    }
-
-    return {
-      goHome,
-      mapRef
-    }
-  }
-}
+    return { avatars };
+  },
+};
 </script>
-
-<template>
-  <div id="map" class="map"></div>
-  <slot :map="mapRef"></slot>
-  <button id="home-button" @click="goHome">
-    <img id="home-icon" src="/src/assets/images/home-map-pin.svg" alt="voltar ao início" />
-  </button>
-</template>
 
 <style scoped>
 .map {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
-:global(.ol-zoom-in) {
-  bottom: 6em;
-  right: 2em;
-  width: 3.5vh;
-  height: auto;
-  position: fixed;
-}
-
-:global(.ol-zoom-out) {
-  bottom: 4.5em;
-  right: 2em;
-  width: 3.5vh;
-  height: auto;
-  position: fixed;
-}
-
-#home-button {
-  bottom: 9em;
-  right: 2.3em;
-  width: 3.2vh;
-  height: auto;
-  position: fixed;
-  border-radius: 5px;
-  background: none;
-  border: none;
-  padding: 0;
+.avatar-marker {
+  /* Estilos dos avatares */
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 40px;
+  height: 40px;
 }
 
-#home-icon {
-  width: 3.2vh;
-  height: auto;
-  background-color: white;
-  border-radius: 5px;
-  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+:global(.ol-zoom) {
+  bottom: 0.5em;
+  top: auto;
+  left: auto;
+  right: 0.5em;
+}
+
+:global(.ol-attribution ul) {
+  display: none;
 }
 </style>
