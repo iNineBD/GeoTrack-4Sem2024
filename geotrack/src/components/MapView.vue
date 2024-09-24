@@ -60,7 +60,7 @@ export default defineComponent({
           startDate: "2024-08-24",
           finalDate: "2024-09-24"
         };
-        const response = await axios.post('http://localhost:8080/stopoint/find', requestData);
+        const response = await axios.post('http://localhost:8080/stoppoint/find', requestData);
         console.log(response.data)
         geoJsonData.value = {
           user: response.data.user,
