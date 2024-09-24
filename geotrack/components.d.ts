@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AvatarMarkers: typeof import('./src/components/Markers/AvatarMarkers.vue')['default']
     BottomNavegation: typeof import('./src/components/Menu/BottomNavegation.vue')['default']
     Buble: typeof import('./src/components/Markers/Buble.vue')['default']
     Filter: typeof import('./src/components/Filter.vue')['default']
