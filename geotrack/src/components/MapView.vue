@@ -1,7 +1,7 @@
 <template>
   <div id="map" class="map"></div>
 
-  <AvatarMarkers v-if="map" :avatars="avatars" :map="map" />
+  <AvatarMarkers v-if="map && geoJsonData" :avatars="avatars" :map="map" />
 </template>
 
 <script lang="ts">
@@ -12,13 +12,31 @@ import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls, Zoom } from 'ol/control';
+import axios from 'axios';
 import AvatarMarkers from './Markers/AvatarMarkers.vue';
 
+// Interface para Avatar e GeoJsonData
 interface Avatar {
   fullName: string;
   coords: [number, number];
   color: string;
   initials: string;
+}
+
+interface GeoJsonData {
+  user: string;
+  device: string;
+  geojson: {
+    type: string;
+    features: Array<{
+      type: string;
+      properties: Record<string, any>;
+      geometry: {
+        type: string;
+        coordinates: number[];
+      };
+    }>;
+  };
 }
 
 export default defineComponent({
@@ -28,13 +46,39 @@ export default defineComponent({
   },
   setup() {
     const map = ref<Map | null>(null);
-    const avatars = ref<Avatar[]>([
-      { initials: 'AK', fullName: 'Ali Khodr', color: 'primary', coords: [-45.88671, -23.21978] },
-      { initials: 'CJ', fullName: 'Carlos José', color: 'primary', coords: [-45.88000, -23.22000] },
-      { initials: 'LM', fullName: 'Leonardo Maicon', color: 'primary', coords: [-45.89000, -23.21800] },
-    ]);
+    const avatars = ref<Avatar[]>([]);
+    const geoJsonData = ref<GeoJsonData | null>(null);
+
+    // Função para buscar dados do backend
+    const fetchGeoJsonData = async () => {
+      try {
+        const requestData = {
+          user: 5432,
+          device: 9,
+          dataInicio: '2024-01-30T03:59:30.000Z',
+          dataFim: '2024-08-08T12:14:22.000Z',
+        };
+        const response = await axios.post('http://localhost:8080/stop-point', requestData);
+        geoJsonData.value = {
+          user: response.data.user,
+          device: response.data.device,
+          geojson: response.data.geoJsonDTO,
+        };
+
+        // Transformar dados do GeoJSON em avatares
+        avatars.value = geoJsonData.value.geojson.features.map((feature) => ({
+          initials: geoJsonData.value?.user.substring(0, 2).toUpperCase() || 'NA',
+          fullName: geoJsonData.value?.user || 'Unknown',
+          coords: feature.geometry.coordinates as [number, number],
+          color: 'primary',
+        }));
+      } catch (error) {
+        console.error('Error fetching points from the backend:', error);
+      }
+    };
 
     onMounted(() => {
+      fetchGeoJsonData();
       map.value = new Map({
         target: 'map',
         layers: [
@@ -50,7 +94,7 @@ export default defineComponent({
       });
     });
 
-    return { map, avatars };
+    return { map, avatars, geoJsonData, fetchGeoJsonData };
   },
 });
 </script>
