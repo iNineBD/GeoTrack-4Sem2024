@@ -53,12 +53,15 @@ export default defineComponent({
     const fetchGeoJsonData = async () => {
       try {
         const requestData = {
-          user: 5432,
-          device: 9,
-          dataInicio: '2024-01-30T03:59:30.000Z',
-          dataFim: '2024-08-08T12:14:22.000Z',
+          user: 0,
+          userName: "André",
+          device: 2,
+          userDevice: "string",
+          startDate: "2024-08-24",
+          finalDate: "2024-09-24"
         };
-        const response = await axios.post('http://localhost:8080/stop-point', requestData);
+        const response = await axios.post('http://localhost:8080/stopoint/find', requestData);
+        console.log(response.data)
         geoJsonData.value = {
           user: response.data.user,
           device: response.data.device,
