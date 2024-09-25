@@ -9,11 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AvatarMarkers: typeof import('./src/components/Markers/AvatarMarkers.vue')['default']
     BottomNavegation: typeof import('./src/components/Menu/BottomNavegation.vue')['default']
-    Buble: typeof import('./src/components/Markers/Buble.vue')['default']
     Filter: typeof import('./src/components/Filter.vue')['default']
-    InfoBubble: typeof import('./src/components/Markers/InfoBubble.vue')['default']
-    InfoBuble: typeof import('./src/components/Markers/InfoBuble.vue')['default']
-    MapMarkers: typeof import('./src/components/Markers/MapMarkers.vue')['default']
     MapView: typeof import('./src/components/MapView.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
