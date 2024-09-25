@@ -4,23 +4,40 @@ export default {
     today: new Date().toISOString().substr(0, 10),
     loading: false,
     date: null,
+    users: [],
   }),
+
+  mounted() {
+    this.fetchUsers();
+  },
+
+  methods: {
+    async fetchUsers() {
+      try {
+        const response = await fetch("http://localhost:8080/filters/users?page=0&qtdPage=1000");
+        const data = await response.json();
+        this.users = data.listUsers.map(user => user.name.toUpperCase());
+        console.log("Sucesso ao buscar usuários:", data);
+      } catch (error) {
+        console.log("Erro ao buscar usuários:", error);
+      }
+    },
+  },
 
   watch: {
     loading(val) {
-      if (!val) return
-
-      setTimeout(() => (this.loading = false), 2000)
+      if (!val) return;
+      setTimeout(() => (this.loading = false), 1000);
     },
   },
-}
+};
 </script>
 
 <template>
   <v-card class="mx-auto" width="100%" height="100vh" title="Filtrar" style="box-shadow: none; border-radius: 0;">
     <v-container>
-      <v-combobox label="Usuário" color="primary"
-        :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"></v-combobox>
+      <!-- Combobox preenchido com os dados dos usuários -->
+      <v-combobox label="Usuário" color="primary" :items="users"></v-combobox>
 
       <v-combobox label="Dispositivo" color="primary"
         :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"></v-combobox>
