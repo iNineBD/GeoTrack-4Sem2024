@@ -1,4 +1,6 @@
 <script>
+import { placeholder } from '@babel/types';
+
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
@@ -6,8 +8,11 @@ export default {
     date: null,
     users: [],
     selectedUserId: null,
+    selectedUserName: null,
     devices: [],
     selectedDevice: null,
+    locale: 'pt',
+    customDateFormat: 'dd/MM/yyyy',
   }),
 
   mounted() {
@@ -34,11 +39,40 @@ export default {
       try {
         const response = await fetch(`http://localhost:8080/filters/devices?idUser=${this.selectedUserId}&page=0`);
         const data = await response.json();
-        this.devices = data.listDevices.map(device => device.code);
+        this.devices = data.listDevices.map(device => ({
+          code: device.code,
+          idDevice: device.idDevice
+        }));
         console.log("Sucesso ao buscar dispositivos:", data);
       } catch (error) {
         console.log("Erro ao buscar dispositivos:", error);
       }
+    },
+
+    async handleConsult() {
+      if (!this.selectedUserId || !this.selectedDevice || !this.date) return;
+
+      const [startDate, finalDate] = this.date.map(date => date.toISOString().substr(0, 10));
+
+      const selectedUser = this.users.find(user => user.id === this.selectedUserId);
+
+      const selectedDevice = this.devices.find(device => device.idDevice === this.selectedDevice);
+
+      const requestData = {
+        user: this.selectedUserId,
+        userName: selectedUser.name,
+        device: this.selectedDevice.idDevice,
+        userDevice: this.selectedDevice.code,
+        startDate,
+        finalDate,
+      };
+
+      console.log("Dados da requisição:", requestData);
+
+      // this.$router.push({
+      //   name: 'MapView',
+      //   query: requestData
+      // });
     }
   },
 
@@ -60,18 +94,22 @@ export default {
   <v-card class="mx-auto" width="100%" height="100vh" title="Filtrar" style="box-shadow: none; border-radius: 0;">
     <v-container>
       <!-- Combobox de usuários -->
-      <v-combobox label="Usuário" color="primary" v-model="selectedUserId" :items="users" item-value="id" item-title="name" :return-object="false"></v-combobox>
+      <v-combobox label="Usuário" color="primary" v-model="selectedUserId" :items="users" item-value="id"
+        item-title="name" :return-object="false"></v-combobox>
 
       <!-- Combobox de dispositivos -->
-      <v-combobox label="Dispositivo" color="primary" v-model="selectedDevice" :items="devices"></v-combobox>
+      <v-combobox label="Dispositivo" color="primary" v-model="selectedDevice" :items="devices" item-value="idDevice"
+        item-title="code"></v-combobox>
 
       <!-- Seleção de data -->
-      <v-date-input v-model="date" label="Selecionar intervalo" multiple="range" color="primary" :max="today"></v-date-input>
+      <v-date-input v-model="date" label="Select range" multiple="range" color="primary" :max="today" :locale="locale"
+        :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
+
     </v-container>
 
     <v-card-actions>
       <v-btn :disabled="loading" :loading="loading" class="text-none mb-4" color="primary" size="large" variant="flat"
-        block rounded="lg" @click="loading = !loading">
+        block rounded="lg" @click="handleConsult">
         Consultar
       </v-btn>
     </v-card-actions>
