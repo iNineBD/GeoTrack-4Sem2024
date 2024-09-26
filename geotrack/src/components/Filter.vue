@@ -52,19 +52,20 @@ export default {
     async handleConsult() {
       if (!this.selectedUserId || !this.selectedDevice || !this.date) return;
 
-      const [startDate, finalDate] = this.date.map(date => date.toISOString().substr(0, 10));
-
       const selectedUser = this.users.find(user => user.id === this.selectedUserId);
 
       const selectedDevice = this.devices.find(device => device.idDevice === this.selectedDevice);
+
+      const startDate = new Date(this.date[0]).toLocaleDateString('en-CA'); 
+      const finalDate = new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA');
 
       const requestData = {
         user: this.selectedUserId,
         userName: selectedUser.name,
         device: this.selectedDevice.idDevice,
         userDevice: this.selectedDevice.code,
-        startDate,
-        finalDate,
+        startDate: this.startDate,
+        finalDate: this.finalDate,
       };
 
       console.log("Dados da requisição:", requestData);
