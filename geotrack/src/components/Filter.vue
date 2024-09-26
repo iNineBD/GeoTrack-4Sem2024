@@ -71,10 +71,10 @@ export default {
 
       console.log("Dados da requisição:", requestData);
 
-    //   this.$router.push({
-    //     name: 'Home',
-    //     query: requestData
-    //   });
+      this.$router.push({
+        name: 'Home',
+        query: requestData
+      });
     }
   },
 

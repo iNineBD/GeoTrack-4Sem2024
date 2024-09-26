@@ -1,20 +1,20 @@
 <template>
   <div id="map" class="map"></div>
-  <!-- Componente AvatarMarkers -->
   <AvatarMarkers :avatars="avatars" />
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import axios from 'axios';
 import 'ol/ol.css';
 import { Map, View, Overlay } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
-import {fromLonLat } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls, Zoom } from 'ol/control';
 import AvatarMarkers from '../components/Markers/AvatarMarkers.vue';
 import { boundingExtent } from 'ol/extent';
+import { useRoute } from 'vue-router';
 
 // Definindo o tipo para o Avatar
 interface Avatar {
@@ -43,19 +43,22 @@ export default {
   name: 'MapView',
   components: { AvatarMarkers }, // Importando AvatarMarkers
   setup() {
-    const avatars = ref<Avatar[]>([]); // Definindo o tipo do array de avatares
+    const route = useRoute();
+    const avatars = ref<Avatar[]>([]);
 
     // Função para buscar dados GeoJSON da API
     const fetchGeoJsonData = async () => {
       try {
         const requestData = {
-          user: 0,
-          userName: "André",
-          device: 2,
-          userDevice: "string",
-          startDate: "2024-08-24",
-          finalDate: "2024-09-24"
+          user: route.query.user,
+          userName: route.query.userName,
+          device: route.query.device,
+          userDevice: route.query.userDevice,
+          startDate: route.query.startDate,
+          finalDate: route.query.finalDate,
         };
+
+        console.log("requestData MapView: ", requestData)
 
         const response = await axios.post('http://localhost:8080/stoppoint/find', requestData);
         const geoJsonData: GeoJsonResponse = {
@@ -81,55 +84,61 @@ export default {
       }
     };
 
-    onMounted(() => {
-  // Inicializa o mapa
-  const map = new Map({
-    target: 'map',
-    layers: [
-      new TileLayer({
-        source: new OSM(),
-      }),
-    ],
-    view: new View({
-      center: fromLonLat([-45.88671, -23.21978]), // Centro do mapa (Brasil)
-      zoom: 3, // Zoom inicial padrão
-      extent: [
-        -20026376.39,  // Limite Oeste (longitude mínima)
-        -20048966.10,  // Limite Sul (latitude mínima)
-        20026376.39,   // Limite Leste (longitude máxima)
-        20048966.10,   // Limite Norte (latitude máxima)
-      ], // Limite para a projeção EPSG:3857 (usada pelo OSM)
-    }),
-    controls: defaultControls().extend([new Zoom()]),
-  });
-
-  // Função para ajustar o zoom e a área visível
-const adjustMapToFitAvatars = () => {
-  const coordinates = avatars.value.map(avatar => fromLonLat(avatar.coords));
-  // Cria uma extensão que abrange todas as coordenadas
-  const extent = boundingExtent(coordinates);
-  // Ajusta a visualização do mapa para essa extensão
-  map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 15 });
-};
-
-  // Busca os dados e preenche os avatares
-  fetchGeoJsonData().then(() => {
-    avatars.value.forEach((avatar, index) => {
-      const avatarMarker = new Overlay({
-        element: document.getElementById('avatar-' + index)!,
-        position: fromLonLat(avatar.coords),
-        positioning: 'center-center',
-      });
-
-      map.addOverlay(avatarMarker);
+    watch(() => route.query, () => {
+      if (route.query.user && route.query.device && route.query.startDate && route.query.finalDate) {
+        fetchGeoJsonData();
+      }
     });
 
-    // Após adicionar todos os avatares, ajusta o zoom para que todos fiquem visíveis
-    if (avatars.value.length > 0) {
-      adjustMapToFitAvatars();
-    }
-  });
-});
+    onMounted(() => {
+      // Inicializa o mapa
+      const map = new Map({
+        target: 'map',
+        layers: [
+          new TileLayer({
+            source: new OSM(),
+          }),
+        ],
+        view: new View({
+          center: fromLonLat([-45.88671, -23.21978]), // Centro do mapa (Brasil)
+          zoom: 3, // Zoom inicial padrão
+          extent: [
+            -20026376.39,  // Limite Oeste (longitude mínima)
+            -20048966.10,  // Limite Sul (latitude mínima)
+            20026376.39,   // Limite Leste (longitude máxima)
+            20048966.10,   // Limite Norte (latitude máxima)
+          ], // Limite para a projeção EPSG:3857 (usada pelo OSM)
+        }),
+        controls: defaultControls().extend([new Zoom()]),
+      });
+
+      // Função para ajustar o zoom e a área visível
+      const adjustMapToFitAvatars = () => {
+        const coordinates = avatars.value.map(avatar => fromLonLat(avatar.coords));
+        // Cria uma extensão que abrange todas as coordenadas
+        const extent = boundingExtent(coordinates);
+        // Ajusta a visualização do mapa para essa extensão
+        map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 15 });
+      };
+
+      // Busca os dados e preenche os avatares
+      fetchGeoJsonData().then(() => {
+        avatars.value.forEach((avatar, index) => {
+          const avatarMarker = new Overlay({
+            element: document.getElementById('avatar-' + index)!,
+            position: fromLonLat(avatar.coords),
+            positioning: 'center-center',
+          });
+
+          map.addOverlay(avatarMarker);
+        });
+
+        // Após adicionar todos os avatares, ajusta o zoom para que todos fiquem visíveis
+        if (avatars.value.length > 0) {
+          adjustMapToFitAvatars();
+        }
+      });
+    });
 
     return { avatars };
   },
