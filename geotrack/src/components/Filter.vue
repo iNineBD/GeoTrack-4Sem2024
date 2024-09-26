@@ -56,24 +56,25 @@ export default {
 
       const selectedDevice = this.devices.find(device => device.idDevice === this.selectedDevice);
 
-      const startDate = new Date(this.date[0]).toLocaleDateString('en-CA'); 
-      const finalDate = new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA');
+      const startDate = new Date(this.date[0]).toLocaleDateString('en-CA').toString(); 
+      const finalDate = new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA').toString();
+      console.log(startDate, finalDate);
 
       const requestData = {
         user: this.selectedUserId,
         userName: selectedUser.name,
         device: this.selectedDevice.idDevice,
         userDevice: this.selectedDevice.code,
-        startDate: this.startDate,
-        finalDate: this.finalDate,
+        startDate: startDate,
+        finalDate: finalDate,
       };
 
       console.log("Dados da requisição:", requestData);
 
-      // this.$router.push({
-      //   name: 'MapView',
-      //   query: requestData
-      // });
+    //   this.$router.push({
+    //     name: 'Home',
+    //     query: requestData
+    //   });
     }
   },
 
