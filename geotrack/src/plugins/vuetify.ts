@@ -3,6 +3,7 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as labsComponents from 'vuetify/labs/components'
+import { pt } from 'vuetify/locale' // Importando locale para português
 
 export default createVuetify({
   theme: {
@@ -20,4 +21,8 @@ export default createVuetify({
     ...components,
     ...labsComponents,
   },
+  locale: {
+    locale: 'pt', // Definindo o locale para português
+    messages: { pt }, // Usando as mensagens de locale
+  },
 })
