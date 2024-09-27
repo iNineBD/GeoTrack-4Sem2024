@@ -53,12 +53,9 @@ export default {
       if (!this.selectedUserId || !this.selectedDevice || !this.date) return;
 
       const selectedUser = this.users.find(user => user.id === this.selectedUserId);
-
       const selectedDevice = this.devices.find(device => device.idDevice === this.selectedDevice);
-
-      const startDate = new Date(this.date[0]).toLocaleDateString('en-CA').toString(); 
+      const startDate = new Date(this.date[0]).toLocaleDateString('en-CA').toString();
       const finalDate = new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA').toString();
-      console.log(startDate, finalDate);
 
       const requestData = {
         user: this.selectedUserId,
@@ -69,13 +66,13 @@ export default {
         finalDate: finalDate,
       };
 
-      console.log("Dados da requisição:", requestData);
+      console.log("Dados da requisição enviados:", requestData);
 
       this.$router.push({
         name: 'Home',
         query: requestData
       });
-    }
+    },
   },
 
   watch: {
@@ -87,7 +84,7 @@ export default {
     loading(val) {
       if (!val) return;
       setTimeout(() => (this.loading = false), 1000);
-    }
+    },
   },
 };
 </script>
@@ -104,9 +101,8 @@ export default {
         item-title="code"></v-combobox>
 
       <!-- Seleção de data -->
-      <v-date-input v-model="date" label="Select range" multiple="range" color="primary" :max="today" :locale="locale"
+      <v-date-input v-model="date" label="Selecionar período" multiple="range" color="primary" :max="today" :locale="locale"
         :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
-
     </v-container>
 
     <v-card-actions>
