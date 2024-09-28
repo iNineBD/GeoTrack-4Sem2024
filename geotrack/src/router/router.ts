@@ -16,11 +16,6 @@ const routes = [
       filter: Filter,
     },
   },
-  {
-    path: '/map-view',
-    name: 'MapView',
-    component: () => import('../components/MapView.vue'),
-  },
 ];
 
 const router = createRouter({

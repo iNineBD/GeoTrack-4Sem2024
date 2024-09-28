@@ -1,10 +1,11 @@
 <script>
-import { placeholder } from '@babel/types';
+import { ref, onMounted } from 'vue';
 
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
     loading: false,
+    disabledTexts: false,
     date: null,
     users: [],
     selectedUserId: null,
@@ -13,13 +14,26 @@ export default {
     selectedDevice: null,
     locale: 'pt',
     customDateFormat: 'dd/MM/yyyy',
+    isMobile: false, // Adicionando a verificação se é mobile
   }),
 
   mounted() {
     this.fetchUsers();
+    this.checkMobile(); // Verifica se é mobile ao montar
+    window.addEventListener('resize', this.checkMobile); // Adiciona o listener de resize
+  },
+
+  computed: {
+    ButtonDisabled() {
+      return !this.selectedUserId || !this.selectedDevice || !this.date;
+    },
   },
 
   methods: {
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 900; // Define o limite para dispositivos móveis
+    },
+
     async fetchUsers() {
       try {
         const response = await fetch("http://localhost:8080/filters/users?page=0&qtdPage=1000");
@@ -66,19 +80,35 @@ export default {
         finalDate: finalDate,
       };
 
+      this.disabledTexts = true;
       console.log("Dados da requisição enviados:", requestData);
 
-      this.$router.push({
-        name: 'Home',
-        query: requestData
-      });
+      // Redireciona apenas se for mobile
+      if (this.isMobile) {
+        this.$router.push({
+          name: 'Home',
+          query: requestData
+        });
+      } else {
+        this.$router.push({
+          query: requestData
+        });
+      }
     },
+
+    clearFields() {
+      this.selectedUserId = null;
+      this.selectedDevice = null;
+      this.date = null;
+      this.devices = [];
+      this.disabledTexts = false;
+    }
   },
 
   watch: {
     selectedUserId() {
       this.devices = [];
-      this.selectedDevice = null
+      this.selectedDevice = null;
       this.fetchDevices();
     },
     loading(val) {
@@ -93,11 +123,11 @@ export default {
   <v-card class="mx-auto" width="100%" height="100vh" title="Filtrar" style="box-shadow: none; border-radius: 0;">
     <v-container>
       <!-- Combobox de usuários -->
-      <v-combobox label="Usuário" color="primary" v-model="selectedUserId" :items="users" item-value="id"
+      <v-combobox :disabled="disabledTexts" label="Usuário" color="primary" v-model="selectedUserId" :items="users" item-value="id"
         item-title="name" :return-object="false"></v-combobox>
 
       <!-- Combobox de dispositivos -->
-      <v-combobox label="Dispositivo" color="primary" v-model="selectedDevice" :items="devices" item-value="idDevice"
+      <v-combobox :disabled="disabledTexts" label="Dispositivo" color="primary" v-model="selectedDevice" :items="devices" item-value="idDevice"
         item-title="code"></v-combobox>
 
       <!-- Seleção de data -->
@@ -106,9 +136,15 @@ export default {
     </v-container>
 
     <v-card-actions>
-      <v-btn :disabled="loading" :loading="loading" class="text-none mb-4" color="primary" size="large" variant="flat"
+      <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none mb-4" color="primary" size="large" variant="flat"
         block rounded="lg" @click="handleConsult">
         Consultar
+      </v-btn>
+    </v-card-actions>
+    <v-card-actions>
+      <v-btn :disabled="loading" :loading="loading" class="text-none mb-4" color="primary_light" size="large" variant="flat"
+        block rounded="lg" @click="clearFields">
+        Limpar
       </v-btn>
     </v-card-actions>
   </v-card>
