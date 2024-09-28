@@ -1,6 +1,6 @@
 <template>
-  <v-card>
-    <v-layout>
+  <v-card >
+    <v-layout style="height: 100%;">
       <!-- Sidebar para desktop -->
       <v-navigation-drawer
         v-if="!isMobile"
