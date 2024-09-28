@@ -8,7 +8,8 @@
             <v-col :md="$route.name != 'Filter' ? 0 : 3" v-if="!isMobile || $route.name === 'Filter'">
               <router-view name="filter"></router-view>
             </v-col>
-            <v-col :md="$route.name != 'Filter' ? 12 : 9" v-if="!isMobile || $route.name !== 'Filter'">
+            <v-col :md="(isMobile && $route.name === 'Filter') ? 12 : (!isMobile && $route.name !== 'Filter' ? 12 : 9)"
+                   :style="{ display: (isMobile && $route.name === 'Filter') ? 'none' : 'block' }">
               <MapView />
             </v-col>
           </v-row>
@@ -35,7 +36,7 @@ export default {
     const isMobile = ref(false);
 
     const checkMobile = () => {
-      isMobile.value = window.innerWidth <1000; // Define o limite para dispositivos móveis
+      isMobile.value = window.innerWidth <= 900; // Define o limite para dispositivos móveis
     };
 
     onMounted(() => {
