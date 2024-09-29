@@ -48,68 +48,7 @@
         
 ## ◻️ Product Backlog
 
-<table>
-    <tr>
-        <th>Sprints</th>
-        <th>Priority</th>
-        <th>User Stories</th>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>1</td>
-        <td>As a customer, I want to interact with the map using drag and zoom functions so that I can easily navigate the area of interest and get a detailed view of the data plotted on the map.</td>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>2</td>
-        <td>As a customer, I want to filter the results by person using a dropdown list so that I can obtain their respective devices.</td>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>2</td>
-        <td>As a customer, I want to filter the results by time range using a calendar so that I can retrieve results that occur only within the selected time range.</td>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>3</td>
-        <td>As a customer, I want to see location points on the map represented by pins that show stops along collected routes so that I can clearly visualize the geolocations.</td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>1</td>
-        <td>As a customer, I want to perform quick searches using tags with specific terms like "Today", "Last 3 days", "This week", and "Last month" so that I can quickly find relevant results.</td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>3</td>
-        <td>As a customer, I want to create, view, and delete geographic sections using geometric shapes so that I can customize and define specific regions for geolocation searches and filters, making it easier to analyze and manage areas of interest.</td>
-    </tr>
-    <tr>
-        <td>3</td>
-        <td>2</td>
-        <td>As a customer, I want to view detailed reports in a pop-up regarding the information plotted on the map so that I can get the necessary details for my analysis needs.</td>
-    </tr>
-    <tr>
-        <td>3</td>
-        <td>3</td>
-        <td>As a customer, I want to access the system via login and password, with a secure authentication mechanism that includes credential validation to ensure that only authorized users access the application.</td>
-    </tr>
-    <tr>
-        <td>4</td>
-        <td>1</td>
-        <td>As a customer, I want the system to plot the routes of people or objects on the map based on the selected filters so that I can clearly and intuitively view movements.</td>
-    </tr>
-    <tr>
-        <td>4</td>
-        <td>3</td>
-        <td>As a customer, I want to perform searches by specific geographic sections (previously registered) so that I can view the IoT devices present in a given area.</td>
-    </tr>
-    <tr>
-        <td>1, 2, 3, 4</td>
-        <td>1</td>
-        <td>As a customer, I want a robust, scalable, and highly available solution for geolocation data storage and querying so that large volumes of IoT data are processed and accessed quickly and reliably.</td>
-    </tr>
-</table>
+In development
 
 <div align="left"><hr width=70%></div>
 
