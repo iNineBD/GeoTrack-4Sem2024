@@ -57,16 +57,25 @@ export default {
 
     const clearAvatarOverlays = () => {
       avatarOverlays.forEach((overlay) => {
-        if (map.value) {
-          map.value.removeOverlay(overlay);
-        }
-        const element = overlay.getElement();
-        if (element && element.parentNode) {
-          element.parentNode.removeChild(element);
-        }
+      if (map.value) {
+        map.value.removeOverlay(overlay);
+      }
+      const element = overlay.getElement();
+      if (element && element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
       });
+
       avatarOverlays = [];
       console.log("Overlays de avatares removidos.");
+      if (map.value) {
+      const view = map.value.getView();
+      view.animate({
+        center: fromLonLat([-45.88671, -23.21978]),
+        zoom: 3,
+        duration: 1000,
+      });
+      }
     };
 
     // Função para buscar dados GeoJSON da API
