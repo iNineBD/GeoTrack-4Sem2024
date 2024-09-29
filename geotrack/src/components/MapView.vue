@@ -8,17 +8,17 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import axios from 'axios';
-import 'ol/ol.css';
-import { Map, View, Overlay } from 'ol';
-import TileLayer from 'ol/layer/Tile';
-import OSM from 'ol/source/OSM';
-import { fromLonLat } from 'ol/proj';
-import { defaults as defaultControls, Zoom } from 'ol/control';
-import AvatarMarkers from '../components/Markers/AvatarMarkers.vue';
-import { boundingExtent } from 'ol/extent';
-import { useRoute } from 'vue-router';
+import { onMounted, ref, watch } from "vue";
+import axios from "axios";
+import "ol/ol.css";
+import { Map, View, Overlay } from "ol";
+import TileLayer from "ol/layer/Tile";
+import OSM from "ol/source/OSM";
+import { fromLonLat } from "ol/proj";
+import { defaults as defaultControls, Zoom } from "ol/control";
+import AvatarMarkers from "../components/Markers/AvatarMarkers.vue";
+import { boundingExtent } from "ol/extent";
+import { useRoute } from "vue-router";
 
 // Definindo o tipo para o Avatar
 interface Avatar {
@@ -44,7 +44,7 @@ interface GeoJsonResponse {
 }
 
 export default {
-  name: 'MapView',
+  name: "MapView",
   components: { AvatarMarkers }, // Importando AvatarMarkers
   setup() {
     const route = useRoute();
@@ -52,6 +52,31 @@ export default {
     const errorMessage = ref<string | null>(null);
     const map = ref<Map | null>(null);
     let notificationTimeout: ReturnType<typeof setTimeout>;
+
+    let avatarOverlays: Overlay[] = [];
+
+    const clearAvatarOverlays = () => {
+      avatarOverlays.forEach((overlay) => {
+      if (map.value) {
+        map.value.removeOverlay(overlay);
+      }
+      const element = overlay.getElement();
+      if (element && element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
+      });
+
+      avatarOverlays = [];
+      console.log("Overlays de avatares removidos.");
+      if (map.value) {
+      const view = map.value.getView();
+      view.animate({
+        center: fromLonLat([-45.88671, -23.21978]),
+        zoom: 3,
+        duration: 1000,
+      });
+      }
+    };
 
     // Função para buscar dados GeoJSON da API
     const fetchGeoJsonData = async () => {
@@ -66,11 +91,14 @@ export default {
           finalDate: route.query.finalDate,
         };
 
-        console.log("Dados da requisição recebidos: ", requestData)
+        console.log("Dados da requisição recebidos: ", requestData);
 
-        const response = await axios.post('http://localhost:8080/stoppoint/find', requestData);
+        const response = await axios.post(
+          "http://localhost:8080/stoppoint/find",
+          requestData
+        );
 
-        console.log("Resposta da API: ", response.data)
+        console.log("Resposta da API: ", response.data);
 
         if (response.status === 200) {
           const geoJsonData: GeoJsonResponse = {
@@ -82,26 +110,31 @@ export default {
           // Preenche os avatares com base nos dados GeoJSON retornados
           avatars.value = geoJsonData.geojson.features.map((feature) => {
             const coords = feature.geometry.coordinates;
-            const initials = geoJsonData.user.substring(0, 2).toUpperCase() || 'NA';
-            const fullName = geoJsonData.user || 'Unknown';
+            const initials =
+              geoJsonData.user.substring(0, 2).toUpperCase() || "NA";
+            const fullName = geoJsonData.user || "Unknown";
 
-            console.log(`Usuário: ${fullName}, Coordenadas: [${coords[1]}, ${coords[0]}]`);
+            console.log(
+              `Usuário: ${fullName}, Coordenadas: [${coords[1]}, ${coords[0]}]`
+            );
 
             return {
               initials,
               fullName,
-              color: 'primary',
+              color: "primary",
               coords,
             };
           });
 
+          // Limpa os avatares existentes antes de adicionar novos
+          clearAvatarOverlays();
+
           // Adiciona os avatares ao mapa
           avatars.value.forEach((avatar, index) => {
-
             // Criar um novo elemento para o avatar
-            const avatarElement = document.createElement('div');
-            avatarElement.id = 'avatar-' + index;
-            avatarElement.className = 'avatar-marker';
+            const avatarElement = document.createElement("div");
+            avatarElement.id = "avatar-" + index;
+            avatarElement.className = "avatar-marker";
             avatarElement.innerText = avatar.initials;
 
             avatarElement.title = `Nome: ${avatar.fullName}\nLatitude: ${avatar.coords[1]}\nLongitude: ${avatar.coords[0]}`;
@@ -113,12 +146,14 @@ export default {
             const avatarMarker = new Overlay({
               element: avatarElement,
               position: fromLonLat(avatar.coords),
-              positioning: 'center-center',
+              positioning: "center-center",
             });
 
             if (map.value) {
               map.value.addOverlay(avatarMarker);
             }
+
+            avatarOverlays.push(avatarMarker);
           });
 
           // Ajusta o zoom para que todos os avatares fiquem visíveis
@@ -128,10 +163,11 @@ export default {
         }
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
-          errorMessage.value = "Esse usuário não tem pontos de parada no período selecionado.";
+          errorMessage.value =
+            "Esse usuário não tem pontos de parada no período selecionado.";
           startNotificationTimeout();
         } else {
-          console.error('Erro ao buscar os dados GeoJSON:', error);
+          console.error("Erro ao buscar os dados GeoJSON:", error);
         }
       }
     };
@@ -154,25 +190,37 @@ export default {
 
     // Função para ajustar o zoom e a área visível
     const adjustMapToFitAvatars = () => {
-      const coordinates = avatars.value.map(avatar => fromLonLat(avatar.coords));
+      const coordinates = avatars.value.map((avatar) =>
+        fromLonLat(avatar.coords)
+      );
       // Cria uma extensão que abrange todas as coordenadas
       const extent = boundingExtent(coordinates);
       // Ajusta a visualização do mapa para essa extensão
       if (map.value) {
-        map.value.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 15 });
+        map.value
+          .getView()
+          .fit(extent, { padding: [50, 50, 50, 50], maxZoom: 15 });
       }
     };
 
-    watch(() => route.query, () => {
-      if (route.query.user && route.query.device && route.query.startDate && route.query.finalDate) {
-        fetchGeoJsonData();
+    watch(
+      () => route.query,
+      () => {
+        if (
+          route.query.user &&
+          route.query.device &&
+          route.query.startDate &&
+          route.query.finalDate
+        ) {
+          fetchGeoJsonData();
+        }
       }
-    });
+    );
 
     onMounted(() => {
       // Inicializa o mapa
       map.value = new Map({
-        target: 'map',
+        target: "map",
         layers: [
           new TileLayer({
             source: new OSM(),
@@ -181,12 +229,13 @@ export default {
         view: new View({
           center: fromLonLat([-45.88671, -23.21978]), // Centro do mapa (Brasil)
           zoom: 3, // Zoom inicial padrão
-          extent: [-20026376.39, -20048966.10, 20026376.39, 20048966.10], // [Limite Oeste, Sul, Leste, Norte] Limite para a projeção EPSG:3857 (usada pelo OSM)
+          extent: [-20026376.39, -20048966.1, 20026376.39, 20048966.1], // [Limite Oeste, Sul, Leste, Norte] Limite para a projeção EPSG:3857 (usada pelo OSM)
         }),
         controls: defaultControls().extend([new Zoom()]),
       });
     });
 
+    window.addEventListener("clearOverlays", clearAvatarOverlays);
     // Método para ser chamado ao clicar no botão do filtro
     const onFilterApply = () => {
       fetchGeoJsonData();

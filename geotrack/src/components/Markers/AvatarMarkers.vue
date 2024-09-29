@@ -2,7 +2,7 @@
   <div v-for="(avatar, index) in avatars" :key="index" :id="'avatar-' + index">
     <v-tooltip :open-on-hover="true" :text="`${avatar.fullName} (${avatar.coords})`">
       <template v-slot:activator="{ props }">
-        <v-avatar v-bind="props" :color="avatar.color" style="width: 25px; height: 25px;">
+        <v-avatar v-bind="props" :color="avatar.color" style="width: 25px; height: 25px;display: none;">
           <span class="text-subtitle-2">{{ avatar.initials }}</span>
         </v-avatar>
       </template>

@@ -102,6 +102,8 @@ export default {
       this.date = null;
       this.devices = [];
       this.disabledTexts = false;
+
+      window.dispatchEvent(new Event('clearOverlays'));
     }
   },
 
@@ -117,6 +119,7 @@ export default {
     },
   },
 };
+
 </script>
 
 <template>
