@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import MapView from '../components/MapView.vue';
-import Filter from '../components/Filter.vue';
+import MapView from '../pages/MapView.vue';
 
 const routes = [
   {
@@ -11,10 +10,7 @@ const routes = [
   {
     path: '/filter',
     name: 'Filter',
-    components: {
-      default: MapView,
-      filter: Filter,
-    },
+    component: MapView,
   },
 ];
 

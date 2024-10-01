@@ -82,18 +82,7 @@ export default {
 
       this.disabledTexts = true;
       console.log("Dados da requisição enviados:", requestData);
-
-      // Redireciona apenas se for mobile
-      if (this.isMobile) {
-        this.$router.push({
-          name: 'Home',
-          query: requestData
-        });
-      } else {
-        this.$router.push({
-          query: requestData
-        });
-      }
+      this.$emit('consult', requestData);
     },
 
     clearFields() {
@@ -102,8 +91,6 @@ export default {
       this.date = null;
       this.devices = [];
       this.disabledTexts = false;
-
-      window.dispatchEvent(new Event('clearOverlays'));
     }
   },
 
@@ -119,7 +106,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <template>
