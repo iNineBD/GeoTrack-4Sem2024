@@ -1,0 +1,33 @@
+{
+  "name": "MyApp-GeoTrack",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fawmi/vue-google-maps": "^0.9.79",
+    "@mdi/font": "7.4.47",
+    "axios": "^1.7.7",
+    "MyApp-GeoTrack": "file:",
+    "ol": "^10.2.0",
+    "roboto-fontface": "*",
+    "vue": "^3.4.31",
+    "vue-router": "^4.4.5",
+    "vuetify": "^3.6.11"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.24.7",
+    "@types/google.maps": "^3.58.1",
+    "@types/node": "^20.14.10",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "sass": "1.77.6",
+    "typescript": "^5.4.2",
+    "unplugin-fonts": "^1.1.1",
+    "unplugin-vue-components": "^0.27.2",
+    "vite": "^5.3.3",
+    "vite-plugin-vuetify": "^2.0.3",
+    "vue-tsc": "^2.0.26"
+  }
+}
