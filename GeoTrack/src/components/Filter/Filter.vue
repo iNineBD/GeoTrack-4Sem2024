@@ -86,11 +86,7 @@ export default {
     },
 
     clearFields() {
-      this.selectedUserId = null;
-      this.selectedDevice = null;
-      this.date = null;
-      this.devices = [];
-      this.disabledTexts = false;
+      window.location.reload();
     }
   },
 
@@ -112,30 +108,35 @@ export default {
   <v-card class="mx-auto" width="100%" height="100vh" title="Filtrar" style="box-shadow: none; border-radius: 0;">
     <v-container>
       <!-- Combobox de usuários -->
-      <v-combobox :disabled="disabledTexts" label="Usuário" color="primary" v-model="selectedUserId" :items="users" item-value="id"
-        item-title="name" :return-object="false"></v-combobox>
+      <v-combobox :disabled="disabledTexts" label="Usuário" color="primary" v-model="selectedUserId" :items="users"
+        item-value="id" item-title="name" :return-object="false"></v-combobox>
 
       <!-- Combobox de dispositivos -->
-      <v-combobox :disabled="disabledTexts" label="Dispositivo" color="primary" v-model="selectedDevice" :items="devices" item-value="idDevice"
-        item-title="code"></v-combobox>
+      <v-combobox :disabled="disabledTexts" label="Dispositivo" color="primary" v-model="selectedDevice"
+        :items="devices" item-value="idDevice" item-title="code"></v-combobox>
 
       <!-- Seleção de data -->
-      <v-date-input v-model="date" label="Selecionar período" multiple="range" color="primary" :max="today" :locale="locale"
-        :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
+      <v-date-input v-model="date" label="Selecionar período" multiple="range" color="primary" :max="today"
+        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
     </v-container>
 
-    <v-card-actions>
-      <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none mb-4" color="primary" size="large" variant="flat"
-        block rounded="lg" @click="handleConsult">
-        Consultar
-      </v-btn>
+    <v-card-actions class="d-flex justify-space-between">
+      <v-row class="d-flex" no-gutters>
+        <v-col cols="8">
+          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary"
+            size="large" variant="flat" block rounded="lg" @click="handleConsult">
+            Consultar
+          </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
+            variant="flat" block rounded="lg" @click="clearFields">
+            Limpar
+          </v-btn>
+        </v-col>
+      </v-row>
     </v-card-actions>
-    <v-card-actions>
-      <v-btn :disabled="loading" :loading="loading" class="text-none mb-4" color="primary_light" size="large" variant="flat"
-        block rounded="lg" @click="clearFields">
-        Limpar
-      </v-btn>
-    </v-card-actions>
+
   </v-card>
 </template>
 

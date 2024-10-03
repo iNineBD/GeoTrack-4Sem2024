@@ -21,17 +21,23 @@ declare namespace google.maps {
   export interface MarkerOptions {
     position: LatLng | LatLngLiteral;
     map: Map | null;
+    label?: string | MarkerLabel; // Agora `label` pode ser uma string ou um objeto detalhado
     title?: string;
+    animation?: google.maps.Animation;
     draggable?: boolean;
     icon?: string | Icon | Symbol; // Adiciona a propriedade `icon`
   }
 
-  export interface Icon {
+  export interface MarkerLabel {
+    text: string;         // O texto da label (as iniciais, por exemplo)
+    color?: string;       // Cor da fonte
+    fontWeight?: string;  // Peso da fonte (ex.: 'bold')
+    fontSize?: string;    // Tamanho da fonte (ex.: '16px')
+  }
+
+  export interface MarkerIcon {
     url: string;
-    size?: Size;
-    scaledSize?: Size;
-    origin?: Point;
-    anchor?: Point;
+    scaledSize?: google.maps.Size; // Adiciona a propriedade scaledSize com o tipo google.maps.Size
   }
 
   export interface Size {
@@ -54,6 +60,7 @@ declare namespace google.maps {
     FORWARD_OPEN_ARROW = 2,
     BACKWARD_CLOSED_ARROW = 3,
     BACKWARD_OPEN_ARROW = 4,
+    PIN = 10,
   }
 
   export interface LatLng {
