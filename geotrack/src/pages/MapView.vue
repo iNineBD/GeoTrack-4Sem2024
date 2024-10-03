@@ -56,10 +56,10 @@ export default {
             },
             (error) => {
               // Se a localização não for aceita, inicie o mapa com a localização padrão
-              const defaultLocation = { lat: 2.8266, lng: -60.6623 };
+              const defaultLocation = { lat: -14.2350, lng: -51.9253 };
               map.value = new google.maps.Map(mapDiv.value!, {
                 center: defaultLocation,
-                zoom: 10,
+                zoom: 3,
                 minZoom: 4,  // Limite inferior de zoom
               });
               // Não chama addMarker se a geolocalização falhar
