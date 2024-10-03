@@ -105,22 +105,6 @@ export default {
       }
     };
 
-    const createCustomMarkerIcon = (userName: string) => {
-      const initials = userName
-        .split(' ')
-        .slice(0, 2)
-        .map((name) => name[0])
-        .join('');
-
-      const svgMarker = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 50 50">
-          <circle cx="15" cy="15" r="15" fill="#000B62" />
-          <text x="15" y="15" text-anchor="middle" fill="white" font-size="12px" font-family="Arial" dy=".3em">${initials}</text>
-        </svg>`;
-
-      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgMarker)}`;
-    };
-
     const fetchGeoJsonData = async (filterData: FilterData) => {
       try {
         const requestData = { ...filterData };
@@ -139,18 +123,31 @@ export default {
             if (coords && coords.length >= 2) {
               const position = { lat: coords[1], lng: coords[0] };
 
-              const customIcon = createCustomMarkerIcon(filterData.userName);
+              const initials = filterData.userName
+                .split(' ')
+                .slice(0, 2)
+                .map((name) => name[0])
+                .join('');
 
               const marker = new google.maps.Marker({
                 position,
                 map: map.value,
+                label: {
+                  text: initials,
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                },
                 icon: {
-                  url: customIcon,
-                  scaledSize: { width: 50, height: 50 },
+                  path: google.maps.SymbolPath.CIRCLE,
+                  scale: 15, // Tamanho do círculo
+                  fillColor: '#000B62', // Azul
+                  fillOpacity: 1,
+                  strokeWeight: 2,
+                  strokeColor: '#ffffff', // Cor da borda
                 },
                 title: `Usuário: ${filterData.user}, Dispositivo: ${filterData.device}, Coordenadas: ${position.lat}, ${position.lng}`,
               });
-
               const infoWindow = new google.maps.InfoWindow({
                 content: `<div>
                             <strong>Usuário:</strong> ${filterData.userName}<br>
