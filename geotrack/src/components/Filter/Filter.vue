@@ -14,7 +14,8 @@ export default {
     selectedDevice: null,
     locale: 'pt',
     customDateFormat: 'dd/MM/yyyy',
-    isMobile: false, // Adicionando a verificação se é mobile
+    isMobile: false,
+    open: ['geoAreas'],
   }),
 
   mounted() {
@@ -87,7 +88,11 @@ export default {
 
     clearFields() {
       window.location.reload();
-    }
+    },
+
+    selectArea(areaType) {
+      console.log('Tipo de área selecionado:', areaType);
+    },
   },
 
   watch: {
@@ -115,29 +120,73 @@ export default {
       <v-combobox :disabled="disabledTexts" label="Dispositivo" color="primary" v-model="selectedDevice"
         :items="devices" item-value="idDevice" item-title="code"></v-combobox>
 
+      <!-- Card das áreas geográficas -->
+      <v-card-actions class="d-flex justify-space-between">
+        <v-row class="d-flex align-center no-gutters">
+          <v-col cols="100%" style="padding: 0px;">
+            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary"></v-combobox>
+          </v-col>
+
+          <v-col cols="auto" style="padding: 0px 0px 20px 10px;">
+            <div class="icon-container">
+              <v-btn icon @click="selectArea('circle')" class="no-shadow rounded">
+                <v-icon>mdi-circle-outline</v-icon>
+                <v-icon class="plus-icon">mdi-plus</v-icon>
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+
       <!-- Seleção de data -->
       <v-date-input v-model="date" label="Selecionar período" multiple="range" color="primary" :max="today"
         :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
     </v-container>
 
+    <!-- Botões Consultar e Limpar -->
     <v-card-actions class="d-flex justify-space-between">
-      <v-row class="d-flex" no-gutters>
-        <v-col cols="8">
-          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary"
-            size="large" variant="flat" block rounded="lg" @click="handleConsult">
+      <v-row class="d-flex align-center no-gutters">
+        <v-col cols="9" class="pr-2"> <!-- Adicionando padding à direita -->
+          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary" size="small"
+            variant="flat" block rounded="lg" @click="handleConsult" style="height: 36px;">
             Consultar
           </v-btn>
         </v-col>
-        <v-col cols="4">
-          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="lg" @click="clearFields">
+        <v-col cols="3">
+          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="small"
+            variant="flat" block rounded="lg" @click="clearFields" style="height: 36px;">
             Limpar
           </v-btn>
         </v-col>
       </v-row>
     </v-card-actions>
-
   </v-card>
 </template>
 
-<style scoped></style>
+<style scoped>
+.icon-container {
+  position: relative;
+}
+
+.plus-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: black;
+}
+
+.title-text {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.no-shadow {
+  box-shadow: none !important;
+}
+
+.rounded {
+  border-radius: 0 !important;
+}
+</style>

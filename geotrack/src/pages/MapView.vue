@@ -4,7 +4,7 @@
       <v-col v-if="$route.name === 'Filter'" cols="4">
         <Filter @consult="fetchGeoJsonData" />
       </v-col>
-      <v-col :cols="$route.name === 'Filter' ? 8 : 12">
+      <v-col :cols="$route.name === 'Filter' ? 8 : 12" style="padding-left: 0px;">
         <div ref="mapDiv" style="height: 100vh; width: 100%;"></div>
       </v-col>
     </v-row>
