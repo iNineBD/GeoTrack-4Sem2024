@@ -8,10 +8,11 @@
         <div ref="mapDiv" style="height: 100vh; width: 100%;"></div>
       </v-col>
     </v-row>
-      <!--Adicionado-->
-      <v-snackbar v-model="snackbarVisible" :timeout="10000" top right>
+      <!--Adicionado | confirmar o tempo em que a mensagem deverá ser exibida na tela para o usuário-->
+      <v-snackbar v-model="snackbarVisible" :timeout="10000" top right: class="snackbarColor"> <!--se for para a mensagem ficar para 
+        q o usuário feche, colocar timeout = 0-->
         {{ snackbarMessage }}
-        <v-btn color="red" text @click="snackbarVisible = false"> Fechar </v-btn>
+        <v-btn color="blue" _text: (true) @click="snackbarVisible = false"> Fechar </v-btn>
     </v-snackbar>
   </v-container>
 </template>
@@ -44,6 +45,17 @@ export default {
     //adicionado
     const snackbarVisible = ref(false);
     const snackbarMessage = ref('');
+    const snackbarColor = ref('');
+
+    const showSnackbar = (message: string, type: string) => {
+      snackbarMessage.value = message;
+      snackbarVisible.value = true;
+      if (type === 'warn') {
+        snackbarColor.value = 'warning-snackbar';  // alerta em amarelo
+      } else if (type === 'error') {
+        snackbarColor.value = 'error-snackbar';  // erro em vermelho
+      }
+    };
 
     onMounted(() => {
       if (mapDiv.value) {
@@ -175,6 +187,7 @@ export default {
           });
         } else { 
           console.warn('Nenhum dado GeoJSON disponível.');// inserir o snackbars para exibir o erro
+          showSnackbar('Nenhum dado GeoJSON disponível.','warn')//;
         }
       } catch (error) {
         console.error('Erro ao buscar os dados GeoJSON:', error);//inserir o snackbars para exibir o erro
@@ -183,9 +196,22 @@ export default {
       }
     };
 
-    return { map, mapDiv, fetchGeoJsonData, snackbarVisible, snackbarMessage };
+    return { map, mapDiv, fetchGeoJsonData, snackbarVisible, snackbarMessage, showSnackbar,snackbarColor };
   },
 };
 </script>
 
-<style scoped></style>
+<!--verificar-->
+<style scoped>
+/* Amarelo para avisos */
+.warning-snackbar {
+  background-color: yellow;
+  color: black;  /* Texto preto para contraste */
+}
+
+/* Vermelho para erros */
+.error-snackbar {
+  background-color: red;
+  color: white;  /* Texto branco para contraste */
+}
+</style>
