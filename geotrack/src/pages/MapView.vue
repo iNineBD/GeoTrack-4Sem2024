@@ -8,6 +8,11 @@
         <div ref="mapDiv" style="height: 100vh; width: 100%;"></div>
       </v-col>
     </v-row>
+      <!--Adicionado-->
+      <v-snackbar v-model="snackbarVisible" :timeout="6000" top right>
+        {{ snackbarMessage }}
+        <v-btn color="red" text @click="snackbarVisible = false"> Fechar </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -35,6 +40,10 @@ export default {
   setup() {
     const map = ref<google.maps.Map | null>(null);
     const mapDiv = ref<HTMLElement | null>(null);
+
+    //adicionado
+    const snackbarVisible = ref(false);
+    const snackbarMessage = ref('');
 
     onMounted(() => {
       if (mapDiv.value) {
@@ -164,15 +173,17 @@ export default {
               centerMapOnMarker(position);
             }
           });
-        } else {
-          console.warn('Nenhum dado GeoJSON disponível.');
+        } else { 
+          console.warn('Nenhum dado GeoJSON disponível.');// inserir o snackbars para exibir o erro
         }
       } catch (error) {
-        console.error('Erro ao buscar os dados GeoJSON:', error);
+        console.error('Erro ao buscar os dados GeoJSON:', error);//inserir o snackbars para exibir o erro
+        snackbarMessage.value = 'Erro ao buscar os dados GeoJSON.';
+        snackbarVisible.value = true;
       }
     };
 
-    return { map, mapDiv, fetchGeoJsonData };
+    return { map, mapDiv, fetchGeoJsonData, snackbarVisible, snackbarMessage };
   },
 };
 </script>
