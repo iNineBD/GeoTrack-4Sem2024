@@ -2,7 +2,7 @@
   <v-container fluid style="padding: 0;">
     <v-row>
       <v-col v-if="$route.name === 'Filter'" cols="4">
-        <Filter @consult="fetchGeoJsonData" />
+        <Filter @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing" />
       </v-col>
       <v-col :cols="$route.name === 'Filter' ? 8 : 12" style="padding-left: 0px;">
         <div ref="mapDiv" style="height: 100vh; width: 100%;"></div>
@@ -35,6 +35,7 @@ export default {
   setup() {
     const map = ref<google.maps.Map | null>(null);
     const mapDiv = ref<HTMLElement | null>(null);
+    const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
 
     onMounted(() => {
       if (mapDiv.value) {
@@ -53,6 +54,7 @@ export default {
               });
 
               addCurrentLocationMarker(userLocation);
+              initializeDrawingManager();
             },
             (error) => {
               // Se a localização não for aceita, inicie o mapa com a localização padrão
@@ -77,6 +79,41 @@ export default {
       }
     });
 
+    const initializeDrawingManager = () => {
+      let circleInstance: google.maps.Circle | null = null;
+
+      drawingManager.value = new google.maps.drawing.DrawingManager({
+        drawingMode: google.maps.drawing.OverlayType.CIRCLE,
+        drawingControl: false,
+        circleOptions: {
+          fillColor: '#4285F4',
+          fillOpacity: 0.4,
+          strokeWeight: 2,
+          strokeColor: '#f0f0f0',
+          clickable: true,
+        },
+      });
+
+      google.maps.event.addListener(drawingManager.value, 'circlecomplete', (circle: google.maps.Circle) => {
+        if (circleInstance) {
+          circleInstance.setMap(null);
+        }
+
+        const center = circle.getCenter().toJSON(); // {lat, lng}
+        const radius = circle.getRadius(); // em metros
+
+        console.log('Centro: ', center);
+        console.log('Raio: ', radius);
+
+        circleInstance = circle;
+
+        if (drawingManager.value) {
+          drawingManager.value.setDrawingMode(null);
+          drawingManager.value.setMap(null);
+        }
+      });
+    };
+
     const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
       if (map.value) {
         new google.maps.Marker({
@@ -99,6 +136,12 @@ export default {
       if (map.value) {
         map.value.panTo(position);
         map.value.setZoom(15);
+      }
+    };
+
+    const enableCircleDrawing = () => {
+      if (drawingManager.value && map.value) {
+        drawingManager.value.setMap(map.value);
       }
     };
 
@@ -172,7 +215,7 @@ export default {
       }
     };
 
-    return { map, mapDiv, fetchGeoJsonData };
+    return { map, mapDiv, fetchGeoJsonData, enableCircleDrawing };
   },
 };
 </script>

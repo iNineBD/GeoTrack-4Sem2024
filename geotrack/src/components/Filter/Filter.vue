@@ -31,6 +31,11 @@ export default {
   },
 
   methods: {
+
+    drawCircle() {
+      this.$emit('drawCircle'); // Emite o evento para habilitar o desenho do círculo
+    },
+    
     checkMobile() {
       this.isMobile = window.innerWidth <= 900; // Define o limite para dispositivos móveis
     },
@@ -129,7 +134,7 @@ export default {
 
           <v-col cols="auto" style="padding: 0px 0px 20px 10px;">
             <div class="icon-container">
-              <v-btn icon @click="selectArea('circle')" class="no-shadow rounded">
+              <v-btn icon @click="drawCircle" class="no-shadow rounded">
                 <v-icon>mdi-circle-outline</v-icon>
                 <v-icon class="plus-icon">mdi-plus</v-icon>
               </v-btn>
