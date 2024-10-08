@@ -9,7 +9,7 @@
       </v-col>
     </v-row>
       <!--Adicionado-->
-      <v-snackbar v-model="snackbarVisible" :timeout="6000" top right>
+      <v-snackbar v-model="snackbarVisible" :timeout="10000" top right>
         {{ snackbarMessage }}
         <v-btn color="red" text @click="snackbarVisible = false"> Fechar </v-btn>
     </v-snackbar>
