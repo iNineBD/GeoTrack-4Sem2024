@@ -9,10 +9,10 @@
       </v-col>
     </v-row>
       <!--Adicionado | confirmar o tempo em que a mensagem deverá ser exibida na tela para o usuário-->
-      <v-snackbar v-model="snackbarVisible" :timeout="10000" top right: class="snackbarColor"> <!--se for para a mensagem ficar para 
+      <v-snackbar v-model="snackbarVisible" :timeout="5000" top right: class="snackbarColor"> <!--se for para a mensagem ficar para 
         q o usuário feche, colocar timeout = 0-->
         {{ snackbarMessage }}
-        <v-btn color="blue" _text: (true) @click="snackbarVisible = false"> Fechar </v-btn>
+        <v-btn color="blue" @click="snackbarVisible = false"> Fechar </v-btn>
     </v-snackbar>
   </v-container>
 </template>
@@ -126,7 +126,7 @@ export default {
     const fetchGeoJsonData = async (filterData: FilterData) => {
       try {
         const requestData = { ...filterData };
-        console.log('dados recebidos:', requestData);
+        console.log('dados ENVIADOS:', requestData);
 
         const response = await axios.post('http://localhost:8080/stoppoint/find', requestData);
         console.log('response.data:', response.data);
@@ -186,13 +186,11 @@ export default {
             }
           });
         } else { 
-          console.warn('Nenhum dado GeoJSON disponível.');// inserir o snackbars para exibir o erro
-          showSnackbar('Nenhum dado GeoJSON disponível.','warn')//;
+          showSnackbar('Nenhum dado GeoJSON disponível','warn');
+          console.log(geoJsonDTO)
         }
       } catch (error) {
-        console.error('Erro ao buscar os dados GeoJSON:', error);//inserir o snackbars para exibir o erro
-        snackbarMessage.value = 'Erro ao buscar os dados GeoJSON.';
-        snackbarVisible.value = true;
+        showSnackbar('Erro ao buscar os dados GeoJSON: ' + error, 'error');//inserir o snackbars para exibir o erro
       }
     };
 
