@@ -31,28 +31,40 @@ export default {
     onMounted(() => {
       if (mapDiv.value) {
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            const userLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
 
-            map.value = new google.maps.Map(mapDiv.value!, {
-              center: userLocation,
-              zoom: 12,
-              minZoom: 4,
-            });
+              map.value = new google.maps.Map(mapDiv.value!, {
+                center: userLocation,
+                zoom: 12,
+                minZoom: 4,  // Limite inferior de zoom
+              });
 
-            addCurrentLocationMarker(userLocation);
-          });
+              addCurrentLocationMarker(userLocation);
+            },
+            (error) => {
+              // Se a localização não for aceita, inicie o mapa com a localização padrão
+              const defaultLocation = { lat: -14.2350, lng: -51.9253 };
+              map.value = new google.maps.Map(mapDiv.value!, {
+                center: defaultLocation,
+                zoom: 3,
+                minZoom: 4,  // Limite inferior de zoom
+              });
+              // Não chama addMarker se a geolocalização falhar
+            }
+          );
         } else {
           const defaultLocation = { lat: 2.8266, lng: -60.6623 };
           map.value = new google.maps.Map(mapDiv.value!, {
             center: defaultLocation,
-            zoom: 12,
-            minZoom: 4,
+            zoom: 10,
+            minZoom: 4,  // Limite inferior de zoom
           });
-          addMarker(defaultLocation);
+          // Não chama addMarker se geolocalização não estiver disponível
         }
       }
     });
