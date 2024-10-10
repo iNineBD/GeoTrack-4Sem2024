@@ -63,12 +63,8 @@ const toggleDial = () => {
   dial.value = !dial.value;
 };
 
-// const goToHome = () => {
-//   router.push("/");
-// };
-
 const goToFilter = () => {
-  router.push("/filter");
+  router.push("/");
   toggleDial();
 };
 </script>
@@ -76,8 +72,8 @@ const goToFilter = () => {
 <style scoped>
 .floating-panel {
   position: fixed;
-  top: 100px;
-  left: 20px;
+  top: 10px;
+  left: 10px;
   z-index: 1000;
   display: flex;
   align-items: flex-start;
@@ -86,20 +82,13 @@ const goToFilter = () => {
 
 .panel-container {
   display: flex;
-  width: 100%;
-}
-
-.expansion-panel {
-  width: 500px;
-  max-width: 90vw;
-  background-color: white;
+  width: 430px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
   overflow: hidden;
 }
 
 .panel-header {
-  height: 40px;
+  height: 16px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -123,13 +112,5 @@ const goToFilter = () => {
   font-size: 16px;
   font-weight: bold;
   padding: 0 16px;
-}
-
-.v-expansion-panel--active .panel-header,
-.v-expansion-panel:not(.v-expansion-panel--active) .panel-header {
-  height: 40px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
 }
 </style>

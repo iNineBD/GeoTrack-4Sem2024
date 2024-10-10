@@ -1,10 +1,6 @@
 <template>
-  <v-container fluid style="padding: 0">
-    <v-row style="height: 100vh">
-      <Sidebar @consult="fetchGeoJsonData" />
-      <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
-    </v-row>
-  </v-container>
+  <Sidebar @consult="fetchGeoJsonData" />
+  <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 </template>
 
 <script lang="ts">
