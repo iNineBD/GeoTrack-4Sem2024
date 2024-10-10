@@ -1,79 +1,135 @@
 <template>
-  <v-card >
-    <v-layout style="height: 100%;">
-      <!-- Sidebar para desktop -->
-      <v-navigation-drawer
-        v-if="!isMobile"
-        v-model="drawer"
-        :rail="rail"
-        permanent
-        @click="rail = false"
-      >
-        <v-list-item nav>
-          <v-img
-            :src="rail ? logoPin : logo"
-            height="32"
-            style="margin: 6px;"
-          />
-          <template v-slot:append>
-            <v-btn
-              v-if="!rail"
-              icon="mdi-chevron-left"
-              variant="text"
-              @click.stop="rail = !rail"
-            ></v-btn>
+  <div class="floating-panel">
+    <div class="panel-container">
+      <v-expansion-panels v-model="panel">
+        <v-expansion-panel>
+          <template v-slot:title>
+            <div class="panel-header">
+              <v-img :src="logo" height="32" class="icon" />
+            </div>
           </template>
-        </v-list-item>
+          <v-expansion-panel-text>
+            <div class="filter-container" v-show="showFilter">
+              <Filter @consult="props.onConsult" />
+            </div>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </div>
 
-        <!-- Divider -->
-        <v-divider></v-divider>
+    <div class="speed-dial-container">
+      <v-speed-dial
+        v-model="dial"
+        location="bottom center"
+        transition="scale-transition"
+        class="speed-dial"
+      >
+        <template v-slot:activator="{ props: activatorProps }">
+          <v-btn v-bind="activatorProps" icon="mdi-menu" large></v-btn>
+        </template>
 
-        <!-- Navigation List -->
-        <v-list density="compact" nav>
-          <v-list-item prepend-icon="mdi-home" title="Home" to="/" :color="drawer ? 'primary' : ''" @click.stop="rail = !rail"></v-list-item>
-          <v-list-item prepend-icon="mdi-filter" title="Filtrar" to="/filter" :color="drawer ? 'primary' : ''" @click.stop="rail = !rail"></v-list-item>
-        </v-list>
-      </v-navigation-drawer>
-
-      <!-- Bottom Navigation para dispositivos móveis -->
-      <v-bottom-navigation v-if="isMobile" grow>
-        <v-btn value="home" to="/">
-          <v-icon>mdi-home</v-icon>
-          <span>Home</span>
-        </v-btn>
-        <v-btn value="filter" to="/filter">
-          <v-icon>mdi-filter</v-icon>
-          <span>Filtrar</span>
-        </v-btn>
-      </v-bottom-navigation>
-
-      <v-main style="height: 250px"></v-main>
-    </v-layout>
-  </v-card>
+        <v-btn
+          key="map-marker"
+          @click="goToFilter"
+          icon="mdi-map-marker"
+        ></v-btn>
+      </v-speed-dial>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed, ref } from "vue";
+import Filter from "../Filter/Filter.vue";
+import { FilterData } from "@/pages/MapView.vue";
+import { useRoute, useRouter } from "vue-router";
 
-const isMobile = ref(false);
+const props = defineProps<{
+  onConsult: (data: FilterData) => void;
+}>();
 
-const checkMobile = () => {
-  isMobile.value = window.innerWidth < 600; // Define o limite para dispositivos móveis
+const logo = "/src/assets/Logo.svg";
+const panel = ref([]);
+const dial = ref(false);
+
+const route = useRoute();
+const router = useRouter();
+
+const showFilter = computed(
+  () => route.path === "/" || route.path === "/filter"
+);
+
+const toggleDial = () => {
+  dial.value = !dial.value;
 };
 
-onMounted(() => {
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-});
+// const goToHome = () => {
+//   router.push("/");
+// };
 
-const logo = '/src/assets/Logo.svg';
-const logoPin = '/src/assets/LogoPin.svg';
-const drawer = ref(true);
-const rail = ref(true);
+const goToFilter = () => {
+  router.push("/filter");
+  toggleDial();
+};
 </script>
 
 <style scoped>
-.v-navigation-drawer {
-  height: 100vh;
+.floating-panel {
+  position: fixed;
+  top: 100px;
+  left: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  max-width: calc(100% - 40px);
+}
+
+.panel-container {
+  display: flex;
+  width: 100%;
+}
+
+.expansion-panel {
+  width: 500px;
+  max-width: 90vw;
+  background-color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.panel-header {
+  height: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-container {
+  padding: 10px;
+  width: 100%;
+}
+
+.speed-dial-container {
+  margin-left: 16px;
+}
+
+.icon {
+  cursor: pointer;
+}
+
+.v-expansion-panel-header {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0 16px;
+}
+
+.v-expansion-panel--active .panel-header,
+.v-expansion-panel:not(.v-expansion-panel--active) .panel-header {
+  height: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 </style>
