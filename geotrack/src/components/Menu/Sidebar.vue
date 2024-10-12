@@ -1,40 +1,33 @@
 <template>
   <div class="floating-panel">
-    <div class="panel-container">
-      <v-expansion-panels v-model="panel">
+    <v-container width="400px" class="panel-container" style="padding: 0px;">
+      <v-expansion-panels v-model="panel" rounded="xl" elevation="4">
         <v-expansion-panel>
           <template v-slot:title>
-            <div class="panel-header">
-              <v-img :src="logo" height="32" class="icon" />
-            </div>
+            <v-row class="panel-header" justify="center" align="center">
+              <v-img :src="logo" height="30" class="icon" />
+            </v-row>
           </template>
-          <v-expansion-panel-text>
-            <div class="filter-container" v-show="showFilter">
-              <Filter @consult="props.onConsult" />
-            </div>
+          <v-expansion-panel-text style="padding: 0px;">
+
+            <v-container width="400px" class="filter-container" v-show="showFilter" style="padding: 0px;">
+              <v-divider :thickness="2"/>
+              <Filter @consult="handleFilterData" />
+            </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
-    </div>
+    </v-container>
 
-    <div class="speed-dial-container">
-      <v-speed-dial
-        v-model="dial"
-        location="bottom center"
-        transition="scale-transition"
-        class="speed-dial"
-      >
-        <template v-slot:activator="{ props: activatorProps }">
-          <v-btn v-bind="activatorProps" icon="mdi-menu" large></v-btn>
-        </template>
 
-        <v-btn
-          key="map-marker"
-          @click="goToFilter"
-          icon="mdi-map-marker"
-        ></v-btn>
-      </v-speed-dial>
-    </div>
+    <v-speed-dial v-model="dial" location="bottom center" transition="scale-transition" class="speed-dial">
+      <template v-slot:activator="{ props: activatorProps }">
+        <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
+      </template>
+
+      <v-btn key="map-marker" @click="goToFilter" icon="mdi-map-marker" ></v-btn>
+    </v-speed-dial>
+
   </div>
 </template>
 
@@ -47,6 +40,10 @@ import { useRoute, useRouter } from "vue-router";
 const props = defineProps<{
   onConsult: (data: FilterData) => void;
 }>();
+
+const handleFilterData = (data: FilterData) => {
+  props.onConsult(data);
+};
 
 const logo = "/src/assets/Logo.svg";
 const panel = ref([]);
@@ -78,39 +75,6 @@ const goToFilter = () => {
   display: flex;
   align-items: flex-start;
   max-width: calc(100% - 40px);
-}
-
-.panel-container {
-  display: flex;
-  width: 430px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.panel-header {
-  height: 16px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.filter-container {
-  padding: 10px;
-  width: 100%;
-}
-
-.speed-dial-container {
-  margin-left: 16px;
-}
-
-.icon {
-  cursor: pointer;
-}
-
-.v-expansion-panel-header {
-  font-size: 16px;
-  font-weight: bold;
-  padding: 0 16px;
+  gap: 10px;
 }
 </style>

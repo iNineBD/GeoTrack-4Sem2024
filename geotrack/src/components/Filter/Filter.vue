@@ -1,25 +1,69 @@
-<script>
-import { ref, onMounted } from 'vue';
+<template>
+  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px;">
+    <v-col style="padding: 20px 20px 0 20px;">
+      <!-- Users combobox -->
+      <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
+        prepend-icon="mdi-filter-variant" chips clearable multiple>
+        <!-- Slot para customizar a exibição dos chips -->
+        <template v-slot:selection="{ attrs, item, select, selected }">
+          <v-chip v-bind="attrs" :model-value="selected" closable @click="select" @click:close="remove(item)">
+            <strong>{{ item.name }}</strong>&nbsp;<span>({{ item.deviceName }})</span>
+            <!-- Exibe o nome do dispositivo -->
+          </v-chip>
+        </template>
+      </v-combobox>
 
+      <!-- Date selection -->
+      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
+        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
+
+      <!-- Quick date filters using chips -->
+      <v-col style="padding: 0px; display: flex;">
+        <v-chip style="margin: 0px 2px !important;" size="small" v-for="(filter, index) in quickFilters"
+          :key="filter.label" @click="setQuickFilter(filter.range, index)"
+          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
+          filter class="ma-2" variant="flat">
+          {{ filter.label }}
+        </v-chip>
+      </v-col>
+    </v-col>
+
+    <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px;">
+      <v-row class="d-flex" no-gutters>
+        <v-col cols="8">
+          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary" size="large"
+            variant="flat" block rounded="lg" @click="handleConsult">
+            Consultar
+          </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
+            variant="flat" block rounded="lg" @click="clearFields">
+            Limpar
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card-actions>
+
+  </v-card>
+</template>
+
+<script>
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
     loading: false,
-    disabledTexts: false,
     date: null,
-    users: [],
-    selectedUserId: null,
-    selectedUserName: null,
+    users: [], // Lista de usuários
+    selectedUsers: [], // Armazena múltiplos usuários selecionados
     devices: [],
-    selectedDevice: null,
     locale: 'pt',
     customDateFormat: 'dd/MM/yyyy',
-    isMobile: false, // Adding the check if it's mobile
     quickFilters: [
-      { label: "Hoje", range: [new Date(), new Date()] }, // "Today"
-      { label: "Últimos 3 dias", range: [new Date(Date.now() - 3 * 864e5), new Date()] }, // "Last 3 days"
-      { label: "Última semana", range: [new Date(Date.now() - 7 * 864e5), new Date()] }, // "Last week"
-      { label: "Último mês", range: [new Date(Date.now() - 30 * 864e5), new Date()] } // "Last month"
+      { label: "Hoje", range: [new Date(), new Date()] },
+      { label: "Últimos 3 dias", range: [new Date(Date.now() - 3 * 864e5), new Date()] },
+      { label: "Última semana", range: [new Date(Date.now() - 7 * 864e5), new Date()] },
+      { label: "Último mês", range: [new Date(Date.now() - 30 * 864e5), new Date()] }
     ],
     selectedQuickFilter: null,
     dateInputDisabled: false,
@@ -27,70 +71,47 @@ export default {
 
   mounted() {
     this.fetchUsers();
-    this.checkMobile(); // Check if it's mobile when mounted
-    window.addEventListener('resize', this.checkMobile); // Add the resize listener
   },
 
   computed: {
     ButtonDisabled() {
-      return !this.selectedUserId || !this.selectedDevice || !this.date;
+      return this.selectedUsers.length === 0 || !this.date;
     },
   },
 
   methods: {
-    checkMobile() {
-      this.isMobile = window.innerWidth <= 900; // Set the limit for mobile devices
-    },
-
     async fetchUsers() {
       try {
         const response = await fetch("http://localhost:8080/filters/users?page=0&qtdPage=1000");
         const data = await response.json();
+
+        // Mapeando a resposta da API para o formato correto
         this.users = data.listUsers.map(user => ({
-          id: user.id,
-          name: user.name.toUpperCase()
+          name: user.userName.toUpperCase(), // Nome do usuário
+          deviceId: user.idDevice, // ID do dispositivo associado
         }));
-        console.log("Successfully fetched users:", data);
+
+        console.log("Successfully fetched users:", this.users);
       } catch (error) {
         console.log("Error fetching users:", error);
       }
     },
 
-    async fetchDevices() {
-      if (!this.selectedUserId) return;
-      try {
-        const response = await fetch(`http://localhost:8080/filters/devices?idUser=${this.selectedUserId}&page=0`);
-        const data = await response.json();
-        this.devices = data.listDevices.map(device => ({
-          code: device.code,
-          idDevice: device.idDevice
-        }));
-        console.log("Successfully fetched devices:", data);
-      } catch (error) {
-        console.log("Error fetching devices:", error);
-      }
-    },
-
     async handleConsult() {
-      if (!this.selectedUserId || !this.selectedDevice || !this.date) return;
+      if (this.selectedUsers.length === 0 || !this.date) return;
 
-      const selectedUser = this.users.find(user => user.id === this.selectedUserId);
-      const selectedDevice = this.devices.find(device => device.idDevice === this.selectedDevice);
-      const startDate = new Date(this.date[0]).toLocaleDateString('en-CA').toString();
-      const finalDate = new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA').toString();
+      // Extraindo os IDs dos dispositivos dos usuários selecionados
+      const deviceIds = this.selectedUsers.map(user => user.deviceId);
 
+      // Preparando os dados da requisição com todos os devices como um array e as datas uma única vez
       const requestData = {
-        user: this.selectedUserId,
-        userName: selectedUser.name,
-        device: this.selectedDevice.idDevice,
-        userDevice: this.selectedDevice.code,
-        startDate: startDate,
-        finalDate: finalDate,
+        devices: deviceIds,  // Array de IDs dos dispositivos
+        startDate: new Date(this.date[0]).toLocaleDateString('en-CA'),  // Data de início
+        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA')  // Data de fim
       };
 
-      this.disabledTexts = true;
-      console.log("Request data sent:", requestData);
-      this.$emit('consult', requestData);
+      console.log("Dados enviados:", requestData);
+      this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
     },
 
     clearFields() {
@@ -98,24 +119,28 @@ export default {
     },
 
     setQuickFilter(range, index) {
-      // Toggle button selection
       if (this.selectedQuickFilter === index) {
-        this.selectedQuickFilter = null; // Unselect if the same button is clicked again
-        this.date = null; // Clear date when unselecting
-        this.dateInputDisabled = false; 
+        this.selectedQuickFilter = null;
+        this.date = null;
+        this.dateInputDisabled = false;
       } else {
-        this.selectedQuickFilter = index; // Mark the clicked button
-        this.date = range.map(date => date.toISOString().substr(0, 10)); // Set the new date
+        this.selectedQuickFilter = index;
+        this.date = range.map(date => date.toISOString().substr(0, 10));
         this.dateInputDisabled = true;
       }
+    },
+
+    remove(item) {
+      this.selectedUsers = this.selectedUsers.filter(user => user.id !== item.id);
     }
   },
 
   watch: {
-    selectedUserId() {
-      this.devices = [];
-      this.selectedDevice = null;
-      this.fetchDevices();
+    selectedUsers(newValue) {
+      if (newValue.length > 5) {
+        this.selectedUsers = newValue.slice(0, 5); // Mantém apenas os 3 primeiros usuários
+      }
+      console.log(this.selectedUsers)
     },
     loading(val) {
       if (!val) return;
@@ -124,54 +149,5 @@ export default {
   },
 };
 </script>
-
-<template>
-  <v-card class="mx-auto" width="100%" height="100vh" title="Filtrar" style="box-shadow: none; border-radius: 0;">
-    <v-container>
-      <!-- Users combobox -->
-      <v-combobox :disabled="disabledTexts" label="User" color="primary" v-model="selectedUserId" :items="users"
-        item-value="id" item-title="name" :return-object="false"></v-combobox>
-
-      <!-- Devices combobox -->
-      <v-combobox :disabled="disabledTexts" label="Device" color="primary" v-model="selectedDevice"
-        :items="devices" item-value="idDevice" item-title="code"></v-combobox>
-
-      <!-- Quick date filters -->
-      <div class="d-flex mb-2" >
-        <v-btn
-          v-for="(filter, index) in quickFilters"
-          :key="filter.label"
-          @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
-          style="font-size: 10px; padding: 2px 4px; height: 30px; margin: 8px;"
-        >
-          {{ filter.label }}
-        </v-btn>
-      </div>
-
-      <!-- Date selection -->
-      <v-date-input v-model="date" label="Select period" multiple="range" color="primary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :disabled="dateInputDisabled"></v-date-input>
-    </v-container>
-
-    <v-card-actions class="d-flex justify-space-between">
-      <v-row class="d-flex" no-gutters>
-        <v-col cols="8">
-          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary" size="large"
-            variant="flat" block rounded="lg" @click="handleConsult">
-            Consult
-          </v-btn>
-        </v-col>
-        <v-col cols="4">
-          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="lg" @click="clearFields">
-            Clear
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card-actions>
-
-  </v-card>
-</template>
 
 <style scoped></style>

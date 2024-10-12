@@ -14,10 +14,7 @@ interface GeoJsonFeature {
 }
 
 export interface FilterData {
-  user: string;
-  userName: string;
-  device: string;
-  userDevice: string;
+  idDevice: number[];
   startDate: string;
   finalDate: string;
 }
@@ -69,18 +66,6 @@ export default {
       }
     });
 
-    const addMarker = (position: google.maps.LatLngLiteral) => {
-      if (map.value) {
-        new google.maps.Marker({
-          position,
-          map: map.value,
-          title: "Localização",
-        });
-
-        centerMapOnMarker(position);
-      }
-    };
-
     const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
       if (map.value) {
         new google.maps.Marker({
@@ -107,74 +92,75 @@ export default {
     };
 
     const fetchGeoJsonData = async (filterData: FilterData) => {
+      console.log("Filter data recebido:", filterData)
       try {
-        const requestData = { ...filterData };
+        const requestData = { ...filterData }; // Formato dos dados que você espera no backend
+
         console.log("dados recebidos:", requestData);
 
-        const response = await axios.post(
-          "http://localhost:8080/stoppoint/find",
-          requestData
-        );
-        console.log("response.data:", response.data);
+        const response = await axios.post("http://localhost:8080/stoppoint/find", requestData);
 
-        const geoJsonDTO = response.data.geoJsonDTO || {};
-        console.log("geoJsonDTO:", geoJsonDTO);
+        // Resposta esperada: uma matriz de objetos
+        const geoJsonResponses = response.data;
+        console.log("geoJsonResponses:", geoJsonResponses);
 
-        if (geoJsonDTO.features && geoJsonDTO.features.length > 0) {
-          geoJsonDTO.features.forEach((feature: GeoJsonFeature) => {
-            const coords = feature.geometry.coordinates;
-            console.log("Coordenadas:", coords);
-            if (coords && coords.length >= 2) {
-              const position = { lat: coords[1], lng: coords[0] };
+        geoJsonResponses.forEach((item: any) => {
+          const { user, device, geoJsonDTO } = item;
 
-              const initials = filterData.userName
-                .split(" ")
-                .slice(0, 2)
-                .map((name) => name[0])
-                .join("");
+          if (geoJsonDTO.features && geoJsonDTO.features.length > 0) {
+            geoJsonDTO.features.forEach((feature: GeoJsonFeature) => {
+              const coords = feature.geometry.coordinates;
+              if (coords && coords.length >= 2) {
+                const position = { lat: coords[1], lng: coords[0] }; // Coordenadas: lat e lng
 
-              const marker = new google.maps.Marker({
-                position,
-                map: map.value,
-                label: {
-                  text: initials,
-                  color: "white",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                },
-                icon: {
-                  path: google.maps.SymbolPath.CIRCLE,
-                  scale: 15,
-                  fillColor: "#000B62",
-                  fillOpacity: 1,
-                  strokeWeight: 2,
-                  strokeColor: "#ffffff",
-                },
-                title: `Usuário: ${filterData.user}, Dispositivo: ${filterData.device}, Coordenadas: ${position.lat}, ${position.lng}`,
-              });
+                // Gera as iniciais do usuário
+                const initials = user.split(" ")
+                  .slice(0, 2)
+                  .map((name: string) => name[0])
+                  .join("");
 
-              const infoWindow = new google.maps.InfoWindow({
-                content: `<div>
-                            <strong>Usuário:</strong> ${filterData.userName}<br>
-                            <strong>Dispositivo:</strong> ${filterData.userDevice}<br>
-                            <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
-                           </div>`,
-              });
+                const marker = new google.maps.Marker({
+                  position,
+                  map: map.value,
+                  label: {
+                    text: initials,
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: "14px",
+                  },
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 15,
+                    fillColor: "#000B62",
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: "#ffffff",
+                  },
+                });
 
-              google.maps.event.addListener(marker, "click", () => {
-                infoWindow.open(map.value!, marker);
-              });
+                const infoWindow = new google.maps.InfoWindow({
+                  content: `<div>
+                          <strong>Usuário:</strong> ${user}<br>
+                          <strong>Dispositivo:</strong> ${device}<br>
+                          <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
+                         </div>`,
+                });
 
-              google.maps.event.addListener(map.value, "click", () => {
-                infoWindow.close();
-              });
+                google.maps.event.addListener(marker, "click", () => {
+                  infoWindow.open(map.value!, marker);
+                });
 
-              centerMapOnMarker(position);
-            }
-          });
-        } else {
-          console.warn("Nenhum dado GeoJSON disponível.");
-        }
+                google.maps.event.addListener(map.value, "click", () => {
+                  infoWindow.close();
+                });
+
+                centerMapOnMarker(position);
+              }
+            });
+          } else {
+            console.warn("Nenhum dado GeoJSON disponível para o usuário:", user);
+          }
+        });
       } catch (error) {
         console.error("Erro ao buscar os dados GeoJSON:", error);
       }
