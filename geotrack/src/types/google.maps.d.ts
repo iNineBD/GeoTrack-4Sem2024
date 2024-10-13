@@ -21,11 +21,11 @@ declare namespace google.maps {
   export interface MarkerOptions {
     position: LatLng | LatLngLiteral;
     map: Map | null;
-    label?: string | MarkerLabel; // Agora `label` pode ser uma string ou um objeto detalhado
+    label?: string | MarkerLabel; // Agora label pode ser uma string ou um objeto detalhado
     title?: string;
     animation?: google.maps.Animation;
     draggable?: boolean;
-    icon?: string | Icon | Symbol; // Adiciona a propriedade `icon`
+    icon?: string | Icon | Symbol; // Adiciona a propriedade icon
   }
 
   export interface MarkerLabel {
@@ -96,4 +96,56 @@ declare namespace google.maps {
   }
 
   // Adicione mais interfaces e classes conforme necessário
+}
+
+declare namespace google.maps.drawing {
+  interface DrawingManagerOptions {
+    drawingMode?: google.maps.OverlayType;
+    drawingControl?: boolean;
+    drawingControlOptions?: DrawingControlOptions;
+    circleOptions?: google.maps.CircleOptions;
+    rectangleOptions?: google.maps.RectangleOptions;
+    polygonOptions?: google.maps.PolygonOptions;
+    polylineOptions?: google.maps.PolylineOptions;
+    markerOptions?: google.maps.MarkerOptions;
+  }
+
+  interface DrawingControlOptions {
+    position?: google.maps.ControlPosition;
+  }
+
+  class DrawingManager {
+    constructor(options?: DrawingManagerOptions);
+    setMap(map: google.maps.Map | null): void;
+    setDrawingMode(mode: OverlayType | null): void;
+  }
+
+  enum OverlayType {
+    CIRCLE = 'CIRCLE',
+    POLYGON = 'POLYGON',
+    POLYLINE = 'POLYLINE',
+    RECTANGLE = 'RECTANGLE',
+    MARKER = 'MARKER',
+  }
+
+  interface CircleOptions {
+    center?: google.maps.LatLng | google.maps.LatLngLiteral;
+    radius?: number;
+    strokeColor?: string;
+    strokeOpacity?: number;
+    strokeWeight?: number;
+    fillColor?: string;
+    fillOpacity?: number;
+    map?: google.maps.Map;
+    editable?: boolean;
+    draggable?: boolean;
+    visible?: boolean;
+  }
+
+  interface RectangleOptions { /* ... */ }
+  interface PolygonOptions { /* ... */ }
+  interface PolylineOptions { /* ... */ }
+  interface MarkerOptions { /* ... */ }
+
+  // Aqui você pode adicionar mais definições conforme necessário
 }

@@ -12,7 +12,7 @@
 
             <v-container width="400px" class="filter-container" v-show="showFilter" style="padding: 0px;">
               <v-divider :thickness="2"/>
-              <Filter @consult="handleFilterData" />
+              <Filter @consult="handleFilterData" @drawCircle="handleDrawCircle"/>
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -39,10 +39,15 @@ import { useRoute, useRouter } from "vue-router";
 
 const props = defineProps<{
   onConsult: (data: FilterData) => void;
+  onDrawCircle: () => void;
 }>();
 
 const handleFilterData = (data: FilterData) => {
   props.onConsult(data);
+};
+
+const handleDrawCircle = () => {
+  props.onDrawCircle();
 };
 
 const logo = "/src/assets/Logo.svg";
