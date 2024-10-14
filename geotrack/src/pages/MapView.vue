@@ -1,6 +1,42 @@
 <template>
-  <Sidebar @consult="fetchGeoJsonData" />
+  <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
+
+  <!-- Modal dialog para detalhes do círculo -->
+  <v-dialog v-model="dialog" max-width="425px" max-height="460px">
+    <v-card>
+      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
+        <span class="headline">Detalhes da zona selecionada</span>
+      </v-card-title>
+
+      <v-card-text style="padding: 10px 15px 10px 15px;">
+        <v-form>
+          <v-text-field v-model="circleDetails.name" label="Nome"></v-text-field>
+          <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%;"></v-text-field>
+          <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
+            style="opacity: 75%;"></v-text-field>
+          <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly
+            style="opacity: 75%;"></v-text-field>
+        </v-form>
+      </v-card-text>
+
+      <v-card-actions>
+        <v-row justify="center">
+          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px;">
+            Salvar
+          </v-btn>
+          <v-btn variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;">
+            Remover
+          </v-btn>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
+    {{ snackbarMessage }}
+  </v-snackbar>
+
 </template>
 
 <script lang="ts">
@@ -24,6 +60,20 @@ export default {
   setup() {
     const map = ref<google.maps.Map | null>(null);
     const mapDiv = ref<HTMLElement | null>(null);
+    const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
+    const dialog = ref(false);
+    const snackbar = ref(false);
+    const snackbarMessage = ref('');
+    const snackbarColor = ref('success');
+    const circleDetails = ref({
+      name: 'Zona 1',
+      type: 'CIRCLE',
+      center: '',
+      radius: '',
+    });
+
+    // @ts-ignore
+    let circleInstance: google.maps.Circle | null = null;
 
     onMounted(() => {
       if (mapDiv.value) {
@@ -42,6 +92,7 @@ export default {
               });
 
               addCurrentLocationMarker(userLocation);
+              initializeDrawingManager();
             },
             (error) => {
               // Se a localização não for aceita, inicie o mapa com a localização padrão
@@ -65,6 +116,45 @@ export default {
         }
       }
     });
+
+    const initializeDrawingManager = () => {
+      drawingManager.value = new google.maps.drawing.DrawingManager({
+        drawingMode: google.maps.drawing.OverlayType.CIRCLE,
+        drawingControl: false,
+        circleOptions: {
+          fillColor: '#18FFFF',
+          fillOpacity: 0.3,
+          strokeWeight: 2,
+          strokeColor: '#0097A7',
+          clickable: true,
+        },
+      });
+
+      // @ts-ignore
+      google.maps.event.addListener(drawingManager.value, 'circlecomplete', (circle: google.maps.Circle) => {
+        if (circleInstance) {
+          circleInstance.setMap(null);
+        }
+
+        const center = circle.getCenter().toJSON(); // {lat, lng}
+        const radius = circle.getRadius(); // em metros
+
+        circleInstance = circle;
+
+        circleDetails.value.center = `${center.lat}, ${center.lng}`;
+        circleDetails.value.radius = `${radius}`;
+
+        // Evento para abrir o modal quando o círculo for clicado
+        google.maps.event.addListener(circle, 'click', () => {
+          dialog.value = true;
+        });
+
+        if (drawingManager.value) {
+          drawingManager.value.setDrawingMode(null);
+          drawingManager.value.setMap(null);
+        }
+      });
+    };
 
     const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
       if (map.value) {
@@ -166,7 +256,66 @@ export default {
       }
     };
 
-    return { map, mapDiv, fetchGeoJsonData };
+    const enableCircleDrawing = () => {
+      if (drawingManager.value && map.value) {
+        drawingManager.value.setDrawingMode(google.maps.drawing.OverlayType.CIRCLE);
+        drawingManager.value.setMap(map.value);
+      }
+    };
+
+    const saveCircle = async () => {
+      const payload = {
+        name: circleDetails.value.name,
+        type: "CIRCLE",
+        center: {
+          longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
+          latitude: parseFloat(circleDetails.value.center.split(", ")[0])
+        },
+        radius: parseFloat(circleDetails.value.radius)
+      };
+
+      console.log("Dados para insert no banco: ", payload)
+
+      try {
+        const response = await axios.post("http://localhost:8080/zone", payload);
+        console.log('Dados enviados com sucesso:', response.data);
+
+        snackbarMessage.value = 'Zona salva com sucesso!';
+        snackbarColor.value = 'success';
+        snackbar.value = true;
+
+        dialog.value = false;
+
+      } catch (error) {
+        console.log('Erro ao enviar os dados:', error);
+
+        snackbarMessage.value = 'Erro ao salvar a zona. Tente novamente.';
+        snackbarColor.value = 'error';
+        snackbar.value = true;
+      }
+    };
+
+    const removeCircle = () => {
+      dialog.value = false;
+      if (circleInstance) {
+        circleInstance.setMap(null);
+        circleInstance = null;
+      }
+    };
+
+    return {
+      map,
+      mapDiv,
+      fetchGeoJsonData,
+      enableCircleDrawing,
+      dialog,
+      circleDetails,
+      saveCircle,
+      removeCircle,
+      snackbar,
+      snackbarMessage,
+      snackbarColor,
+    };
   },
 };
 </script>

@@ -13,6 +13,26 @@
         </template>
       </v-combobox>
 
+      <!-- Card das áreas geográficas -->
+      <v-card-actions class="d-flex justify-space-between">
+        <v-row class="d-flex align-center no-gutters">
+          <v-col cols="100%" style="padding: 0px;">
+            <!-- Combobox de áreas geográficas -->
+            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary" v-model="selectedGeoArea"
+              :items="geoAreas" item-value="id" item-title="name"></v-combobox>
+          </v-col>
+
+          <v-col cols="auto" style="padding: 0px 0px 20px 10px;">
+            <div class="icon-container">
+              <v-btn icon @click="drawCircle" class="no-shadow rounded">
+                <v-icon>mdi-circle-outline</v-icon>
+                <v-icon class="plus-icon">mdi-plus</v-icon>
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+
       <!-- Date selection -->
       <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
         :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
@@ -67,10 +87,14 @@ export default {
     ],
     selectedQuickFilter: null,
     dateInputDisabled: false,
+    geoAreas: [],
+    selectedGeoArea: null,
+    open: ['geoAreas'],
   }),
 
   mounted() {
     this.fetchUsers();
+    this.fetchGeoAreas();
   },
 
   computed: {
@@ -114,8 +138,26 @@ export default {
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
     },
 
+    async fetchGeoAreas() {
+      try {
+        const response = await fetch("http://localhost:8080/zone");
+        const data = await response.json();
+        this.geoAreas = data.map(area => ({
+          id: area.id,
+          name: area.name,
+        }));
+        console.log("Áreas geográficas carregadas:", data);
+      } catch (error) {
+        console.log("Erro ao buscar áreas geográficas:", error);
+      }
+    },
+
     clearFields() {
       window.location.reload();
+    },
+
+    drawCircle() {
+      this.$emit('drawCircle'); // Emite o evento para habilitar o desenho do círculo
     },
 
     setQuickFilter(range, index) {
@@ -150,4 +192,30 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.icon-container {
+  position: relative;
+}
+
+.plus-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: black;
+}
+
+.title-text {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.no-shadow {
+  box-shadow: none !important;
+}
+
+.rounded {
+  border-radius: 0 !important;
+}
+</style>
