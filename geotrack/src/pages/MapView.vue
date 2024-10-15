@@ -201,7 +201,7 @@ export default {
             geoJsonDTO.features.forEach((feature: GeoJsonFeature) => {
               const coords = feature.geometry.coordinates;
               if (coords && coords.length >= 2) {
-                const position = { lat: coords[1], lng: coords[0] }; // Coordenadas: lat e lng
+                const position = { lat: coords[0], lng: coords[1] }; // Coordenadas: lat e lng
 
                 // Gera as iniciais do usuário
                 const initials = user.split(" ")
