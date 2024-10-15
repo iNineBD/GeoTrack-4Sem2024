@@ -110,6 +110,7 @@ export default {
                 this.users = data.listUsers.map(user => ({
                     name: user.userName.toUpperCase(), // Nome do usuário
                     deviceId: user.idDevice, // ID do dispositivo associado
+                    device: user.deviceName
                 }));
 
                 console.log("Sucesso ao buscar usuários: ", this.users);
@@ -171,14 +172,24 @@ export default {
                     console.log("Pontos de parada recebidos:", data.stopPoints);
 
                     const dataCircleAndUser = {
+                        userName: this.selectedUser.name,
                         name: selectedArea.name,
                         latitude: selectedArea.latitude,
                         longitude: selectedArea.longitude,
                         radius: selectedArea.radius,
                     }
+
+                    const coord = data.stopPoints
+
+                    const dados = {
+                        userName: this.selectedUser.name,
+                        device: this.selectedUser.device,
+                        coords: coord // Definindo corretamente um array para coordenadas
+                    };
+
                     // Dados enviados para plotar o círculo escolhido
                     this.$emit('consult', dataCircleAndUser);
-                    this.$emit('stopPointsReceived', data.stopPoints);
+                    this.$emit('stopPointsReceived', dados);
 
                 } else if (response.status === 404) {
                     const errorData = await response.json();

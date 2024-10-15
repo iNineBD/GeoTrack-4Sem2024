@@ -50,6 +50,8 @@ interface GeoJsonFeature {
   };
 }
 
+
+
 export interface FilterData {
   idDevice: number[];
   startDate: string;
@@ -348,6 +350,57 @@ export default {
 
     const handleStopPointsOnMap = (points: any) => {
       console.log("Pontos de parada recebidos do Sidebar:", points);
+
+      points.coords.forEach((item: any) => {
+
+                const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
+
+                console.log('name ', points)
+
+                // Gera as iniciais do usuário
+                const initials = points.userName.split(" ")
+                  .slice(0, 2)
+                  .map((name: string) => name[0])
+                  .join("");
+
+                const marker = new google.maps.Marker({
+                  position,
+                  map: map.value,
+                  label: {
+                    text: initials,
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: "14px",
+                  },
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 15,
+                    fillColor: "#000B62",
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: "#ffffff",
+                  },
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                  content: `<div>
+                          <strong>Usuário:</strong> ${points.userName}<br>
+                          <strong>Dispositivo:</strong> ${points.device}<br>
+                          <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
+                         </div>`,
+                });
+
+                google.maps.event.addListener(marker, "click", () => {
+                  infoWindow.open(map.value!, marker);
+                });
+
+                google.maps.event.addListener(map.value, "click", () => {
+                  infoWindow.close();
+                });
+
+                centerMapOnMarker(position);
+        });
+
     };
 
     return {
