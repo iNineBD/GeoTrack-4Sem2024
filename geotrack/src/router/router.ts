@@ -8,8 +8,13 @@ const routes = [
     component: MapView,
   },
   {
-    path: '/filter',
-    name: 'Filter',
+    path: '/stoppointsfilter',
+    name: 'StopPointFilter',
+    component: MapView,
+  },
+  {
+    path: '/geographicareasfilter',
+    name: 'GeographicAreasFilter',
     component: MapView,
   },
 ];

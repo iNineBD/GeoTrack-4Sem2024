@@ -7,9 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Filter: typeof import('./src/components/Filter/Filter.vue')['default']
+    GeographicAreasFilter: typeof import('./src/components/Filters/GeographicAreasFilter.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Menu/Sidebar.vue')['default']
+    StopPointsFilter: typeof import('./src/components/Filters/StopPointsFilter.vue')['default']
   }
 }

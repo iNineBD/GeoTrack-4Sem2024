@@ -9,34 +9,36 @@
             </v-row>
           </template>
           <v-expansion-panel-text style="padding: 0px;">
-
-            <v-container width="400px" class="filter-container" v-show="showFilter" style="padding: 0px;">
-              <v-divider :thickness="2"/>
-              <Filter @consult="handleFilterData" @drawCircle="handleDrawCircle"/>
+            <v-container width="400px" class="filter-container" style="padding: 0px;">
+              <v-divider :thickness="2" />
+              <!-- Exibe o filtro correto com base na rota -->
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" @drawCircle="handleDrawCircle"/>
+              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
 
-
     <v-speed-dial v-model="dial" location="bottom center" transition="scale-transition" class="speed-dial">
       <template v-slot:activator="{ props: activatorProps }">
         <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
       </template>
 
-      <v-btn key="map-marker" @click="goToFilter" icon="mdi-map-marker" ></v-btn>
+      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"></v-btn>
+      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"></v-btn>
     </v-speed-dial>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import Filter from "../Filter/Filter.vue";
+import { ref } from "vue";
+import StopPointsFilter from "../Filters/StopPointsFilter.vue";
+import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
 import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 
+// Definindo as props
 const props = defineProps<{
   onConsult: (data: FilterData) => void;
   onDrawCircle: () => void;
@@ -57,18 +59,20 @@ const dial = ref(false);
 const route = useRoute();
 const router = useRouter();
 
-const showFilter = computed(
-  () => route.path === "/" || route.path === "/filter"
-);
-
 const toggleDial = () => {
   dial.value = !dial.value;
 };
 
-const goToFilter = () => {
-  router.push("/");
+const goToFilterStopPoints = () => {
+  router.push("/stoppointsfilter");
   toggleDial();
 };
+
+const goToFilterGeographicAreas = () => {
+  router.push("/geographicareasfilter");
+  toggleDial();
+};
+
 </script>
 
 <style scoped>
