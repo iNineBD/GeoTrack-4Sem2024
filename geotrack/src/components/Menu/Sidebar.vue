@@ -14,7 +14,7 @@
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
               <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"/>
-              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle"/>
+              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsReceived"/>
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -43,6 +43,8 @@ import { useRoute, useRouter } from "vue-router";
 const props = defineProps<{
   onConsult: (data: FilterData) => void;
   onDrawCircle: () => void;
+  onGeographicAreaConsult: (data: FilterData) => void;
+  onStopPointsReceived: (stopPoints: any) => void;
 }>();
 
 const handleFilterData = (data: FilterData) => {
@@ -51,6 +53,16 @@ const handleFilterData = (data: FilterData) => {
 
 const handleDrawCircle = () => {
   props.onDrawCircle();
+};
+
+const handleGeographicAreaConsult = (data: FilterData) => {
+  console.log("Dados recebidos do GeographicAreasFilter:", data);
+  props.onGeographicAreaConsult(data);
+};
+
+const handleStopPointsReceived = (stopPoints: any) => {
+  console.log("Pontos de parada recebidos do GeographicAreasFilter:", stopPoints);
+  props.onStopPointsReceived(stopPoints);
 };
 
 const logo = "/src/assets/Logo.svg";

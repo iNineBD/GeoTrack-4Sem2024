@@ -1,5 +1,6 @@
 <template>
-  <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing" />
+  <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
+    @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 
   <!-- Modal dialog para detalhes do círculo -->
@@ -74,6 +75,8 @@ export default {
 
     // @ts-ignore
     let circleInstance: google.maps.Circle | null = null;
+    // @ts-ignore
+    const circles = ref<{ circle: google.maps.Circle; details: any }[]>([]);
 
     onMounted(() => {
       if (mapDiv.value) {
@@ -303,6 +306,50 @@ export default {
       }
     };
 
+    const drawCircleOnMap = (latitude: number, longitude: number, radius: number) => {
+      if (circleInstance) {
+        circleInstance.setMap(null);
+      }
+
+      const circleCenter = { lat: latitude, lng: longitude };
+
+      // @ts-ignore
+      circleInstance = new google.maps.Circle({
+        map: map.value,
+        center: circleCenter,
+        radius: radius,
+        fillColor: '#18FFFF',
+        fillOpacity: 0.3,
+        strokeWeight: 2,
+        strokeColor: '#0097A7',
+        clickable: true,
+      });
+
+      google.maps.event.addListener(circleInstance, 'click', () => {
+        dialog.value = true;
+      });
+
+      map.value?.panTo(circleCenter);
+      map.value?.setZoom(14);
+    };
+
+    const handleGeographicAreaConsult = (data: any) => {
+      console.log("Dados geográficos recebidos do Sidebar:", data);
+
+      circleDetails.value = {
+        name: data.name,
+        type: 'CIRCLE',
+        center: `${data.latitude}, ${data.longitude}`,
+        radius: `${data.radius}`,
+      };
+
+      drawCircleOnMap(data.latitude, data.longitude, data.radius);
+    };
+
+    const handleStopPointsOnMap = (points: any) => {
+      console.log("Pontos de parada recebidos do Sidebar:", points);
+    };
+
     return {
       map,
       mapDiv,
@@ -315,6 +362,9 @@ export default {
       snackbar,
       snackbarMessage,
       snackbarColor,
+      drawCircleOnMap,
+      handleGeographicAreaConsult,
+      handleStopPointsOnMap,
     };
   },
 };

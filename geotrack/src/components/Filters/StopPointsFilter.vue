@@ -15,7 +15,7 @@
 
       <!-- Date selection -->
       <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
+        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :readonly="dateInputDisabled"></v-date-input>
 
       <!-- Quick date filters using chips -->
       <v-col style="padding: 0px; display: flex;">
