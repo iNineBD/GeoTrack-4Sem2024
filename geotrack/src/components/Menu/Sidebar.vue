@@ -9,11 +9,12 @@
             </v-row>
           </template>
           <v-expansion-panel-text style="padding: 0px;">
+            
             <v-container width="400px" class="filter-container" style="padding: 0px;">
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
-              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" @drawCircle="handleDrawCircle"/>
-              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" />
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"/>
+              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle"/>
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>

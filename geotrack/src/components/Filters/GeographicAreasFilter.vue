@@ -123,15 +123,15 @@ export default {
 
         async handleConsult() {
             if (this.selectedUsers.length === 0 || !this.date) return;
-
+            
             // Extraindo os IDs dos dispositivos dos usuários selecionados
             const deviceIds = this.selectedUsers.map(user => user.deviceId);
 
             // Preparando os dados da requisição com todos os devices como um array e as datas uma única vez
             const requestData = {
-                devices: deviceIds,  // Array de IDs dos dispositivos
+                devices: deviceIds[0],  // Array de IDs dos dispositivos
                 startDate: new Date(this.date[0]).toLocaleDateString('en-CA'),  // Data de início
-                finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA')  // Data de fim
+                finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA') , // Data de fim
             };
 
             console.log("Dados enviados:", requestData);
