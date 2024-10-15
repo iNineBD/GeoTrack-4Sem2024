@@ -47,9 +47,21 @@
 
   </v-card>
 
-  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
+  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
+  <span style="font-weight: bold; font-size: 15px; color: white;">
     {{ snackbarMessage }}
-  </v-snackbar>
+  </span>
+  <template v-slot:actions>
+    <v-btn
+      color="white"
+      variant="text"
+      style="font-weight: bold; text-transform: uppercase; color: white;"
+      @click="snackbar = false"
+    >
+      Close
+    </v-btn>
+  </template>
+</v-snackbar>
 
 </template>
 
@@ -115,8 +127,9 @@ export default {
 
       const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
 
-      if(qtddias > 30){
-        this.showSnackbar("Mais que 30 dias selecionados");
+      if(qtddias > 31){
+        this.showSnackbar("Mais que 31 dias selecionados");
+        return;
       }
 
 
