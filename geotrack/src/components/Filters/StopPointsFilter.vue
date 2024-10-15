@@ -46,6 +46,23 @@
     </v-card-actions>
 
   </v-card>
+
+  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
+  <span style="font-weight: bold; font-size: 15px; color: white;">
+    {{ snackbarMessage }}
+  </span>
+  <template v-slot:actions>
+    <v-btn
+      color="white"
+      variant="text"
+      style="font-weight: bold; text-transform: uppercase; color: white;"
+      @click="snackbar = false"
+    >
+      Close
+    </v-btn>
+  </template>
+</v-snackbar>
+
 </template>
 
 <script>
@@ -67,6 +84,9 @@ export default {
     ],
     selectedQuickFilter: null,
     dateInputDisabled: false,
+    snackbar: false, // Controla a exibição do snackbar
+    snackbarMessage: '', // Mensagem exibida no snackbar
+    snackbarColor: 'success', // Cor do snackbar
   }),
 
   mounted() {
@@ -94,14 +114,24 @@ export default {
         console.log("Successfully fetched users:", this.users);
       } catch (error) {
         console.log("Error fetching users:", error);
+
       }
     },
 
     async handleConsult() {
       if (this.selectedUsers.length === 0 || !this.date) return;
 
+
       // Extraindo os IDs dos dispositivos dos usuários selecionados
       const deviceIds = this.selectedUsers.map(user => user.deviceId);
+
+      const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
+
+      if(qtddias > 31){
+        this.showSnackbar("Mais que 31 dias selecionados");
+        return;
+      }
+
 
       // Preparando os dados da requisição com todos os devices como um array e as datas uma única vez
       const requestData = {
@@ -132,7 +162,14 @@ export default {
 
     remove(item) {
       this.selectedUsers = this.selectedUsers.filter(user => user.id !== item.id);
-    }
+    },
+
+      // Método para exibir o snackbar
+      showSnackbar(message, color = 'success') {
+      this.snackbarMessage = message;
+      this.snackbarColor = 'error';
+      this.snackbar = true;
+    },
   },
 
   watch: {
