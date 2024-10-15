@@ -13,7 +13,7 @@
                         <!-- Combobox de áreas geográficas -->
                         <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary"
                             v-model="selectedGeoArea" :items="geoAreas" item-value="id" item-title="name" clearable
-                            :multiple="false">
+                            :multiple="false" @update:model-value="handleGeoAreaChange">
                         </v-combobox>
                     </v-col>
 
@@ -135,6 +135,32 @@ export default {
                 console.log("Erro ao buscar áreas geográficas:", error);
             }
         },
+
+        async handleGeoAreaChange(){
+        
+        const selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+
+        if (!selectedArea) {
+            console.log("Área geográfica não encontrada");
+            return;
+        }
+
+        const requestData = {
+            latitude: selectedArea.latitude,
+            longitude: selectedArea.longitude,
+            radius: selectedArea.radius,
+        };
+        
+        const dataCircleAndUser = {
+            name: selectedArea.name,
+            latitude: selectedArea.latitude,
+            longitude: selectedArea.longitude,
+            radius: selectedArea.radius,
+        }
+
+        this.$emit('consult', dataCircleAndUser);
+
+    },
 
         async handleConsult() {
             if (!this.selectedUser || !this.date || !this.selectedGeoArea) {
