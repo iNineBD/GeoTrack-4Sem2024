@@ -34,27 +34,27 @@
                 :readonly="dateInputDisabled"></v-date-input>
 
             <!-- Quick date filters using chips -->
-            <v-col style="padding: 0px; display: flex;">
-                <v-chip style="margin: 0px 2px !important;" size="small" v-for="(filter, index) in quickFilters"
-                    :key="filter.label" @click="setQuickFilter(filter.range, index)"
+            <v-col style="padding: 0px; display: flex; justify-content: space-evenly;">
+                <v-chip v-for="(filter, index) in quickFilters" :key="filter.label"
+                    @click="setQuickFilter(filter.range, index)"
                     :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
-                    :active="selectedQuickFilter === index" filter class="ma-2" variant="flat">
+                    :active="selectedQuickFilter === index" filter variant="flat" size="small">
                     {{ filter.label }}
                 </v-chip>
             </v-col>
         </v-col>
 
-        <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px;">
-            <v-row class="d-flex" no-gutters>
-                <v-col cols="8">
+        <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px;">
+            <v-row class="d-flex" no-gutters style="justify-content: space-around;">
+                <v-col cols="7">
                     <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary"
-                        size="large" variant="flat" block rounded="lg" @click="handleConsult">
+                        size="large" variant="flat" block rounded="xl" @click="handleConsult">
                         Consultar
                     </v-btn>
                 </v-col>
                 <v-col cols="4">
                     <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
-                        variant="flat" block rounded="lg" @click="clearFields">
+                        variant="flat" block rounded="xl" @click="clearFields">
                         Limpar
                     </v-btn>
                 </v-col>
@@ -136,31 +136,30 @@ export default {
             }
         },
 
-        async handleGeoAreaChange(){
-        
-        const selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+        async handleGeoAreaChange() {
 
-        if (!selectedArea) {
-            console.log("Área geográfica não encontrada");
-            return;
-        }
+            const selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
 
-        const requestData = {
-            latitude: selectedArea.latitude,
-            longitude: selectedArea.longitude,
-            radius: selectedArea.radius,
-        };
-        
-        const dataCircleAndUser = {
-            name: selectedArea.name,
-            latitude: selectedArea.latitude,
-            longitude: selectedArea.longitude,
-            radius: selectedArea.radius,
-        }
+            if (!selectedArea) {
+                console.log("Área geográfica não encontrada");
+                return;
+            }
 
-        this.$emit('consult', dataCircleAndUser);
+            const requestData = {
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
+            };
 
-    },
+            const dataCircleAndUser = {
+                name: selectedArea.name,
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
+            }
+
+            this.$emit('consult', dataCircleAndUser);
+        },
 
         async handleConsult() {
             if (!this.selectedUser || !this.date || !this.selectedGeoArea) {

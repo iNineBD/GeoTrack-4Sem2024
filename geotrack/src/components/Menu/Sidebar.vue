@@ -26,8 +26,11 @@
         <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
       </template>
 
-      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"></v-btn>
-      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"></v-btn>
+      <!-- Botão para StopPointsFilter -->
+      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker" title="Filtro de Pontos de Parada"></v-btn>
+
+      <!-- Botão para GeographicAreasFilter -->
+      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search" title="Filtro de Áreas Geográficas"></v-btn>
     </v-speed-dial>
   </div>
 </template>

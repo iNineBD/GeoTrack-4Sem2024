@@ -4,13 +4,13 @@
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 
   <!-- Modal dialog para detalhes do círculo -->
-  <v-dialog v-model="dialog" max-width="425px" max-height="460px">
-    <v-card>
+  <v-dialog v-model="dialog" max-width="400px">
+    <v-card rounded="xl">
       <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
         <span class="headline">Detalhes da zona selecionada</span>
       </v-card-title>
 
-      <v-card-text style="padding: 10px 15px 10px 15px;">
+      <v-card-text style="padding: 10px 15px 0px 15px;">
         <v-form>
           <v-text-field v-model="circleDetails.name" label="Nome"></v-text-field>
           <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%;"></v-text-field>
@@ -23,10 +23,11 @@
 
       <v-card-actions>
         <v-row justify="center">
-          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px;">
+          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px;" rounded="xl">
             Salvar
           </v-btn>
-          <v-btn variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;">
+          <v-btn variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;"
+            rounded="xl">
             Remover
           </v-btn>
         </v-row>
@@ -49,8 +50,6 @@ interface GeoJsonFeature {
     coordinates: [number, number];
   };
 }
-
-
 
 export interface FilterData {
   idDevice: number[];
@@ -353,53 +352,53 @@ export default {
 
       points.coords.forEach((item: any) => {
 
-                const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
+        const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
 
-                console.log('name ', points)
+        console.log('name ', points)
 
-                // Gera as iniciais do usuário
-                const initials = points.userName.split(" ")
-                  .slice(0, 2)
-                  .map((name: string) => name[0])
-                  .join("");
+        // Gera as iniciais do usuário
+        const initials = points.userName.split(" ")
+          .slice(0, 2)
+          .map((name: string) => name[0])
+          .join("");
 
-                const marker = new google.maps.Marker({
-                  position,
-                  map: map.value,
-                  label: {
-                    text: initials,
-                    color: "white",
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                  },
-                  icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 15,
-                    fillColor: "#000B62",
-                    fillOpacity: 1,
-                    strokeWeight: 2,
-                    strokeColor: "#ffffff",
-                  },
-                });
+        const marker = new google.maps.Marker({
+          position,
+          map: map.value,
+          label: {
+            text: initials,
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "14px",
+          },
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 15,
+            fillColor: "#000B62",
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: "#ffffff",
+          },
+        });
 
-                const infoWindow = new google.maps.InfoWindow({
-                  content: `<div>
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<div>
                           <strong>Usuário:</strong> ${points.userName}<br>
                           <strong>Dispositivo:</strong> ${points.device}<br>
                           <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
                          </div>`,
-                });
-
-                google.maps.event.addListener(marker, "click", () => {
-                  infoWindow.open(map.value!, marker);
-                });
-
-                google.maps.event.addListener(map.value, "click", () => {
-                  infoWindow.close();
-                });
-
-                centerMapOnMarker(position);
         });
+
+        google.maps.event.addListener(marker, "click", () => {
+          infoWindow.open(map.value!, marker);
+        });
+
+        google.maps.event.addListener(map.value, "click", () => {
+          infoWindow.close();
+        });
+
+        centerMapOnMarker(position);
+      });
 
     };
 
