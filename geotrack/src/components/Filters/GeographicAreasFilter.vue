@@ -2,15 +2,8 @@
     <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px;">
         <v-col style="padding: 20px 20px 0 20px;">
             <!-- Users combobox -->
-            <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
-                prepend-icon="mdi-filter-variant" chips clearable multiple>
-                <!-- Slot para customizar a exibição dos chips -->
-                <template v-slot:selection="{ attrs, item, select, selected }">
-                    <v-chip v-bind="attrs" :model-value="selected" closable @click="select" @click:close="remove(item)">
-                        <strong>{{ item.name }}</strong>&nbsp;<span>({{ item.deviceName }})</span>
-                        <!-- Exibe o nome do dispositivo -->
-                    </v-chip>
-                </template>
+            <v-combobox v-model="selectedUser" label="Usuário" :items="users" item-title="name" item-value="deviceId"
+                prepend-icon="mdi-filter-variant" clearable :multiple="false">
             </v-combobox>
 
             <!-- Card das áreas geográficas -->
@@ -19,7 +12,9 @@
                     <v-col cols="100%" style="padding: 0px;">
                         <!-- Combobox de áreas geográficas -->
                         <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary"
-                            v-model="selectedGeoArea" :items="geoAreas" item-value="id" item-title="name"></v-combobox>
+                            v-model="selectedGeoArea" :items="geoAreas" item-value="id" item-title="name" clearable
+                            :multiple="false">
+                        </v-combobox>
                     </v-col>
 
                     <v-col cols="auto" style="padding: 0px 0px 20px 10px;">
@@ -35,7 +30,8 @@
 
             <!-- Date selection -->
             <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
-                :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"></v-date-input>
+                :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
+                :readonly="dateInputDisabled"></v-date-input>
 
             <!-- Quick date filters using chips -->
             <v-col style="padding: 0px; display: flex;">
@@ -75,8 +71,7 @@ export default {
         loading: false,
         date: null,
         users: [], // Lista de usuários
-        selectedUsers: [], // Armazena múltiplos usuários selecionados
-        devices: [],
+        selectedUser: null,
         locale: 'pt',
         customDateFormat: 'dd/MM/yyyy',
         quickFilters: [
@@ -89,7 +84,9 @@ export default {
         dateInputDisabled: false,
         geoAreas: [],
         selectedGeoArea: null,
-        open: ['geoAreas'],
+        latitude: null,
+        longitude: null,
+        radius: null,
     }),
 
     mounted() {
@@ -99,7 +96,7 @@ export default {
 
     computed: {
         ButtonDisabled() {
-            return this.selectedUsers.length === 0 || !this.date;
+            return !this.selectedUser || !this.date;
         },
     },
 
@@ -115,27 +112,10 @@ export default {
                     deviceId: user.idDevice, // ID do dispositivo associado
                 }));
 
-                console.log("Successfully fetched users:", this.users);
+                console.log("Sucesso ao buscar usuários: ", this.users);
             } catch (error) {
-                console.log("Error fetching users:", error);
+                console.log("Erro ao buscar usuários: ", error);
             }
-        },
-
-        async handleConsult() {
-            if (this.selectedUsers.length === 0 || !this.date) return;
-            
-            // Extraindo os IDs dos dispositivos dos usuários selecionados
-            const deviceIds = this.selectedUsers.map(user => user.deviceId);
-
-            // Preparando os dados da requisição com todos os devices como um array e as datas uma única vez
-            const requestData = {
-                devices: deviceIds[0],  // Array de IDs dos dispositivos
-                startDate: new Date(this.date[0]).toLocaleDateString('en-CA'),  // Data de início
-                finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA') , // Data de fim
-            };
-
-            console.log("Dados enviados:", requestData);
-            this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
         },
 
         async fetchGeoAreas() {
@@ -145,10 +125,70 @@ export default {
                 this.geoAreas = data.map(area => ({
                     id: area.id,
                     name: area.name,
+                    latitude: area.center.latitude,
+                    longitude: area.center.longitude,
+                    radius: area.radius
                 }));
                 console.log("Áreas geográficas carregadas:", data);
             } catch (error) {
                 console.log("Erro ao buscar áreas geográficas:", error);
+            }
+        },
+
+        async handleConsult() {
+            if (!this.selectedUser || !this.date || !this.selectedGeoArea) {
+                console.log("Dados incompletos para a consulta");
+                return;
+            }
+
+            const selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+
+            if (!selectedArea) {
+                console.log("Área geográfica não encontrada");
+                return;
+            }
+
+            const requestData = {
+                deviceId: this.selectedUser.deviceId,
+                startDate: new Date(this.date[0]).toLocaleDateString('en-CA'),
+                finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA'),
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
+            };
+
+            console.log("Dados enviados: ", requestData);
+
+            const url = `http://localhost:8080/stoppointsession/pointsInSession?deviceId=${requestData.deviceId}&startDate=${requestData.startDate}&endDate=${requestData.finalDate}&latitude=${requestData.latitude}&longitude=${requestData.longitude}&radius=${requestData.radius}`;
+
+            console.log("URL: ", url);
+
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+
+                    console.log("Pontos de parada recebidos:", data.stopPoints);
+
+                    const dataCircleAndUser = {
+                        name: selectedArea.name,
+                        latitude: selectedArea.latitude,
+                        longitude: selectedArea.longitude,
+                        radius: selectedArea.radius,
+                    }
+                    // Dados enviados para plotar o círculo escolhido
+                    this.$emit('consult', dataCircleAndUser);
+                    this.$emit('stopPointsReceived', data.stopPoints);
+
+                } else if (response.status === 404) {
+                    const errorData = await response.json();
+
+                    console.log("Erro 404: ", errorData.message);
+
+                    this.$emit('noPointsFound', errorData.message);
+                }
+            } catch (error) {
+                console.log("Erro ao buscar pontos de parada:", error);
             }
         },
 
@@ -157,7 +197,7 @@ export default {
         },
 
         drawCircle() {
-            this.$emit('drawCircle'); // Emite o evento para habilitar o desenho do círculo
+            this.$emit('drawCircle');
         },
 
         setQuickFilter(range, index) {
@@ -171,19 +211,9 @@ export default {
                 this.dateInputDisabled = true;
             }
         },
-
-        remove(item) {
-            this.selectedUsers = this.selectedUsers.filter(user => user.id !== item.id);
-        }
     },
 
     watch: {
-        selectedUsers(newValue) {
-            if (newValue.length > 5) {
-                this.selectedUsers = newValue.slice(0, 5); // Mantém apenas os 3 primeiros usuários
-            }
-            console.log(this.selectedUsers)
-        },
         loading(val) {
             if (!val) return;
             setTimeout(() => (this.loading = false), 1000);
