@@ -29,10 +29,11 @@
           <v-btn variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;">
             Remover
           </v-btn>
-        </v-row>
-        <v-btn variant="flat" color="grey-lighten-2" @click="deleteCircle" style="margin: 0px 10px 15px 10px;">
+          <v-btn v-if="circleDetails.name && circleDetails.id != ''" variant="flat" color="grey-lighten-2" @click="deleteCircle" style="margin: 0px 10px 15px 10px;">
             Deletar
           </v-btn>
+        </v-row>
+
       </v-card-actions>
     </v-card>
   </v-dialog>
