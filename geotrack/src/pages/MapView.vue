@@ -59,7 +59,7 @@ export interface FilterData {
 
 export default {
   name: "MapView",
-  setup(props, {emit}) {
+  setup() {
     const map = ref<google.maps.Map | null>(null);
     const mapDiv = ref<HTMLElement | null>(null);
     const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
@@ -281,9 +281,9 @@ export default {
         radius: parseFloat(circleDetails.value.radius)
       };
 
-      console.log("Dados para mandar para o back: ", payload)
+        // Armazenando os dados no localStorage
+        localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
 
-      emit('circleForConsult', payload)
     };
 
     const saveCircle = async () => {

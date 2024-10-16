@@ -162,16 +162,27 @@ export default {
         },
 
         async handleConsult() {
-            if (!this.selectedUser || !this.date || !this.selectedGeoArea) {
+            const cachedDetails = localStorage.getItem('cachedCircleDetails');
+            const cachedCircle = JSON.parse(cachedDetails);
+            let selectedArea = null;
+
+            if (!this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle)) {
                 console.log("Dados incompletos para a consulta");
                 return;
             }
+            
+            if(this.selectedGeoArea){
+                selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
 
-            const selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
-
-            if (!selectedArea) {
-                console.log("Área geográfica não encontrada");
-                return;
+                if (!selectedArea) {
+                    console.log("Área geográfica não encontrada");
+                    return;
+                }
+            }else{
+                selectedArea = cachedCircle;
+                selectedArea.latitude = selectedArea.center.latitude;
+                selectedArea.longitude = selectedArea.center.longitude;
+                console.log('passooou ', selectedArea)
             }
 
             const requestData = {
