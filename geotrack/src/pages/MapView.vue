@@ -5,34 +5,35 @@
 
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="425px" max-height="460px">
-    <v-card>
-      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
-        <span class="headline">Detalhes da zona selecionada</span>
-      </v-card-title>
+  <v-card>
+    <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
+      <span class="headline">Detalhes da zona selecionada</span>
+    </v-card-title>
 
-      <v-card-text style="padding: 10px 15px 10px 15px;">
-        <v-form>
-          <v-text-field v-model="circleDetails.name" label="Nome"></v-text-field>
-          <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%;"></v-text-field>
-          <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
-            style="opacity: 75%;"></v-text-field>
-          <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly
-            style="opacity: 75%;"></v-text-field>
-        </v-form>
-      </v-card-text>
+    <v-card-text style="padding: 10px 15px 10px 15px;">
+      <v-form>
+        <v-text-field v-model="circleDetails.name" label="Nome"></v-text-field>
+        <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%;"></v-text-field>
+        <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
+          style="opacity: 75%;"></v-text-field>
+        <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly
+          style="opacity: 75%;"></v-text-field>
+      </v-form>
+    </v-card-text>
 
-      <v-card-actions>
-        <v-row justify="center">
-          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px;">
-            Salvar
-          </v-btn>
-          <v-btn variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;">
-            Remover
-          </v-btn>
-        </v-row>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+    <v-card-actions>
+      <v-row justify="center">
+        <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px;">
+          Salvar
+        </v-btn>
+        <!-- Condicional para exibir o botão "Remover" -->
+        <v-btn v-if="circleDetails.center && circleDetails.radius == null" variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;">
+          Remover
+        </v-btn>
+      </v-row>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
