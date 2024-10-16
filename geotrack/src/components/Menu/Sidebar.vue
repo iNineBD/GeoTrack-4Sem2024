@@ -39,7 +39,7 @@
 import { ref } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
-import { FilterData } from "@/pages/MapView.vue";
+import MapView, { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 
 // Definindo as props
@@ -49,6 +49,7 @@ const props = defineProps<{
   onGeographicAreaConsult: (data: FilterData) => void;
   onStopPointsReceived: (stopPoints: any) => void;
 }>();
+
 
 const handleFilterData = (data: FilterData) => {
   props.onConsult(data);
