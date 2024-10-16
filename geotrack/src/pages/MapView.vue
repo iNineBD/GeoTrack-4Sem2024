@@ -5,35 +5,37 @@
 
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="425px" max-height="460px">
-  <v-card>
-    <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
-      <span class="headline">Detalhes da zona selecionada</span>
-    </v-card-title>
+    <v-card>
+      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
+        <span class="headline">Detalhes da zona selecionada</span>
+      </v-card-title>
 
-    <v-card-text style="padding: 10px 15px 10px 15px;">
-      <v-form>
-        <v-text-field v-model="circleDetails.name" label="Nome"></v-text-field>
-        <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%;"></v-text-field>
-        <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
-          style="opacity: 75%;"></v-text-field>
-        <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly
-          style="opacity: 75%;"></v-text-field>
-      </v-form>
-    </v-card-text>
+      <v-card-text style="padding: 10px 15px 10px 15px;">
+        <v-form>
+          <v-text-field v-model="circleDetails.name" label="Nome"></v-text-field>
+          <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%;"></v-text-field>
+          <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
+            style="opacity: 75%;"></v-text-field>
+          <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly
+            style="opacity: 75%;"></v-text-field>
+        </v-form>
+      </v-card-text>
 
-    <v-card-actions>
-      <v-row justify="center">
-        <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px;">
-          Salvar
-        </v-btn>
-        <!-- Condicional para exibir o botão "Remover" -->
-        <v-btn v-if="circleDetails.center && circleDetails.radius == null" variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;">
-          Remover
-        </v-btn>
-      </v-row>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+      <v-card-actions>
+        <v-row justify="center">
+          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px;">
+            Salvar
+          </v-btn>
+          <v-btn variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;">
+            Remover
+          </v-btn>
+          <v-btn variant="flat" color="grey-lighten-2" @click="deleteCircle" style="margin: 0px 10px 15px 10px;">
+            Deletar
+          </v-btn>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
@@ -44,6 +46,7 @@
 <script lang="ts">
 import { onMounted, ref } from "vue";
 import axios from "axios";
+import { id } from "vuetify/locale";
 
 interface GeoJsonFeature {
   geometry: {
@@ -70,8 +73,9 @@ export default {
     const snackbarMessage = ref('');
     const snackbarColor = ref('success');
     const circleDetails = ref({
-      name: 'Zona 1',
-      type: 'CIRCLE',
+      id:'',
+      name: '',
+      type: '',
       center: '',
       radius: '',
     });
@@ -147,6 +151,7 @@ export default {
 
         circleInstance = circle;
 
+        circleDetails.value.id = `${id}`;
         circleDetails.value.center = `${center.lat}, ${center.lng}`;
         circleDetails.value.radius = `${radius}`;
 
@@ -301,6 +306,33 @@ export default {
       }
     };
 
+
+    const deleteCircle = async () => {
+      console.log('vai ',circleDetails.value)
+      const payload = {
+        id: circleDetails.value.id
+      };
+      console.log('aquiiiii ', payload )
+
+      try {
+        const response = await axios.delete("http://localhost:8080/zone",{data:payload});
+        console.log('Dados enviados com sucesso:', response.data);
+        console.log({data:payload})
+        snackbarMessage.value = 'Zona deletada com sucesso!';
+        snackbarColor.value = 'success';
+        snackbar.value = true;
+
+        dialog.value = false;
+        removeCircle();
+      } catch (error) {
+        console.log('Erro ao deletar os dados:', error);
+
+        snackbarMessage.value = 'Erro ao deletar a zona. Tente novamente.';
+        snackbarColor.value = 'error';
+        snackbar.value = true;
+      }
+    };
+
     const removeCircle = () => {
       dialog.value = false;
       if (circleInstance) {
@@ -340,6 +372,7 @@ export default {
       console.log("Dados geográficos recebidos do Sidebar:", data);
 
       circleDetails.value = {
+        id: data.id,
         name: data.name,
         type: 'CIRCLE',
         center: `${data.latitude}, ${data.longitude}`,
@@ -412,6 +445,7 @@ export default {
       dialog,
       circleDetails,
       saveCircle,
+      deleteCircle,
       removeCircle,
       snackbar,
       snackbarMessage,
