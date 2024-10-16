@@ -59,7 +59,7 @@ export interface FilterData {
 
 export default {
   name: "MapView",
-  setup() {
+  setup(props, {emit}) {
     const map = ref<google.maps.Map | null>(null);
     const mapDiv = ref<HTMLElement | null>(null);
     const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
@@ -148,6 +148,8 @@ export default {
         circleDetails.value.center = `${center.lat}, ${center.lng}`;
         circleDetails.value.radius = `${radius}`;
 
+        circleForConsult();
+
         // Evento para abrir o modal quando o círculo for clicado
         google.maps.event.addListener(circle, 'click', () => {
           dialog.value = true;
@@ -158,6 +160,7 @@ export default {
           drawingManager.value.setMap(null);
         }
       });
+      
     };
 
     const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
@@ -265,6 +268,22 @@ export default {
         drawingManager.value.setDrawingMode(google.maps.drawing.OverlayType.CIRCLE);
         drawingManager.value.setMap(map.value);
       }
+    };
+
+    const circleForConsult = async () => {
+      const payload = {
+        name: circleDetails.value.name,
+        type: "CIRCLE",
+        center: {
+          longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
+          latitude: parseFloat(circleDetails.value.center.split(", ")[0])
+        },
+        radius: parseFloat(circleDetails.value.radius)
+      };
+
+      console.log("Dados para mandar para o back: ", payload)
+
+      emit('circleForConsult', payload)
     };
 
     const saveCircle = async () => {

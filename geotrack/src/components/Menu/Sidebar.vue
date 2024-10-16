@@ -15,6 +15,7 @@
               <!-- Exibe o filtro correto com base na rota -->
               <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"/>
               <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsReceived"/>
+              <MapView v-if="route.path === '/pages/mapview'" @circleForConsult="handleCircleForConsult"/>
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -39,7 +40,7 @@
 import { ref } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
-import { FilterData } from "@/pages/MapView.vue";
+import MapView, { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 
 // Definindo as props
@@ -48,7 +49,14 @@ const props = defineProps<{
   onDrawCircle: () => void;
   onGeographicAreaConsult: (data: FilterData) => void;
   onStopPointsReceived: (stopPoints: any) => void;
+  onCircleForConsult: (payload: any) => void;
 }>();
+
+const handleCircleForConsult =  (payload : any) => {
+  console.log("chegando aqui: ", payload)
+  props.onCircleForConsult(payload);
+
+}
 
 const handleFilterData = (data: FilterData) => {
   props.onConsult(data);
