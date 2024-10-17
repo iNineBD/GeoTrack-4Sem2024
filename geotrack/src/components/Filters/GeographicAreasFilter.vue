@@ -1,11 +1,41 @@
 <template>
-    <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px;">
-        <v-col style="padding: 20px 20px 0 20px;">
-            <!-- Users combobox -->
-            <v-combobox v-model="selectedUser" label="Usuário" :items="users" item-title="name" item-value="deviceId"
-                prepend-icon="mdi-filter-variant" clearable :multiple="false">
-            </v-combobox>
+  <v-card
+    class="mx-auto"
+    width="100%"
+    style="box-shadow: none; border-radius: 0; margin-bottom: 25px"
+  >
+    <v-col style="padding: 20px 20px 0 20px">
+      <!-- Users combobox -->
+      <v-combobox
+        v-model="selectedUser"
+        label="Usuário"
+        :items="users"
+        item-title="name"
+        item-value="deviceId"
+        prepend-icon="mdi-filter-variant"
+        clearable
+        :multiple="false"
+      >
+      </v-combobox>
 
+      <!-- Card das áreas geográficas -->
+      <v-card-actions class="d-flex justify-space-between">
+        <v-row class="d-flex align-center no-gutters">
+          <v-col cols="100%" style="padding: 0px">
+            <!-- Combobox de áreas geográficas -->
+            <v-combobox
+              :disabled="disabledTexts"
+              label="Áreas geográficas"
+              color="primary"
+              v-model="selectedGeoArea"
+              :items="geoAreas"
+              item-value="id"
+              item-title="name"
+              clearable
+              :multiple="false"
+              @update:model-value="handleGeoAreaChange"
+            >
+            </v-combobox>
             <!-- Card das áreas geográficas -->
             <v-card-actions class="d-flex justify-space-between">
                 <v-row class="d-flex align-center no-gutters">
@@ -66,40 +96,86 @@
 
 <script>
 export default {
-    data: () => ({
-        today: new Date().toISOString().substr(0, 10),
-        loading: false,
-        date: null,
-        users: [], // Lista de usuários
-        selectedUser: null,
-        locale: 'pt',
-        customDateFormat: 'dd/MM/yyyy',
-        quickFilters: [
-            { label: "Hoje", range: [new Date(), new Date()] },
-            { label: "Últimos 3 dias", range: [new Date(Date.now() - 3 * 864e5), new Date()] },
-            { label: "Última semana", range: [new Date(Date.now() - 7 * 864e5), new Date()] },
-            { label: "Último mês", range: [new Date(Date.now() - 30 * 864e5), new Date()] }
-        ],
-        selectedQuickFilter: null,
-        dateInputDisabled: false,
-        geoAreas: [],
-        selectedGeoArea: null,
-        latitude: null,
-        longitude: null,
-        radius: null,
-    }),
+  data: () => ({
+    today: new Date().toISOString().substr(0, 10),
+    loading: false,
+    date: null,
+    users: [], // Lista de usuários
+    selectedUser: null,
+    locale: "pt",
+    customDateFormat: "dd/MM/yyyy",
+    quickFilters: [
+      { label: "Hoje", range: [new Date(), new Date()] },
+      {
+        label: "Últimos 3 dias",
+        range: [new Date(Date.now() - 3 * 864e5), new Date()],
+      },
+      {
+        label: "Última semana",
+        range: [new Date(Date.now() - 7 * 864e5), new Date()],
+      },
+      {
+        label: "Último mês",
+        range: [new Date(Date.now() - 30 * 864e5), new Date()],
+      },
+    ],
+    selectedQuickFilter: null,
+    dateInputDisabled: false,
+    geoAreas: [],
+    selectedGeoArea: null,
+    latitude: null,
+    longitude: null,
+    radius: null,
+  }),
 
-    mounted() {
-        this.fetchUsers();
-        this.fetchGeoAreas();
+  mounted() {
+    this.fetchUsers();
+    this.fetchGeoAreas();
+  },
+
+  computed: {
+    ButtonDisabled() {
+      return !this.selectedUser || !this.date;
+    },
+  },
+
+  methods: {
+    async fetchUsers() {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/filters/users?page=0&qtdPage=1000"
+        );
+        const data = await response.json();
+
+        // Mapeando a resposta da API para o formato correto
+        this.users = data.listUsers.map((user) => ({
+          name: user.userName.toUpperCase(), // Nome do usuário
+          deviceId: user.idDevice, // ID do dispositivo associado
+          device: user.deviceName,
+        }));
+
+        console.log("Sucesso ao buscar usuários: ", this.users);
+      } catch (error) {
+        console.log("Erro ao buscar usuários: ", error);
+      }
     },
 
-    computed: {
-        ButtonDisabled() {
-            return !this.selectedUser || !this.date;
-        },
+    async fetchGeoAreas() {
+      try {
+        const response = await fetch("http://localhost:8080/zone");
+        const data = await response.json();
+        this.geoAreas = data.map((area) => ({
+          id: area.id,
+          name: area.name,
+          latitude: area.center.latitude,
+          longitude: area.center.longitude,
+          radius: area.radius,
+        }));
+        console.log("Áreas geográficas carregadas:", data);
+      } catch (error) {
+        console.log("Erro ao buscar áreas geográficas:", error);
+      }
     },
-
     methods: {
         async fetchUsers() {
             try {
@@ -261,40 +337,35 @@ export default {
             }
         },
     },
+  },
 
-    watch: {
-        loading(val) {
-            if (!val) return;
-            setTimeout(() => (this.loading = false), 1000);
-        },
+  watch: {
+    loading(val) {
+      if (!val) return;
+      setTimeout(() => (this.loading = false), 1000);
     },
+  },
 };
 </script>
 
 <style scoped>
 .icon-container {
-    position: relative;
+  position: relative;
 }
 
 .plus-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 16px;
-    color: black;
-}
+  position: absolute;  top: 50%;  left: 50%;  transform: translate(-50%, -50%);  font-size: 16px;  color: black;}
 
 .title-text {
-    font-weight: bold;
-    font-size: 16px;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .no-shadow {
-    box-shadow: none !important;
+  box-shadow: none !important;
 }
 
 .rounded {
-    border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 </style>
