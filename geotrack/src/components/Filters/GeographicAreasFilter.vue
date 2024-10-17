@@ -337,13 +337,7 @@ export default {
 }
 
 .plus-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 16px;
-  color: black;
-}
+  position: absolute;  top: 50%;  left: 50%;  transform: translate(-50%, -50%);  font-size: 16px;  color: black;}
 
 .title-text {
   font-weight: bold;
