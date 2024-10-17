@@ -36,89 +36,62 @@
               @update:model-value="handleGeoAreaChange"
             >
             </v-combobox>
-          </v-col>
+            <!-- Card das áreas geográficas -->
+            <v-card-actions class="d-flex justify-space-between">
+                <v-row class="d-flex align-center no-gutters">
+                    <v-col cols="100%" style="padding: 0px;">
+                        <!-- Combobox de áreas geográficas -->
+                        <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary"
+                            v-model="selectedGeoArea" :items="geoAreas" item-value="id" item-title="name" clearable
+                            :multiple="false" @update:model-value="handleGeoAreaChange">
+                        </v-combobox>
+                    </v-col>
 
-          <v-col cols="auto" style="padding: 0px 0px 20px 10px">
-            <div class="icon-container">
-              <v-btn icon @click="drawCircle" class="no-shadow rounded">
-                <v-icon>mdi-circle-outline</v-icon>
-                <v-icon class="plus-icon">mdi-plus</v-icon>
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </v-card-actions>
+                    <v-col cols="auto" style="padding: 0px 0px 20px 10px;">
+                        <div class="icon-container">
+                            <v-btn icon @click="drawCircle" class="no-shadow rounded">
+                                <v-icon>mdi-circle-outline</v-icon>
+                                <v-icon class="plus-icon">mdi-plus</v-icon>
+                            </v-btn>
+                        </div>
+                    </v-col>
+                </v-row>
+            </v-card-actions>
 
-      <!-- Date selection -->
-      <v-date-input
-        v-model="date"
-        label="Selecione o período"
-        multiple="range"
-        color="primary"
-        :max="today"
-        :locale="locale"
-        :format="customDateFormat"
-        placeholder="dd/MM/yyyy"
-        :readonly="dateInputDisabled"
-      ></v-date-input>
+            <!-- Date selection -->
+            <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
+                :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
+                :readonly="dateInputDisabled"></v-date-input>
 
-      <!-- Quick date filters using chips -->
-      <v-col style="padding: 0px; display: flex">
-        <v-chip
-          style="margin: 0px 2px !important"
-          size="small"
-          v-for="(filter, index) in quickFilters"
-          :key="filter.label"
-          @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
-          :active="selectedQuickFilter === index"
-          filter
-          class="ma-2"
-          variant="flat"
-        >
-          {{ filter.label }}
-        </v-chip>
-      </v-col>
-    </v-col>
-
-    <v-card-actions
-      class="d-flex justify-space-between"
-      style="padding: 20px 20px 0 20px"
-    >
-      <v-row class="d-flex" no-gutters>
-        <v-col cols="8">
-          <v-btn
-            :disabled="ButtonDisabled || loading"
-            :loading="loading"
-            class="text-none"
-            color="primary"
-            size="large"
-            variant="flat"
-            block
-            rounded="lg"
-            @click="handleConsult"
-          >
-            Consultar
-          </v-btn>
+            <!-- Quick date filters using chips -->
+            <v-col style="padding: 0px; display: flex; justify-content: space-evenly;">
+                <v-chip v-for="(filter, index) in quickFilters" :key="filter.label"
+                    @click="setQuickFilter(filter.range, index)"
+                    :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
+                    :active="selectedQuickFilter === index" filter variant="flat" size="small">
+                    {{ filter.label }}
+                </v-chip>
+            </v-col>
         </v-col>
-        <v-col cols="4">
-          <v-btn
-            :disabled="loading"
-            :loading="loading"
-            class="text-none"
-            color="primary_light"
-            size="large"
-            variant="flat"
-            block
-            rounded="lg"
-            @click="clearFields"
-          >
-            Limpar
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card-actions>
-  </v-card>
+
+        <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px;">
+            <v-row class="d-flex" no-gutters style="justify-content: space-around;">
+                <v-col cols="7">
+                    <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary"
+                        size="large" variant="flat" block rounded="xl" @click="handleConsult">
+                        Consultar
+                    </v-btn>
+                </v-col>
+                <v-col cols="4">
+                    <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
+                        variant="flat" block rounded="xl" @click="clearFields">
+                        Limpar
+                    </v-btn>
+                </v-col>
+            </v-row>
+        </v-card-actions>
+
+    </v-card>
 </template>
 
 <script>
@@ -203,122 +176,166 @@ export default {
         console.log("Erro ao buscar áreas geográficas:", error);
       }
     },
+    methods: {
+        async fetchUsers() {
+            try {
+                const response = await fetch("http://localhost:8080/filters/users?page=0&qtdPage=1000");
+                const data = await response.json();
 
-    async handleGeoAreaChange() {
-      const selectedArea = this.geoAreas.find(
-        (area) => area.id === this.selectedGeoArea.id
-      );
+                // Mapeando a resposta da API para o formato correto
+                this.users = data.listUsers.map(user => ({
+                    name: user.userName.toUpperCase(), // Nome do usuário
+                    deviceId: user.idDevice, // ID do dispositivo associado
+                    device: user.deviceName
+                }));
 
-      if (!selectedArea) {
-        console.log("Área geográfica não encontrada");
-        return;
-      }
+                console.log("Sucesso ao buscar usuários: ", this.users);
+            } catch (error) {
+                console.log("Erro ao buscar usuários: ", error);
+            }
+        },
 
-      const requestData = {
-        latitude: selectedArea.latitude,
-        longitude: selectedArea.longitude,
-        radius: selectedArea.radius,
-      };
+        async fetchGeoAreas() {
+            try {
+                const response = await fetch("http://localhost:8080/zone");
+                const data = await response.json();
+                this.geoAreas = data.map(area => ({
+                    id: area.id,
+                    name: area.name,
+                    latitude: area.center.latitude,
+                    longitude: area.center.longitude,
+                    radius: area.radius
+                }));
+                console.log("Áreas geográficas carregadas:", data);
+            } catch (error) {
+                console.log("Erro ao buscar áreas geográficas:", error);
+            }
+        },
 
-      const dataCircleAndUser = {
-        id: selectedArea.id,
-        name: selectedArea.name,
-        latitude: selectedArea.latitude,
-        longitude: selectedArea.longitude,
-        radius: selectedArea.radius,
-      };
+        async handleGeoAreaChange() {
 
-      this.$emit("consult", dataCircleAndUser);
-    },
+            const selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
 
-    async handleConsult() {
-      if (!this.selectedUser || !this.date || !this.selectedGeoArea) {
-        console.log("Dados incompletos para a consulta");
-        return;
-      }
+            if (!selectedArea) {
+                console.log("Área geográfica não encontrada");
+                return;
+            }
 
-      const selectedArea = this.geoAreas.find(
-        (area) => area.id === this.selectedGeoArea.id
-      );
+            const requestData = {
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
+            };
 
-      if (!selectedArea) {
-        console.log("Área geográfica não encontrada");
-        return;
-      }
+            const dataCircleAndUser = {
+                name: selectedArea.name,
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
+            }
 
-      const requestData = {
-        deviceId: this.selectedUser.deviceId,
-        startDate: new Date(this.date[0]).toLocaleDateString("en-CA"),
-        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString(
-          "en-CA"
-        ),
-        latitude: selectedArea.latitude,
-        longitude: selectedArea.longitude,
-        radius: selectedArea.radius,
-      };
+            this.$emit('consult', dataCircleAndUser);
+        },
 
-      console.log("Dados enviados: ", requestData);
+        async handleConsult() {
+            const cachedDetails = localStorage.getItem('cachedCircleDetails');
+            const cachedCircle = JSON.parse(cachedDetails);
+            let selectedArea = null;
 
-      const url = `http://localhost:8080/stoppointsession/pointsInSession?deviceId=${requestData.deviceId}&startDate=${requestData.startDate}&endDate=${requestData.finalDate}&latitude=${requestData.latitude}&longitude=${requestData.longitude}&radius=${requestData.radius}`;
+            if (!this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle)) {
+                console.log("Dados incompletos para a consulta");
+                return;
+            }
 
-      console.log("URL: ", url);
+            if(this.selectedGeoArea){
+                selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
 
-      try {
-        const response = await fetch(url);
-        if (response.ok) {
-          const data = await response.json();
+                if (!selectedArea) {
+                    console.log("Área geográfica não encontrada");
+                    return;
+                }
+            }else{
+                selectedArea = cachedCircle;
+                selectedArea.latitude = selectedArea.center.latitude;
+                selectedArea.longitude = selectedArea.center.longitude;
+                console.log('passooou ', selectedArea)
+            }
 
-          console.log("Pontos de parada recebidos:", data.stopPoints);
+            const requestData = {
+                deviceId: this.selectedUser.deviceId,
+                startDate: new Date(this.date[0]).toLocaleDateString('en-CA'),
+                finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA'),
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
+            };
 
-          const dataCircleAndUser = {
-            userName: this.selectedUser.name,
-            name: selectedArea.name,
-            latitude: selectedArea.latitude,
-            longitude: selectedArea.longitude,
-            radius: selectedArea.radius,
-          };
+            console.log("Dados enviados: ", requestData);
 
-          const coord = data.stopPoints;
+            const url = `http://localhost:8080/stoppointsession/pointsInSession?deviceId=${requestData.deviceId}&startDate=${requestData.startDate}&endDate=${requestData.finalDate}&latitude=${requestData.latitude}&longitude=${requestData.longitude}&radius=${requestData.radius}`;
 
-          const dados = {
-            userName: this.selectedUser.name,
-            device: this.selectedUser.device,
-            coords: coord, // Definindo corretamente um array para coordenadas
-          };
+            console.log("URL: ", url);
 
-          // Dados enviados para plotar o círculo escolhido
-          this.$emit("consult", dataCircleAndUser);
-          this.$emit("stopPointsReceived", dados);
-        } else if (response.status === 404) {
-          const errorData = await response.json();
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
 
-          console.log("Erro 404: ", errorData.message);
+                    console.log("Pontos de parada recebidos:", data.stopPoints);
 
-          this.$emit("noPointsFound", errorData.message);
-        }
-      } catch (error) {
-        console.log("Erro ao buscar pontos de parada:", error);
-      }
-    },
+                    const dataCircleAndUser = {
+                        userName: this.selectedUser.name,
+                        name: selectedArea.name,
+                        latitude: selectedArea.latitude,
+                        longitude: selectedArea.longitude,
+                        radius: selectedArea.radius,
+                    }
 
-    clearFields() {
-      window.location.reload();
-    },
+                    const coord = data.stopPoints
 
-    drawCircle() {
-      this.$emit("drawCircle");
-    },
+                    const dados = {
+                        userName: this.selectedUser.name,
+                        device: this.selectedUser.device,
+                        coords: coord // Definindo corretamente um array para coordenadas
+                    };
 
-    setQuickFilter(range, index) {
-      if (this.selectedQuickFilter === index) {
-        this.selectedQuickFilter = null;
-        this.date = null;
-        this.dateInputDisabled = false;
-      } else {
-        this.selectedQuickFilter = index;
-        this.date = range.map((date) => date.toISOString().substr(0, 10));
-        this.dateInputDisabled = true;
-      }
+                    // Dados enviados para plotar o círculo escolhido
+                    this.$emit('consult', dataCircleAndUser);
+                    this.$emit('stopPointsReceived', dados);
+
+                } else if (response.status === 404) {
+                    const errorData = await response.json();
+
+                    console.log("Erro 404: ", errorData.message);
+
+                    this.$emit('noPointsFound', errorData.message);
+                }
+            } catch (error) {
+                console.log("Erro ao buscar pontos de parada:", error);
+            }
+        },
+
+        clearFields() {
+            window.location.reload();
+        },
+
+        drawCircle() {
+            this.$emit('drawCircle');
+            this.selectedGeoArea = null
+            console.log('aqui')
+        },
+
+        setQuickFilter(range, index) {
+            if (this.selectedQuickFilter === index) {
+                this.selectedQuickFilter = null;
+                this.date = null;
+                this.dateInputDisabled = false;
+            } else {
+                this.selectedQuickFilter = index;
+                this.date = range.map(date => date.toISOString().substr(0, 10));
+                this.dateInputDisabled = true;
+            }
+        },
     },
   },
 

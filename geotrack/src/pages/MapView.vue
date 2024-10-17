@@ -8,13 +8,13 @@
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 
   <!-- Modal dialog para detalhes do círculo -->
-  <v-dialog v-model="dialog" max-width="425px" max-height="460px">
-    <v-card>
-      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px">
+  <v-dialog v-model="dialog" max-width="400px">
+    <v-card rounded="xl">
+      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
         <span class="headline">Detalhes da zona selecionada</span>
       </v-card-title>
 
-      <v-card-text style="padding: 10px 15px 10px 15px">
+      <v-card-text style="padding: 10px 15px 0px 15px;">
         <v-form>
           <v-text-field
             v-model="circleDetails.name"
@@ -426,6 +426,22 @@ export default {
 
       const payload = {
         name: circleDetails.value.name,
+        type: circleDetails.value.type,
+        center: {
+          longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
+          latitude: parseFloat(circleDetails.value.center.split(", ")[0])
+        },
+        radius: parseFloat(circleDetails.value.radius)
+      };
+
+      // Armazenando os dados no localStorage
+      localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
+
+    };
+
+    const saveCircle = async () => {
+      const payload = {
+        name: 'Zona 1',
         type: "CIRCLE",
         center: {
           longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
@@ -500,6 +516,7 @@ export default {
       if (circleInstance) {
         circleInstance.setMap(null);
         circleInstance = null;
+        localStorage.removeItem('cachedCircleDetails');
       }
     };
 
@@ -536,7 +553,6 @@ export default {
 
     const handleGeographicAreaConsult = (data: any) => {
       console.log("Dados geográficos recebidos do Sidebar:", data);
-
       circleDetails.value = {
         id: data.id,
         name: data.name,
@@ -554,11 +570,12 @@ export default {
       points.coords.forEach((item: any) => {
         const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
 
-        console.log("name ", points);
+        const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
+
+        console.log('name ', points)
 
         // Gera as iniciais do usuário
-        const initials = points.userName
-          .split(" ")
+        const initials = points.userName.split(" ")
           .slice(0, 2)
           .map((name: string) => name[0])
           .join("");

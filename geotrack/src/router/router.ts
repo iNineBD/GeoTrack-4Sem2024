@@ -4,8 +4,7 @@ import MapView from '../pages/MapView.vue';
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: MapView,
+    redirect: '/stoppointsfilter',
   },
   {
     path: '/stoppointsfilter',
