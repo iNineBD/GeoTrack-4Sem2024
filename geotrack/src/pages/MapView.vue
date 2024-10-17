@@ -16,8 +16,29 @@
           <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%;"></v-text-field>
           <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
             style="opacity: 75%;"></v-text-field>
+            <v-col cols="auto" style="padding: 0px 0px 20px 10px">
+            <div class="icon-container" style="position: relative">
+              <v-btn icon @click="editCircle" class="no-shadow rounded">
+                <v-icon>mdi-circle-outline</v-icon>
+                <v-icon
+                  class="plus-icon"
+                  style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 16px;
+                    color: black;
+                  "
+                  >mdi-plus</v-icon
+                >
+              </v-btn>
+            </div>
+          </v-col>
           <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly
-            style="opacity: 75%;"></v-text-field>
+            style="opacity: 75%;">
+          
+          </v-text-field>
         </v-form>
       </v-card-text>
 
@@ -286,6 +307,10 @@ export default {
 
     };
 
+    const editCircle = async() => {
+      console.log('aqui')
+    };
+
     const saveCircle = async () => {
       const payload = {
         name: circleDetails.value.name,
@@ -429,6 +454,7 @@ export default {
       dialog,
       circleDetails,
       saveCircle,
+      editCircle,
       removeCircle,
       snackbar,
       snackbarMessage,
