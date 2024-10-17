@@ -145,6 +145,7 @@ export default {
 
         circleInstance = circle;
 
+        console.log('center:', center, ',radius:', radius)
         circleDetails.value.center = `${center.lat}, ${center.lng}`;
         circleDetails.value.radius = `${radius}`;
 
@@ -160,7 +161,7 @@ export default {
           drawingManager.value.setMap(null);
         }
       });
-      
+
     };
 
     const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
@@ -271,9 +272,11 @@ export default {
     };
 
     const circleForConsult = async () => {
+      circleDetails.value.name = 'Zona 1'
+      circleDetails.value.type = "CIRCLE"
       const payload = {
         name: circleDetails.value.name,
-        type: "CIRCLE",
+        type: circleDetails.value.type,
         center: {
           longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
           latitude: parseFloat(circleDetails.value.center.split(", ")[0])
@@ -281,14 +284,14 @@ export default {
         radius: parseFloat(circleDetails.value.radius)
       };
 
-        // Armazenando os dados no localStorage
-        localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
+      // Armazenando os dados no localStorage
+      localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
 
     };
 
     const saveCircle = async () => {
       const payload = {
-        name: circleDetails.value.name,
+        name: 'Zona 1',
         type: "CIRCLE",
         center: {
           longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
@@ -323,6 +326,7 @@ export default {
       if (circleInstance) {
         circleInstance.setMap(null);
         circleInstance = null;
+        localStorage.removeItem('cachedCircleDetails');
       }
     };
 
@@ -355,7 +359,6 @@ export default {
 
     const handleGeographicAreaConsult = (data: any) => {
       console.log("Dados geográficos recebidos do Sidebar:", data);
-
       circleDetails.value = {
         name: data.name,
         type: 'CIRCLE',

@@ -170,7 +170,7 @@ export default {
                 console.log("Dados incompletos para a consulta");
                 return;
             }
-            
+
             if(this.selectedGeoArea){
                 selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
 
@@ -245,6 +245,8 @@ export default {
 
         drawCircle() {
             this.$emit('drawCircle');
+            this.selectedGeoArea = null
+            console.log('aqui')
         },
 
         setQuickFilter(range, index) {
