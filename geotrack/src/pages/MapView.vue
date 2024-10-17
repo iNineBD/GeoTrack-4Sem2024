@@ -1,92 +1,34 @@
 <template>
-  <Sidebar
-    @consult="fetchGeoJsonData"
-    @drawCircle="enableCircleDrawing"
-    @geographicAreaConsult="handleGeographicAreaConsult"
-    @stopPointsReceived="handleStopPointsOnMap"
-
-  />
+  <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
+    @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 
   <!-- Modal dialog para detalhes do círculo -->
-  <v-dialog v-model="dialog" max-width="425px" max-height="460px">
-    <v-card>
-      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px">
+  <v-dialog v-model="dialog" max-width="400px">
+    <v-card rounded="xl">
+      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
         <span class="headline">Detalhes da zona selecionada</span>
       </v-card-title>
 
-      <v-card-text style="padding: 10px 15px 10px 15px">
+      <v-card-text style="padding: 10px 15px 0px 15px;">
         <v-form>
-          <v-text-field
-            v-model="circleDetails.name"
-            label="Nome"
-          ></v-text-field>
-          <v-text-field
-            v-model="circleDetails.type"
-            label="Tipo"
-            readonly
-            style="opacity: 75%"
-          ></v-text-field>
-          <v-text-field
-            v-model="circleDetails.center"
-            label="Coordenadas do Centro (latitude/longitude)"
-            readonly
-            style="opacity: 75%"
-          ></v-text-field>
-          <v-col cols="auto" style="padding: 0px 0px 20px 10px">
-            <div class="icon-container" style="position: relative">
-              <v-btn icon @click="drawCircle" class="no-shadow rounded">
-                <v-icon>mdi-circle-outline</v-icon>
-                <v-icon
-                  class="plus-icon"
-                  style="
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    font-size: 16px;
-                    color: black;
-                  "
-                  >mdi-plus</v-icon
-                >
-              </v-btn>
-            </div>
-          </v-col>
-          <v-text-field
-            v-model="circleDetails.radius"
-            label="Raio (metros)"
-            readonly
-            style="opacity: 75%"
-          ></v-text-field>
+          <v-text-field v-model="circleDetails.name" label="Nome"></v-text-field>
+          <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%;"></v-text-field>
+          <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
+            style="opacity: 75%;"></v-text-field>
+          <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly
+            style="opacity: 75%;"></v-text-field>
         </v-form>
       </v-card-text>
 
       <v-card-actions>
         <v-row justify="center">
-          <v-btn
-            variant="flat"
-            color="primary"
-            @click="saveCircle"
-            style="margin: 0px 10px 15px 10px"
-          >
+          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px;" rounded="xl">
             Salvar
           </v-btn>
-          <v-btn
-            variant="flat"
-            color="grey-lighten-2"
-            @click="removeCircle"
-            style="margin: 0px 10px 15px 10px"
-          >
+          <v-btn variant="flat" color="grey-lighten-2" @click="removeCircle" style="margin: 0px 10px 15px 10px;"
+            rounded="xl">
             Remover
-          </v-btn>
-          <v-btn
-            v-if="circleDetails.id == null"
-            variant="flat"
-            color="grey-lighten-2"
-            @click="deleteCircle"
-            style="margin: 0px 10px 15px 10px"
-          >
-            Deletar
           </v-btn>
         </v-row>
       </v-card-actions>
@@ -96,12 +38,12 @@
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
+
 </template>
 
 <script lang="ts">
 import { onMounted, ref } from "vue";
 import axios from "axios";
-import { id } from "vuetify/locale";
 
 interface GeoJsonFeature {
   geometry: {
@@ -123,14 +65,13 @@ export default {
     const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
     const dialog = ref(false);
     const snackbar = ref(false);
-    const snackbarMessage = ref("");
-    const snackbarColor = ref("success");
+    const snackbarMessage = ref('');
+    const snackbarColor = ref('success');
     const circleDetails = ref({
-      id: "",
-      name: "",
-      type: "",
-      center: "",
-      radius: "",
+      name: 'Zona 1',
+      type: 'CIRCLE',
+      center: '',
+      radius: '',
     });
 
     // @ts-ignore
@@ -151,7 +92,7 @@ export default {
               map.value = new google.maps.Map(mapDiv.value!, {
                 center: userLocation,
                 zoom: 12,
-                minZoom: 4, // Limite inferior de zoom
+                minZoom: 4,  // Limite inferior de zoom
               });
 
               addCurrentLocationMarker(userLocation);
@@ -159,11 +100,11 @@ export default {
             },
             (error) => {
               // Se a localização não for aceita, inicie o mapa com a localização padrão
-              const defaultLocation = { lat: -14.235, lng: -51.9253 };
+              const defaultLocation = { lat: -14.2350, lng: -51.9253 };
               map.value = new google.maps.Map(mapDiv.value!, {
                 center: defaultLocation,
                 zoom: 3,
-                minZoom: 4, // Limite inferior de zoom
+                minZoom: 4,  // Limite inferior de zoom
               });
               // Não chama addMarker se a geolocalização falhar
             }
@@ -173,7 +114,7 @@ export default {
           map.value = new google.maps.Map(mapDiv.value!, {
             center: defaultLocation,
             zoom: 10,
-            minZoom: 4, // Limite inferior de zoom
+            minZoom: 4,  // Limite inferior de zoom
           });
           // Não chama addMarker se geolocalização não estiver disponível
         }
@@ -185,45 +126,41 @@ export default {
         drawingMode: google.maps.drawing.OverlayType.CIRCLE,
         drawingControl: false,
         circleOptions: {
-          fillColor: "#18FFFF",
+          fillColor: '#18FFFF',
           fillOpacity: 0.3,
           strokeWeight: 2,
-          strokeColor: "#0097A7",
+          strokeColor: '#0097A7',
           clickable: true,
         },
       });
 
-
-
       // @ts-ignore
-      google.maps.event.addListener(
-        drawingManager.value,
-        "circlecomplete",
-        (circle: google.maps.Circle) => {
-          if (circleInstance) {
-            circleInstance.setMap(null);
-          }
-
-          const center = circle.getCenter().toJSON(); // {lat, lng}
-          const radius = circle.getRadius(); // em metros
-
-          circleInstance = circle;
-
-          circleDetails.value.id = `${id}`;
-          circleDetails.value.center = `${center.lat}, ${center.lng}`;
-          circleDetails.value.radius = `${radius}`;
-
-          // Evento para abrir o modal quando o círculo for clicado
-          google.maps.event.addListener(circle, "click", () => {
-            dialog.value = true;
-          });
-
-          if (drawingManager.value) {
-            drawingManager.value.setDrawingMode(null);
-            drawingManager.value.setMap(null);
-          }
+      google.maps.event.addListener(drawingManager.value, 'circlecomplete', (circle: google.maps.Circle) => {
+        if (circleInstance) {
+          circleInstance.setMap(null);
         }
-      );
+
+        const center = circle.getCenter().toJSON(); // {lat, lng}
+        const radius = circle.getRadius(); // em metros
+
+        circleInstance = circle;
+
+        circleDetails.value.center = `${center.lat}, ${center.lng}`;
+        circleDetails.value.radius = `${radius}`;
+
+        circleForConsult();
+
+        // Evento para abrir o modal quando o círculo for clicado
+        google.maps.event.addListener(circle, 'click', () => {
+          dialog.value = true;
+        });
+
+        if (drawingManager.value) {
+          drawingManager.value.setDrawingMode(null);
+          drawingManager.value.setMap(null);
+        }
+      });
+      
     };
 
     const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
@@ -252,16 +189,13 @@ export default {
     };
 
     const fetchGeoJsonData = async (filterData: FilterData) => {
-      console.log("Filter data recebido:", filterData);
+      console.log("Filter data recebido:", filterData)
       try {
         const requestData = { ...filterData }; // Formato dos dados que você espera no backend
 
         console.log("dados recebidos:", requestData);
 
-        const response = await axios.post(
-          "http://localhost:8080/stoppoint/find",
-          requestData
-        );
+        const response = await axios.post("http://localhost:8080/stoppoint/find", requestData);
 
         // Resposta esperada: uma matriz de objetos
         const geoJsonResponses = response.data;
@@ -277,8 +211,7 @@ export default {
                 const position = { lat: coords[1], lng: coords[0] }; // Coordenadas: lat e lng
 
                 // Gera as iniciais do usuário
-                const initials = user
-                  .split(" ")
+                const initials = user.split(" ")
                   .slice(0, 2)
                   .map((name: string) => name[0])
                   .join("");
@@ -322,10 +255,7 @@ export default {
               }
             });
           } else {
-            console.warn(
-              "Nenhum dado GeoJSON disponível para o usuário:",
-              user
-            );
+            console.warn("Nenhum dado GeoJSON disponível para o usuário:", user);
           }
         });
       } catch (error) {
@@ -335,94 +265,55 @@ export default {
 
     const enableCircleDrawing = () => {
       if (drawingManager.value && map.value) {
-        drawingManager.value.setDrawingMode(
-          google.maps.drawing.OverlayType.CIRCLE
-        );
+        drawingManager.value.setDrawingMode(google.maps.drawing.OverlayType.CIRCLE);
         drawingManager.value.setMap(map.value);
       }
     };
 
-    const saveCircle = async () => {
-
-      const updateZone = {
-        id: circleDetails.value.id,
-        name: circleDetails.value.name,
-        type: "CIRCLE",
-        center: {
-          longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
-          latitude: parseFloat(circleDetails.value.center.split(", ")[0]),
-        },
-        radius: parseFloat(circleDetails.value.radius),
-      }
-
+    const circleForConsult = async () => {
       const payload = {
         name: circleDetails.value.name,
         type: "CIRCLE",
         center: {
           longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
-          latitude: parseFloat(circleDetails.value.center.split(", ")[0]),
+          latitude: parseFloat(circleDetails.value.center.split(", ")[0])
         },
-        radius: parseFloat(circleDetails.value.radius),
+        radius: parseFloat(circleDetails.value.radius)
       };
 
-      console.log("Dados para insert no banco: ", payload);
+        // Armazenando os dados no localStorage
+        localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
 
-      try {
-         console.log("vamo que vamooo", circleDetails.value);
-        if(!Number.isInteger(parseInt(circleDetails.value.id, 10))){
-        const response = await axios.post(
-          "http://localhost:8080/zone",
-          payload
-        );
-
-        console.log("Dados enviados com sucesso:", response.data);
-        }
-
-        else{
-          const response = await axios.put(
-          "http://localhost:8080/zone",
-          updateZone
-        );
-        console.log("Dados enviados com sucesso para update:", response.data);
-
-        }
-        snackbarMessage.value = "Zona salva com sucesso!";
-        snackbarColor.value = "success";
-        snackbar.value = true;
-
-        dialog.value = false;
-      } catch (error) {
-        console.log("Erro ao enviar os dados:", error);
-        snackbarMessage.value = "Erro ao salvar a zona. Tente novamente.";
-        snackbarColor.value = "error";
-        snackbar.value = true;
-      }
     };
 
-    const deleteCircle = async () => {
-      console.log("vai ", circleDetails.value);
+    const saveCircle = async () => {
       const payload = {
-        id: circleDetails.value.id,
+        name: circleDetails.value.name,
+        type: "CIRCLE",
+        center: {
+          longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
+          latitude: parseFloat(circleDetails.value.center.split(", ")[0])
+        },
+        radius: parseFloat(circleDetails.value.radius)
       };
-      console.log("aquiiiii ", payload);
+
+      console.log("Dados para insert no banco: ", payload)
 
       try {
-        const response = await axios.delete("http://localhost:8080/zone", {
-          data: payload,
-        });
-        console.log("Dados enviados com sucesso:", response.data);
-        console.log({ data: payload });
-        snackbarMessage.value = "Zona deletada com sucesso!";
-        snackbarColor.value = "success";
+        const response = await axios.post("http://localhost:8080/zone", payload);
+        console.log('Dados enviados com sucesso:', response.data);
+
+        snackbarMessage.value = 'Zona salva com sucesso!';
+        snackbarColor.value = 'success';
         snackbar.value = true;
 
         dialog.value = false;
-        removeCircle();
-      } catch (error) {
-        console.log("Erro ao deletar os dados:", error);
 
-        snackbarMessage.value = "Erro ao deletar a zona. Tente novamente.";
-        snackbarColor.value = "error";
+      } catch (error) {
+        console.log('Erro ao enviar os dados:', error);
+
+        snackbarMessage.value = 'Erro ao salvar a zona. Tente novamente.';
+        snackbarColor.value = 'error';
         snackbar.value = true;
       }
     };
@@ -435,11 +326,7 @@ export default {
       }
     };
 
-    const drawCircleOnMap = (
-      latitude: number,
-      longitude: number,
-      radius: number
-    ) => {
+    const drawCircleOnMap = (latitude: number, longitude: number, radius: number) => {
       if (circleInstance) {
         circleInstance.setMap(null);
       }
@@ -451,14 +338,14 @@ export default {
         map: map.value,
         center: circleCenter,
         radius: radius,
-        fillColor: "#18FFFF",
+        fillColor: '#18FFFF',
         fillOpacity: 0.3,
         strokeWeight: 2,
-        strokeColor: "#0097A7",
+        strokeColor: '#0097A7',
         clickable: true,
       });
 
-      google.maps.event.addListener(circleInstance, "click", () => {
+      google.maps.event.addListener(circleInstance, 'click', () => {
         dialog.value = true;
       });
 
@@ -470,9 +357,8 @@ export default {
       console.log("Dados geográficos recebidos do Sidebar:", data);
 
       circleDetails.value = {
-        id: data.id,
         name: data.name,
-        type: "CIRCLE",
+        type: 'CIRCLE',
         center: `${data.latitude}, ${data.longitude}`,
         radius: `${data.radius}`,
       };
@@ -484,13 +370,13 @@ export default {
       console.log("Pontos de parada recebidos do Sidebar:", points);
 
       points.coords.forEach((item: any) => {
+
         const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
 
-        console.log("name ", points);
+        console.log('name ', points)
 
         // Gera as iniciais do usuário
-        const initials = points.userName
-          .split(" ")
+        const initials = points.userName.split(" ")
           .slice(0, 2)
           .map((name: string) => name[0])
           .join("");
@@ -532,6 +418,7 @@ export default {
 
         centerMapOnMarker(position);
       });
+
     };
 
     return {
@@ -542,7 +429,6 @@ export default {
       dialog,
       circleDetails,
       saveCircle,
-      deleteCircle,
       removeCircle,
       snackbar,
       snackbarMessage,
