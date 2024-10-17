@@ -35,7 +35,19 @@
   </v-dialog>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
+  <span style="font-weight: bold; font-size: 15px; color: white;">  
     {{ snackbarMessage }}
+  </span>
+  <template v-slot:actions>
+    <v-btn
+      color="white"
+      variant="text"
+      style="font-weight: bold; text-transform: uppercase; color: white;"
+      @click="snackbar = false"
+    >
+      Close
+    </v-btn>
+  </template>  
   </v-snackbar>
 
 </template>
@@ -49,8 +61,6 @@ interface GeoJsonFeature {
     coordinates: [number, number];
   };
 }
-
-
 
 export interface FilterData {
   idDevice: number[];
@@ -80,6 +90,12 @@ export default {
     // @ts-ignore
     const circles = ref<{ circle: google.maps.Circle; details: any }[]>([]);
 
+    const showSnackbar = (message: string, color: string = 'sucess') => {
+      snackbarMessage.value = message;
+      snackbarColor.value = color;
+      snackbar.value = true;
+    }
+
     onMounted(() => {
       if (mapDiv.value) {
         if (navigator.geolocation) {
@@ -108,6 +124,7 @@ export default {
                 minZoom: 4,  // Limite inferior de zoom
               });
               // Não chama addMarker se a geolocalização falhar
+              showSnackbar('Falha ao obter a localização.Usando localização padrão.','warning');
             }
           );
         } else {
@@ -118,6 +135,7 @@ export default {
             minZoom: 4,  // Limite inferior de zoom
           });
           // Não chama addMarker se geolocalização não estiver disponível
+          showSnackbar('Geolocalização não suportada pelo navegador.','error');
         }
       }
     });
@@ -253,11 +271,12 @@ export default {
               }
             });
           } else {
+            showSnackbar('Nenhum dado GeoJSON disponível para o usuário', 'warning');
             console.warn("Nenhum dado GeoJSON disponível para o usuário:", user);
           }
         });
       } catch (error) {
-        console.error("Erro ao buscar os dados GeoJSON:", error);
+        showSnackbar('Usuários não possuem pontos de parada para este período', 'error');
       }
     };
 
@@ -292,6 +311,7 @@ export default {
         dialog.value = false;
 
       } catch (error) {
+        showSnackbar('Erro ao enviar os dados.','error');
         console.log('Erro ao enviar os dados:', error);
 
         snackbarMessage.value = 'Erro ao salvar a zona. Tente novamente.';
@@ -414,6 +434,7 @@ export default {
       removeCircle,
       snackbar,
       snackbarMessage,
+      showSnackbar,
       snackbarColor,
       drawCircleOnMap,
       handleGeographicAreaConsult,
