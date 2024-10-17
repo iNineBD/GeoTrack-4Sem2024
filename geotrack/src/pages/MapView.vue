@@ -4,7 +4,6 @@
     @drawCircle="enableCircleDrawing"
     @geographicAreaConsult="handleGeographicAreaConsult"
     @stopPointsReceived="handleStopPointsOnMap"
-
   />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 
@@ -35,7 +34,7 @@
           ></v-text-field>
           <v-col cols="auto" style="padding: 0px 0px 20px 10px">
             <div class="icon-container" style="position: relative">
-              <v-btn icon @click="drawCircle" class="no-shadow rounded">
+              <v-btn icon @click="editCircle" class="no-shadow rounded">
                 <v-icon>mdi-circle-outline</v-icon>
                 <v-icon
                   class="plus-icon"
@@ -342,7 +341,74 @@ export default {
       }
     };
 
+    const editCircle = async () => {
+    const id = circleDetails.value.id;
+    const type = circleDetails.value.type;
+
+    console.log('id antigo', circleDetails.value);
+
+    // Fecha o dialog inicialmente
+    dialog.value = false;
+
+    // Inicia o modo de desenho de círculo
+    if (drawingManager.value && map.value) {
+    drawingManager.value.setDrawingMode(google.maps.drawing.OverlayType.CIRCLE);
+    drawingManager.value.setMap(map.value);
+    }
+
+    // Se já existir um círculo desenhado, remova-o
+    if (circleInstance) {
+    circleInstance.setMap(null);
+    circleInstance = null;
+    }
+
+    // Escuta o evento overlaycomplete para detectar quando o círculo foi desenhado
+    const overlayCompleteListener = (event: any) => {
+    if (event.type === google.maps.drawing.OverlayType.CIRCLE) {
+      // Guarda a nova instância do círculo
+      circleInstance = event.overlay;
+
+      // Atualiza os detalhes do círculo com os novos dados
+      const newRadius = circleInstance.getRadius();
+      const latitude = circleInstance.getCenter().lat();
+      const longitude = circleInstance.getCenter().lng();
+      
+      // Atualiza o circleDetails com as novas informações
+      circleDetails.value = {
+        id: id, // mantemos o id antigo
+        name: circleDetails.value.name,
+        type: type,
+        radius: newRadius,
+        center: {
+          lat: latitude,
+          lng: longitude,
+        },
+      };
+
+      console.log('Novos detalhes do círculo', circleDetails.value);
+
+      // Armazenando os dados no localStorage
+      localStorage.setItem('circleDetailsCached', JSON.stringify(circleDetails.value));
+
+      // Reabre o dialog após o círculo ser desenhado
+      dialog.value = true;
+    }
+    };
+
+    // Adiciona o listener para overlaycomplete
+    google.maps.event.addListener(drawingManager.value, 'overlaycomplete', overlayCompleteListener);
+
+    console.log('Esperando o novo círculo ser desenhado...');
+
+    
+    };
+
+
     const saveCircle = async () => {
+      const cached = localStorage.getItem('circleDetailsCached');
+      const cachedDetails = JSON.parse(cached);
+
+
       const updateZone = {
         id: circleDetails.value.id,
         name: circleDetails.value.name,
@@ -352,6 +418,10 @@ export default {
           latitude: parseFloat(circleDetails.value.center.split(", ")[0]),
         },
         radius: parseFloat(circleDetails.value.radius),
+      }
+
+      if(cachedDetails){
+        updateZone.id = cachedDetails.id
       }
 
       const payload = {
@@ -367,8 +437,7 @@ export default {
       console.log("Dados para insert no banco: ", payload);
 
       try {
-         console.log("vamo que vamooo", circleDetails.value);
-        if(!Number.isInteger(parseInt(circleDetails.value.id, 10))){
+        if(!Number.isInteger(parseInt(updateZone.id, 10))){
         const response = await axios.post(
           "http://localhost:8080/zone",
           payload
@@ -540,6 +609,7 @@ export default {
       enableCircleDrawing,
       dialog,
       circleDetails,
+      editCircle,
       saveCircle,
       deleteCircle,
       removeCircle,
