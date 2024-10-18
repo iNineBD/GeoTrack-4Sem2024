@@ -3,7 +3,7 @@
     <v-col style="padding: 20px 20px 0 20px;">
       <!-- Users combobox -->
       <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
-        prepend-icon="mdi-filter-variant" chips clearable multiple>
+        prepend-icon="mdi-filter-variant" chips clearable multiple color="primary">
         <!-- Slot para customizar a exibição dos chips -->
         <template v-slot:selection="{ attrs, item, select, selected }">
           <v-chip v-bind="attrs" :model-value="selected" closable @click="select" @click:close="remove(item)">

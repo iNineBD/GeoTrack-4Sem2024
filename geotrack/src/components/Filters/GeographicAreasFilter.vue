@@ -1,40 +1,14 @@
 <template>
-  <v-card
-    class="mx-auto"
-    width="100%"
-    style="box-shadow: none; border-radius: 0; margin-bottom: 25px"
-  >
+  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px">
     <v-col style="padding: 20px 20px 0 20px">
-      <!-- Users combobox -->
-      <v-combobox
-        v-model="selectedUser"
-        label="Usuário"
-        :items="users"
-        item-title="name"
-        item-value="deviceId"
-        prepend-icon="mdi-filter-variant"
-        clearable
-        :multiple="false"
-      >
-      </v-combobox>
-
       <!-- Card das áreas geográficas -->
       <v-card-actions class="d-flex justify-space-between">
         <v-row class="d-flex align-center no-gutters">
           <v-col cols="100%" style="padding: 0px">
             <!-- Combobox de áreas geográficas -->
-            <v-combobox
-              :disabled="disabledTexts"
-              label="Áreas geográficas"
-              color="primary"
-              v-model="selectedGeoArea"
-              :items="geoAreas"
-              item-value="id"
-              item-title="name"
-              clearable
-              :multiple="false"
-              @update:model-value="handleGeoAreaChange"
-            >
+            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary" v-model="selectedGeoArea"
+              :items="geoAreas" item-value="id" item-title="name" clearable :multiple="false"
+              @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
             </v-combobox>
           </v-col>
 
@@ -49,70 +23,38 @@
         </v-row>
       </v-card-actions>
 
+      <!-- Users combobox -->
+      <v-combobox v-model="selectedUser" label="Usuário" :items="users" item-title="name" item-value="deviceId"
+        prepend-icon="mdi-filter-variant" clearable :multiple="false" color="primary">
+      </v-combobox>
+
       <!-- Date selection -->
-      <v-date-input
-        v-model="date"
-        label="Selecione o período"
-        multiple="range"
-        color="primary"
-        :max="today"
-        :locale="locale"
-        :format="customDateFormat"
-        placeholder="dd/MM/yyyy"
-        :readonly="dateInputDisabled"
-      ></v-date-input>
+      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
+        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
+        :readonly="dateInputDisabled"></v-date-input>
 
       <!-- Quick date filters using chips -->
-      <v-col style="padding: 0px; display: flex">
-        <v-chip
-          style="margin: 0px 2px !important"
-          size="small"
-          v-for="(filter, index) in quickFilters"
-          :key="filter.label"
-          @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
-          :active="selectedQuickFilter === index"
-          filter
-          class="ma-2"
-          variant="flat"
-        >
+      <v-col style="padding: 0px; display: flex; justify-content: space-evenly;">
+        <v-chip style="margin: 0px 2px !important" size="small" v-for="(filter, index) in quickFilters"
+          :key="filter.label" @click="setQuickFilter(filter.range, index)"
+          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
+          filter class="ma-2" variant="flat">
           {{ filter.label }}
         </v-chip>
       </v-col>
     </v-col>
 
-    <v-card-actions
-      class="d-flex justify-space-between"
-      style="padding: 20px 20px 0 20px"
-    >
-      <v-row class="d-flex" no-gutters>
-        <v-col cols="8">
-          <v-btn
-            :disabled="ButtonDisabled || loading"
-            :loading="loading"
-            class="text-none"
-            color="primary"
-            size="large"
-            variant="flat"
-            block
-            rounded="lg"
-            @click="handleConsult"
-          >
+    <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
+      <v-row class="d-flex" no-gutters style="justify-content: space-around;">
+        <v-col cols="7">
+          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary" size="large"
+            variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn
-            :disabled="loading"
-            :loading="loading"
-            class="text-none"
-            color="primary_light"
-            size="large"
-            variant="flat"
-            block
-            rounded="lg"
-            @click="clearFields"
-          >
+          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
+            variant="flat" block rounded="xl" @click="clearFields">
             Limpar
           </v-btn>
         </v-col>
@@ -337,7 +279,13 @@ export default {
 }
 
 .plus-icon {
-  position: absolute;  top: 50%;  left: 50%;  transform: translate(-50%, -50%);  font-size: 16px;  color: black;}
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: black;
+}
 
 .title-text {
   font-weight: bold;

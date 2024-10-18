@@ -1,14 +1,10 @@
 <template>
-  <Sidebar
-    @consult="fetchGeoJsonData"
-    @drawCircle="enableCircleDrawing"
-    @geographicAreaConsult="handleGeographicAreaConsult"
-    @stopPointsReceived="handleStopPointsOnMap"
-  />
+  <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
+    @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 
   <!-- Modal dialog para detalhes do círculo -->
-  <v-dialog v-model="dialog" max-width="400px">
+  <v-dialog v-model="dialog" max-width="420px">
     <v-card rounded="xl">
       <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
         <span class="headline">Detalhes da zona selecionada</span>
@@ -16,75 +12,31 @@
 
       <v-card-text style="padding: 10px 15px 0px 15px;">
         <v-form>
-          <v-text-field
-            v-model="circleDetails.name"
-            label="Nome"
-          ></v-text-field>
-          <v-text-field
-            v-model="circleDetails.type"
-            label="Tipo"
-            readonly
-            style="opacity: 75%"
-          ></v-text-field>
-          <v-text-field
-            v-model="circleDetails.center"
-            label="Coordenadas do Centro (latitude/longitude)"
-            readonly
-            style="opacity: 75%"
-          ></v-text-field>
-          <v-col cols="auto" style="padding: 0px 0px 20px 10px">
-            <div class="icon-container" style="position: relative">
-              <v-btn icon @click="editCircle" class="no-shadow rounded">
-                <v-icon>mdi-circle-outline</v-icon>
-                <v-icon
-                  class="plus-icon"
-                  style="
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    font-size: 16px;
-                    color: black;
-                  "
-                  >mdi-plus</v-icon
-                >
-              </v-btn>
-            </div>
-          </v-col>
-          <v-text-field
-            v-model="circleDetails.radius"
-            label="Raio (metros)"
-            readonly
-            style="opacity: 75%"
-          ></v-text-field>
+          <v-text-field v-model="circleDetails.name" label="Nome" color="primary"></v-text-field>
+          <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%"
+            color="primary"></v-text-field>
+          <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
+            style="opacity: 75%" color="primary"></v-text-field>
+          <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly style="opacity: 75%"
+            color="primary"></v-text-field>
         </v-form>
       </v-card-text>
 
       <v-card-actions>
         <v-row justify="center">
-          <v-btn
-            variant="flat"
-            color="primary"
-            @click="saveCircle"
-            style="margin: 0px 10px 15px 10px"
-          >
+          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
             Salvar
           </v-btn>
-          <v-btn
-            variant="flat"
-            color="grey-lighten-2"
-            @click="removeCircle"
-            style="margin: 0px 10px 15px 10px"
-          >
+          <v-btn variant="flat" color="primary_light" @click="removeCircle" style="margin: 0px 10px 15px 10px"
+            rounded="xl">
             Remover
           </v-btn>
-          <v-btn
-            v-if="!(circleDetails.id == '')"
-            variant="flat"
-            color="grey-lighten-2"
-            @click="deleteCircle"
-            style="margin: 0px 10px 15px 10px"
-          >
+          <v-btn variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
+            rounded="xl">
+            Editar
+          </v-btn>
+          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="red" @click="deleteCircle"
+            style="margin: 0px 10px 15px 10px" rounded="xl">
             Deletar
           </v-btn>
         </v-row>
@@ -198,10 +150,10 @@ export default {
         "circlecomplete",
         // @ts-ignore
         (circle: google.maps.Circle) => {
-             
+
           if (circleInstance) {
-              circleInstance.setMap(null);
-              circleInstance = null;
+            circleInstance.setMap(null);
+            circleInstance = null;
           }
 
           const center = circle.getCenter().toJSON(); // {lat, lng}
@@ -343,66 +295,66 @@ export default {
     };
 
     const editCircle = async () => {
-    const id = circleDetails.value.id;
-    const type = circleDetails.value.type;
+      const id = circleDetails.value.id;
+      const type = circleDetails.value.type;
 
-    console.log('id antigo', circleDetails.value);
+      console.log('id antigo', circleDetails.value);
 
-    // Fecha o dialog inicialmente
-    dialog.value = false;
+      // Fecha o dialog inicialmente
+      dialog.value = false;
 
-    // Inicia o modo de desenho de círculo
-    if (drawingManager.value && map.value) {
-    drawingManager.value.setDrawingMode(google.maps.drawing.OverlayType.CIRCLE);
-    drawingManager.value.setMap(map.value);
-    }
+      // Inicia o modo de desenho de círculo
+      if (drawingManager.value && map.value) {
+        drawingManager.value.setDrawingMode(google.maps.drawing.OverlayType.CIRCLE);
+        drawingManager.value.setMap(map.value);
+      }
 
-    // Se já existir um círculo desenhado, remova-o
-    if (circleInstance) {
-    circleInstance.setMap(null);
-    circleInstance = null;
-    }
+      // Se já existir um círculo desenhado, remova-o
+      if (circleInstance) {
+        circleInstance.setMap(null);
+        circleInstance = null;
+      }
 
-    // Escuta o evento overlaycomplete para detectar quando o círculo foi desenhado
-    const overlayCompleteListener = (event: any) => {
-    if (event.type === google.maps.drawing.OverlayType.CIRCLE) {
-      // Guarda a nova instância do círculo
-      circleInstance = event.overlay;
+      // Escuta o evento overlaycomplete para detectar quando o círculo foi desenhado
+      const overlayCompleteListener = (event: any) => {
+        if (event.type === google.maps.drawing.OverlayType.CIRCLE) {
+          // Guarda a nova instância do círculo
+          circleInstance = event.overlay;
 
-      // Atualiza os detalhes do círculo com os novos dados
-      const newRadius = circleInstance.getRadius();
-      const latitude = circleInstance.getCenter().lat();
-      const longitude = circleInstance.getCenter().lng();
-      
-      // Atualiza o circleDetails com as novas informações
-      circleDetails.value = {
-        id: id, // mantemos o id antigo
-        name: circleDetails.value.name,
-        type: type,
-        radius: newRadius,
-        //@ts-ignore
-        center: {
-          lat: latitude,
-          lng: longitude,
-        },
+          // Atualiza os detalhes do círculo com os novos dados
+          const newRadius = circleInstance.getRadius();
+          const latitude = circleInstance.getCenter().lat();
+          const longitude = circleInstance.getCenter().lng();
+
+          // Atualiza o circleDetails com as novas informações
+          circleDetails.value = {
+            id: id, // mantemos o id antigo
+            name: circleDetails.value.name,
+            type: type,
+            radius: newRadius,
+            //@ts-ignore
+            center: {
+              lat: latitude,
+              lng: longitude,
+            },
+          };
+
+          console.log('Novos detalhes do círculo', circleDetails.value);
+
+          // Armazenando os dados no localStorage
+          localStorage.setItem('circleDetailsCached', JSON.stringify(circleDetails.value));
+
+          // Reabre o dialog após o círculo ser desenhado
+          dialog.value = true;
+        }
       };
 
-      console.log('Novos detalhes do círculo', circleDetails.value);
+      // Adiciona o listener para overlaycomplete
+      google.maps.event.addListener(drawingManager.value, 'overlaycomplete', overlayCompleteListener);
 
-      // Armazenando os dados no localStorage
-      localStorage.setItem('circleDetailsCached', JSON.stringify(circleDetails.value));
+      console.log('Esperando o novo círculo ser desenhado...');
 
-      // Reabre o dialog após o círculo ser desenhado
-      dialog.value = true;
-    }
-    };
 
-    // Adiciona o listener para overlaycomplete
-    google.maps.event.addListener(drawingManager.value, 'overlaycomplete', overlayCompleteListener);
-
-    console.log('Esperando o novo círculo ser desenhado...');
-
-    
     };
 
     const saveCircle = async () => {
@@ -422,7 +374,7 @@ export default {
         radius: parseFloat(circleDetails.value.radius),
       }
 
-      if(cachedDetails){
+      if (cachedDetails) {
         updateZone.id = cachedDetails.id
       }
 
@@ -439,21 +391,21 @@ export default {
       console.log("Dados para insert no banco: ", payload);
 
       try {
-        if(!Number.isInteger(parseInt(updateZone.id, 10))){
-        const response = await axios.post(
-          "http://localhost:8080/zone",
-          payload
-        );
+        if (!Number.isInteger(parseInt(updateZone.id, 10))) {
+          const response = await axios.post(
+            "http://localhost:8080/zone",
+            payload
+          );
 
-        console.log("Dados enviados com sucesso:", response.data);
+          console.log("Dados enviados com sucesso:", response.data);
         }
 
-        else{
+        else {
           const response = await axios.put(
-          "http://localhost:8080/zone",
-          updateZone
-        );
-        console.log("Dados enviados com sucesso para update:", response.data);
+            "http://localhost:8080/zone",
+            updateZone
+          );
+          console.log("Dados enviados com sucesso para update:", response.data);
 
         }
         snackbarMessage.value = "Zona salva com sucesso!";
@@ -479,7 +431,7 @@ export default {
         id: circleDetails.value.id,
       };
 
-      if(cachedDetails){
+      if (cachedDetails) {
         payload.id = cachedDetails.id
       }
 
