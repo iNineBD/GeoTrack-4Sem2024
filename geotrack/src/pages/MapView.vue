@@ -79,7 +79,7 @@
             Remover
           </v-btn>
           <v-btn
-            v-if="circleDetails.id == null"
+            v-if="!(circleDetails.id == '')"
             variant="flat"
             color="grey-lighten-2"
             @click="deleteCircle"
@@ -192,16 +192,11 @@ export default {
         },
       });
 
-
-
       // @ts-ignore
       google.maps.event.addListener(
         drawingManager.value,
         "circlecomplete",
         (circle: google.maps.Circle) => {
-          if (circleInstance) {
-            circleInstance.setMap(null);
-          }
 
           const center = circle.getCenter().toJSON(); // {lat, lng}
           const radius = circle.getRadius(); // em metros
@@ -403,7 +398,6 @@ export default {
     
     };
 
-
     const saveCircle = async () => {
       const cached = localStorage.getItem('circleDetailsCached');
       const cachedDetails = JSON.parse(cached);
@@ -426,22 +420,6 @@ export default {
 
       const payload = {
         name: circleDetails.value.name,
-        type: circleDetails.value.type,
-        center: {
-          longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
-          latitude: parseFloat(circleDetails.value.center.split(", ")[0])
-        },
-        radius: parseFloat(circleDetails.value.radius)
-      };
-
-      // Armazenando os dados no localStorage
-      localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
-
-    };
-
-    const saveCircle = async () => {
-      const payload = {
-        name: 'Zona 1',
         type: "CIRCLE",
         center: {
           longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
@@ -481,6 +459,7 @@ export default {
         snackbarColor.value = "error";
         snackbar.value = true;
       }
+
     };
 
     const deleteCircle = async () => {
@@ -568,8 +547,6 @@ export default {
       console.log("Pontos de parada recebidos do Sidebar:", points);
 
       points.coords.forEach((item: any) => {
-        const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
-
         const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
 
         console.log('name ', points)
