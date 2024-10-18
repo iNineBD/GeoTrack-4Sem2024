@@ -196,6 +196,7 @@ export default {
       google.maps.event.addListener(
         drawingManager.value,
         "circlecomplete",
+        // @ts-ignore
         (circle: google.maps.Circle) => {
 
           const center = circle.getCenter().toJSON(); // {lat, lng}
@@ -374,6 +375,7 @@ export default {
         name: circleDetails.value.name,
         type: type,
         radius: newRadius,
+        //@ts-ignore
         center: {
           lat: latitude,
           lng: longitude,
@@ -400,6 +402,7 @@ export default {
 
     const saveCircle = async () => {
       const cached = localStorage.getItem('circleDetailsCached');
+      // @ts-ignore
       const cachedDetails = JSON.parse(cached);
 
 
@@ -463,11 +466,17 @@ export default {
     };
 
     const deleteCircle = async () => {
-      console.log("vai ", circleDetails.value);
+      const cached = localStorage.getItem('circleDetailsCached');
+      // @ts-ignore
+      const cachedDetails = JSON.parse(cached);
+
       const payload = {
         id: circleDetails.value.id,
       };
-      console.log("aquiiiii ", payload);
+
+      if(cachedDetails){
+        payload.id = cachedDetails.id
+      }
 
       try {
         const response = await axios.delete("http://localhost:8080/zone", {
