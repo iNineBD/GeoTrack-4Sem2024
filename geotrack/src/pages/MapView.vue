@@ -198,6 +198,13 @@ export default {
         "circlecomplete",
         // @ts-ignore
         (circle: google.maps.Circle) => {
+             
+          if (circleInstance) {
+              circleInstance.setMap(null);
+              circleInstance = null;
+          }
+
+          
 
           const center = circle.getCenter().toJSON(); // {lat, lng}
           const radius = circle.getRadius(); // em metros
