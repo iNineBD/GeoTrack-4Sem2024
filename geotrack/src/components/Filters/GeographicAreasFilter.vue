@@ -61,6 +61,11 @@
             </v-row>
         </v-card-actions>
 
+        <v-snackbar v-model="snackbar" :timeout="3000" top color="red">
+        {{ snackbarMessage }}
+        </v-snackbar>
+
+
     </v-card>
 </template>
 
@@ -87,6 +92,8 @@ export default {
         latitude: null,
         longitude: null,
         radius: null,
+        snackbar: false,
+        snackbarMessage: '',
     }),
 
     mounted() {
@@ -221,6 +228,8 @@ export default {
                     const errorData = await response.json();
 
                     console.log("Erro 404: ", errorData.message);
+                    this.snackbarMessage = errorData.message || 'Dados não localizados para este usuário';
+                    this.snackbar = true;
 
                     this.$emit('noPointsFound', errorData.message);
                 }

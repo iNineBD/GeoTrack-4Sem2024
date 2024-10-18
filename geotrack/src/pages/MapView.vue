@@ -276,7 +276,7 @@ export default {
           }
         });
       } catch (error) {
-        showSnackbar('Usuários não possuem pontos de parada para este período', 'error');
+        showSnackbar('Nenhuma localização encontrada para este período', 'error');
       }
     };
 
