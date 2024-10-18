@@ -204,8 +204,6 @@ export default {
               circleInstance = null;
           }
 
-          
-
           const center = circle.getCenter().toJSON(); // {lat, lng}
           const radius = circle.getRadius(); // em metros
 
