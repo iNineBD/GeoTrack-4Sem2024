@@ -249,6 +249,7 @@ export default {
             geoJsonDTO.features.forEach((feature: GeoJsonFeature) => {
               const coords = feature.geometry.coordinates;
               if (coords && coords.length >= 2) {
+                localStorage.setItem('cachedLoading',JSON.stringify({result: false}));
                 const position = { lat: coords[1], lng: coords[0] }; // Coordenadas: lat e lng
 
                 // Gera as iniciais do usuário

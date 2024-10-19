@@ -31,13 +31,13 @@
     <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px;">
       <v-row class="d-flex" no-gutters style="justify-content: space-around;">
         <v-col cols="7">
-          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary" size="large"
+          <v-btn :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
             variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
+          <v-btn :disabled="loading" class="text-none" color="primary_light" size="large"
             variant="flat" block rounded="xl" @click="clearFields">
             Limpar
           </v-btn>
@@ -45,6 +45,11 @@
       </v-row>
     </v-card-actions>
   </v-card>
+
+  <!-- Loading progress circular -->
+  <v-col id="loadingStopPoints" v-if="loading" class="d-flex justify-center mt-4">
+      <v-progress-circular color="primary" indeterminate></v-progress-circular>
+  </v-col>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
     <span style="font-weight: bold; font-size: 15px; color: white;">
@@ -61,6 +66,9 @@
 </template>
 
 <script>
+import { load } from 'ol/Image';
+import { fa } from 'vuetify/locale';
+
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
@@ -82,6 +90,7 @@ export default {
     snackbar: false, // Controla a exibição do snackbar
     snackbarMessage: '', // Mensagem exibida no snackbar
     snackbarColor: 'success', // Cor do snackbar
+    loading: false,  // Variável para controlar o estado de carregamento
   }),
 
   mounted() {
@@ -114,9 +123,11 @@ export default {
     },
 
     async handleConsult() {
-      if (this.selectedUsers.length === 0 || !this.date) return;
-
-
+      if (this.selectedUsers.length === 0 || !this.date) return;    
+      // @ts-ignore
+            
+      this.loading = true
+      
       // Extraindo os IDs dos dispositivos dos usuários selecionados
       const deviceIds = this.selectedUsers.map(user => user.deviceId);
 
@@ -132,11 +143,24 @@ export default {
       const requestData = {
         devices: deviceIds,  // Array de IDs dos dispositivos
         startDate: new Date(this.date[0]).toLocaleDateString('en-CA'),  // Data de início
-        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA')  // Data de fim
+        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA') // Data de fim
       };
 
       console.log("Dados enviados:", requestData);
+
+
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
+      
+
+      while(true){
+        console.log('vendo', JSON.parse(localStorage.getItem('cachedLoading')))
+        if(!JSON.parse(localStorage.getItem('cachedLoading')).result){
+          document.getElementById("loadingStopPoints").style.display = "none";
+          break;
+        }
+      }
+
+
     },
 
     clearFields() {
