@@ -177,6 +177,11 @@ export default {
     },
 
     async handleGeoAreaChange() {
+
+      const cachedDetails = localStorage.getItem('cachedCircleDetails');
+      const cachedCircle = JSON.parse(cachedDetails);
+
+      
       const selectedArea = this.geoAreas.find(
         (area) => area.id === this.selectedGeoArea.id
       );
@@ -204,7 +209,6 @@ export default {
     },
 
     async handleConsult() {
-
       const cachedDetails = localStorage.getItem('cachedCircleDetails');
       const cachedCircle = JSON.parse(cachedDetails);
       let selectedArea = null
@@ -262,6 +266,7 @@ export default {
           console.log("Pontos de parada recebidos:", data.stopPoints);
 
           const dataCircleAndUser = {
+            id: selectedArea.id,
             userName: this.selectedUser.name,
             name: selectedArea.name,
             latitude: selectedArea.latitude,

@@ -35,7 +35,7 @@
             rounded="xl">
             Editar
           </v-btn>
-          <v-btn v-if="Number.isInteger(parseInt(circleDetails.id, 10))" variant="flat" color="red" @click="deleteCircle"
+          <v-btn v-if="Number.isInteger(parseInt(circleDetails.id,10))" variant="flat" color="red" @click="deleteCircle"
             style="margin: 0px 10px 15px 10px" rounded="xl">
             Deletar
           </v-btn>
