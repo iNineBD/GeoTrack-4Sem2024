@@ -604,6 +604,7 @@ export default {
 
       centerMapOnMarker(position);
     });
+    
   };
 
   return {

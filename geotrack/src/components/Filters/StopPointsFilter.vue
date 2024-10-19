@@ -47,7 +47,7 @@
   </v-card>
 
   <!-- Loading progress circular -->
-  <v-col id="loadingStopPoints" v-if="loading" class="d-flex justify-center mt-4">
+  <v-col v-if="loadingPage" class="d-flex justify-center mt-4">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>
   </v-col>
 
@@ -90,7 +90,7 @@ export default {
     snackbar: false, // Controla a exibição do snackbar
     snackbarMessage: '', // Mensagem exibida no snackbar
     snackbarColor: 'success', // Cor do snackbar
-    loading: false,  // Variável para controlar o estado de carregamento
+    loadingPage: false,  // Variável para controlar o estado de carregamento
   }),
 
   mounted() {
@@ -126,7 +126,7 @@ export default {
       if (this.selectedUsers.length === 0 || !this.date) return;    
       // @ts-ignore
             
-      this.loading = true
+      this.loadingPage = true
       
       // Extraindo os IDs dos dispositivos dos usuários selecionados
       const deviceIds = this.selectedUsers.map(user => user.deviceId);
@@ -148,17 +148,17 @@ export default {
 
       console.log("Dados enviados:", requestData);
 
-
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
       
 
-      while(true){
-        console.log('vendo', JSON.parse(localStorage.getItem('cachedLoading')))
-        if(!JSON.parse(localStorage.getItem('cachedLoading')).result){
-          document.getElementById("loadingStopPoints").style.display = "none";
-          break;
-        }
-      }
+      // while(true){
+      //   console.log('vendo', JSON.parse(localStorage.getItem('cachedLoading')))
+      //   if(!JSON.parse(localStorage.getItem('cachedLoading')).result){
+      //     document.getElementById("loadingStopPoints").style.display = "none";
+      //     this.loadingPage = false
+      //     break;
+      //   }
+      // }
 
 
     },
@@ -194,13 +194,17 @@ export default {
   watch: {
     selectedUsers(newValue) {
       if (newValue.length > 5) {
-        this.selectedUsers = newValue.slice(0, 5); // Mantém apenas os 3 primeiros usuários
+        this.selectedUsers = newValue.slice(0, 5); // Mantém apenas os 5 primeiros usuários
       }
       console.log(this.selectedUsers)
     },
     loading(val) {
       if (!val) return;
       setTimeout(() => (this.loading = false), 1000);
+    },
+    loadingPage(val) {
+      if (!val) return;
+      setTimeout(() => (this.loadingPage = false), 550);
     },
   },
 };

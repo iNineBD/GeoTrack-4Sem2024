@@ -62,6 +62,11 @@
     </v-card-actions>
   </v-card>
 
+    <!-- Loading progress circular -->
+  <v-col v-if="loadingPage"  id="loadingStopPoints" class="d-flex justify-center mt-4">
+      <v-progress-circular color="primary" indeterminate></v-progress-circular>
+  </v-col>
+
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
     <span style="font-weight: bold; font-size: 15px; color: white;">
       {{ snackbarMessage }}
@@ -80,6 +85,7 @@
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
+    loadingPage: false,
     loading: false,
     date: null,
     users: [], // Lista de usuários
@@ -209,6 +215,15 @@ export default {
         return;
       }
 
+      const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
+
+      if (qtddias > 31) {
+        this.showSnackbar("Mais que 31 dias selecionados");
+        return;
+      }
+
+      this.loadingPage = true
+
       const requestData = {
         deviceId: this.selectedUser.deviceId,
         startDate: new Date(this.date[0]).toLocaleDateString("en-CA"),
@@ -296,6 +311,10 @@ export default {
     loading(val) {
       if (!val) return;
       setTimeout(() => (this.loading = false), 1000);
+    },
+    loadingPage(val) {
+      if (!val) return;
+      setTimeout(() => (this.loadingPage = false), 550);
     },
   },
 };
