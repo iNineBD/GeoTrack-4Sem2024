@@ -62,8 +62,8 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from "vue";
 import axios from "axios";
+import { onMounted, ref } from "vue";
 import { id } from "vuetify/locale";
 
 interface GeoJsonFeature {
@@ -483,6 +483,7 @@ export default {
     };
 
     const removeCircle = () => {
+      window.location.reload();
       dialog.value = false;
       if (circleInstance) {
         circleInstance.setMap(null);
