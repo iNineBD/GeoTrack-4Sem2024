@@ -456,9 +456,11 @@ export default {
 
         dialog.value = false;
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        localStorage.removeItem('circleDetailsCached');
+
+         setTimeout(() => {
+           window.location.reload();
+         }, 500);
 
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
