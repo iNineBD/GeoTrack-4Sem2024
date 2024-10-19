@@ -9,7 +9,7 @@
             </v-row>
           </template>
           <v-expansion-panel-text style="padding: 0px;">
-            
+
             <v-container width="400px" class="filter-container" style="padding: 0px;">
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
@@ -39,6 +39,7 @@
 import { ref } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
+//@ts-ignore
 import MapView, { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -82,11 +83,16 @@ const toggleDial = () => {
 
 const goToFilterStopPoints = () => {
   router.push("/stoppointsfilter");
+  //@ts-ignore
+  panel.value = 0; // Define o primeiro painel como aberto
   toggleDial();
 };
 
+
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
+  //@ts-ignore
+  panel.value = 0; // Define o primeiro painel como aberto
   toggleDial();
 };
 

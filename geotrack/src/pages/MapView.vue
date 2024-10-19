@@ -160,7 +160,10 @@ export default {
           const radius = circle.getRadius(); // em metros
 
           circleInstance = circle;
-
+          if (circleDetails.value.name === "") {
+            circleDetails.value.name = "Zona 1";
+            circleDetails.value.type = "CIRCLE";
+          }
           circleDetails.value.id = `${id}`;
           circleDetails.value.center = `${center.lat}, ${center.lng}`;
           circleDetails.value.radius = `${radius}`;
@@ -473,6 +476,7 @@ export default {
       if (circleInstance) {
         circleInstance.setMap(null);
       }
+
 
       const circleCenter = { lat: latitude, lng: longitude };
 
