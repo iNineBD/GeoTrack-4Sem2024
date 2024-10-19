@@ -465,126 +465,126 @@ export default {
         circleInstance.setMap(null);
         circleInstance = null;
         localStorage.removeItem('cachedCircleDetails');
-      }
-    };
-
-    const drawCircleOnMap = (
-      latitude: number,
-      longitude: number,
-      radius: number
-    ) => {
-      if (circleInstance) {
-        circleInstance.setMap(null);
-      }
-
-
-      const circleCenter = { lat: latitude, lng: longitude };
-
-      // @ts-ignore
-      circleInstance = new google.maps.Circle({
-        map: map.value,
-        center: circleCenter,
-        radius: radius,
-        fillColor: "#18FFFF",
-        fillOpacity: 0.3,
-        strokeWeight: 2,
-        strokeColor: "#0097A7",
-        clickable: true,
-      });
-
-      google.maps.event.addListener(circleInstance, "click", () => {
-        dialog.value = true;
-      });
-
-      map.value?.panTo(circleCenter);
-      map.value?.setZoom(14);
-    };
-
-    const handleGeographicAreaConsult = (data: any) => {
-      console.log("Dados geográficos recebidos do Sidebar:", data);
-      circleDetails.value = {
-        id: data.id,
-        name: data.name,
-        type: "CIRCLE",
-        center: `${data.latitude}, ${data.longitude}`,
-        radius: `${data.radius}`,
       };
+  };
 
-      drawCircleOnMap(data.latitude, data.longitude, data.radius);
+  const drawCircleOnMap = (
+    latitude: number,
+    longitude: number,
+    radius: number
+  ) => {
+    if (circleInstance) {
+      circleInstance.setMap(null);
+    }
+
+
+    const circleCenter = { lat: latitude, lng: longitude };
+
+    // @ts-ignore
+    circleInstance = new google.maps.Circle({
+      map: map.value,
+      center: circleCenter,
+      radius: radius,
+      fillColor: "#18FFFF",
+      fillOpacity: 0.3,
+      strokeWeight: 2,
+      strokeColor: "#0097A7",
+      clickable: true,
+    });
+
+    google.maps.event.addListener(circleInstance, "click", () => {
+      dialog.value = true;
+    });
+
+    map.value?.panTo(circleCenter);
+    map.value?.setZoom(14);
+  };
+
+  const handleGeographicAreaConsult = (data: any) => {
+    console.log("Dados geográficos recebidos do Sidebar:", data);
+    circleDetails.value = {
+      id: data.id,
+      name: data.name,
+      type: "CIRCLE",
+      center: `${data.latitude}, ${data.longitude}`,
+      radius: `${data.radius}`,
     };
 
-    const handleStopPointsOnMap = (points: any) => {
-      console.log("Pontos de parada recebidos do Sidebar:", points);
+    drawCircleOnMap(data.latitude, data.longitude, data.radius);
+  };
 
-      points.coords.forEach((item: any) => {
-        const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
+  const handleStopPointsOnMap = (points: any) => {
+    console.log("Pontos de parada recebidos do Sidebar:", points);
 
-        console.log('name ', points)
+    points.coords.forEach((item: any) => {
+      const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
 
-        // Gera as iniciais do usuário
-        const initials = points.userName.split(" ")
-          .slice(0, 2)
-          .map((name: string) => name[0])
-          .join("");
+      console.log('name ', points)
 
-        const marker = new google.maps.Marker({
-          position,
-          map: map.value,
-          label: {
-            text: initials,
-            color: "white",
-            fontWeight: "bold",
-            fontSize: "14px",
-          },
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 15,
-            fillColor: "#000B62",
-            fillOpacity: 1,
-            strokeWeight: 2,
-            strokeColor: "#ffffff",
-          },
-        });
+      // Gera as iniciais do usuário
+      const initials = points.userName.split(" ")
+        .slice(0, 2)
+        .map((name: string) => name[0])
+        .join("");
 
-        const infoWindow = new google.maps.InfoWindow({
-          content: `<div>
+      const marker = new google.maps.Marker({
+        position,
+        map: map.value,
+        label: {
+          text: initials,
+          color: "white",
+          fontWeight: "bold",
+          fontSize: "14px",
+        },
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 15,
+          fillColor: "#000B62",
+          fillOpacity: 1,
+          strokeWeight: 2,
+          strokeColor: "#ffffff",
+        },
+      });
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `<div>
                           <strong>Usuário:</strong> ${points.userName}<br>
                           <strong>Dispositivo:</strong> ${points.device}<br>
                           <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
                          </div>`,
-        });
-
-        google.maps.event.addListener(marker, "click", () => {
-          infoWindow.open(map.value!, marker);
-        });
-
-        google.maps.event.addListener(map.value, "click", () => {
-          infoWindow.close();
-        });
-
-        centerMapOnMarker(position);
       });
-    };
 
-    return {
-      map,
-      mapDiv,
-      fetchGeoJsonData,
-      enableCircleDrawing,
-      dialog,
-      circleDetails,
-      editCircle,
-      saveCircle,
-      deleteCircle,
-      removeCircle,
-      snackbar,
-      snackbarMessage,
-      snackbarColor,
-      drawCircleOnMap,
-      handleGeographicAreaConsult,
-      handleStopPointsOnMap,
-    };
-  },
+      google.maps.event.addListener(marker, "click", () => {
+        infoWindow.open(map.value!, marker);
+      });
+
+      google.maps.event.addListener(map.value, "click", () => {
+        infoWindow.close();
+      });
+
+      centerMapOnMarker(position);
+    });
+  };
+
+  return {
+    map,
+    mapDiv,
+    fetchGeoJsonData,
+    enableCircleDrawing,
+    dialog,
+    circleDetails,
+    editCircle,
+    saveCircle,
+    deleteCircle,
+    removeCircle,
+    snackbar,
+    snackbarMessage,
+    snackbarColor,
+    drawCircleOnMap,
+    handleGeographicAreaConsult,
+    handleStopPointsOnMap,
+  };
+},
 };
 </script>
 

@@ -14,7 +14,7 @@
 
           <v-col cols="auto" style="padding: 0px 0px 20px 10px">
             <div class="icon-container">
-              <v-btn icon @click="drawCircle" class="no-shadow rounded">
+              <v-btn icon @click="drawCircle" class="no-shadow rounded" :disabled="disableDrawButton">
                 <v-icon>mdi-circle-outline</v-icon>
                 <v-icon class="plus-icon">mdi-plus</v-icon>
               </v-btn>
@@ -95,6 +95,7 @@ export default {
     latitude: null,
     longitude: null,
     radius: null,
+    circleDrawn: false,
   }),
 
   mounted() {
@@ -103,8 +104,12 @@ export default {
   },
 
   computed: {
+    disableDrawButton() {
+      return this.selectedGeoArea !== null;
+    },
+
     ButtonDisabled() {
-      return !this.selectedUser || !this.date;
+      return !this.selectedUser || !this.date || !this.selectedGeoArea;
     },
   },
 
