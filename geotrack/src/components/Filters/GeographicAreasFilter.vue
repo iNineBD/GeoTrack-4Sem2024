@@ -6,7 +6,7 @@
         <v-row class="d-flex align-center no-gutters">
           <v-col cols="100%" style="padding: 0px">
             <!-- Combobox de áreas geográficas -->
-            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary" v-model="selectedGeoArea"
+            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary" v-autocomplete="selectedGeoArea"
               :items="geoAreas" item-value="id" item-title="name" clearable :multiple="false"
               @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
             </v-combobox>
