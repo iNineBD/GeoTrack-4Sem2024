@@ -240,7 +240,9 @@ export default {
           const errorData = await response.json();
 
           console.log("Erro 404: ", errorData.message);
-
+          
+          this.snackbarMessage = errorData.message || 'Dados não localizados para este usuário';
+          this.snackbar = true;
           this.$emit("noPointsFound", errorData.message);
         }
       } catch (error) {
@@ -255,7 +257,6 @@ export default {
     drawCircle() {
       this.$emit("drawCircle");
     },
-
     setQuickFilter(range, index) {
       if (this.selectedQuickFilter === index) {
         this.selectedQuickFilter = null;
