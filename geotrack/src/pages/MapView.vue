@@ -312,6 +312,8 @@ export default {
         drawingManager.value.setDrawingMode(
           google.maps.drawing.OverlayType.CIRCLE
         );
+        circleDetails.value.name = 'ZONA 1'
+        circleDetails.value.type = 'CIRCLE'
         drawingManager.value.setMap(map.value);
       }
     };
@@ -476,13 +478,11 @@ export default {
         snackbar.value = true;
 
         dialog.value = false;
-        
-        // setTimeout(() => (dialog.value = false), 1000)
-       
-        removeCircle()
         setTimeout(() => {
           window.location.reload();
         }, 500);
+               
+        removeCircle()
       } catch (error) {
         showSnackbar('Erro ao enviar os dados.','error');
         console.log('Erro ao enviar os dados:', error);
@@ -495,6 +495,13 @@ export default {
 
     const removeCircle = () => {
       dialog.value = false;
+      circleDetails.value = {
+        id: '',
+        name: '',
+        type: "CIRCLE",
+        center: ``,
+        radius: ``,
+      };
       if (circleInstance) {
         circleInstance.setMap(null);
         circleInstance = null;
@@ -510,7 +517,6 @@ export default {
     if (circleInstance) {
       circleInstance.setMap(null);
     }
-
 
     const circleCenter = { lat: latitude, lng: longitude };
 
