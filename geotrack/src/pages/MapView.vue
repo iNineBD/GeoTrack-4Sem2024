@@ -435,9 +435,14 @@ export default {
         snackbar.value = true;
 
         dialog.value = false;
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
-        snackbarMessage.value = "Erro ao salvar a zona. Tente novamente.";
+        snackbarMessage.value = "Erro ao salvar a zona. Nome Já existe.";
         snackbarColor.value = "error";
         snackbar.value = true;
       }
@@ -471,7 +476,13 @@ export default {
         snackbar.value = true;
 
         dialog.value = false;
-        removeCircle();
+        
+        // setTimeout(() => (dialog.value = false), 1000)
+       
+        removeCircle()
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       } catch (error) {
         showSnackbar('Erro ao enviar os dados.','error');
         console.log('Erro ao enviar os dados:', error);
@@ -483,7 +494,6 @@ export default {
     };
 
     const removeCircle = () => {
-      window.location.reload();
       dialog.value = false;
       if (circleInstance) {
         circleInstance.setMap(null);
