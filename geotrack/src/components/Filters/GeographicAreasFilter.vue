@@ -61,6 +61,19 @@
       </v-row>
     </v-card-actions>
   </v-card>
+
+  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
+    <span style="font-weight: bold; font-size: 15px; color: white;">
+      {{ snackbarMessage }}
+    </span>
+    <template v-slot:actions>
+      <v-btn color="white" variant="text" style="font-weight: bold; text-transform: uppercase; color: white;"
+        @click="snackbar = false">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
+
 </template>
 
 <script>
@@ -96,6 +109,9 @@ export default {
     longitude: null,
     radius: null,
     circleDrawn: false,
+    snackbar: false, // Controla a exibição do snackbar
+    snackbarMessage: '', // Mensagem exibida no snackbar
+    snackbarColor: 'success', // Cor do snackbar
   }),
 
   mounted() {
@@ -241,8 +257,7 @@ export default {
 
           console.log("Erro 404: ", errorData.message);
           
-          this.snackbarMessage = errorData.message || 'Dados não localizados para este usuário';
-          this.snackbar = true;
+          this.showSnackbar('Dados não localizados para este usuário');
           this.$emit("noPointsFound", errorData.message);
         }
       } catch (error) {
@@ -252,6 +267,13 @@ export default {
 
     clearFields() {
       window.location.reload();
+    },
+
+    // Método para exibir o snackbar
+    showSnackbar(message, color = 'success') {
+      this.snackbarMessage = message;
+      this.snackbarColor = 'error';
+      this.snackbar = true;
     },
 
     drawCircle() {
