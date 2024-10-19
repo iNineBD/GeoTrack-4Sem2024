@@ -9,7 +9,7 @@
             </v-row>
           </template>
           <v-expansion-panel-text style="padding: 0px;">
-            
+
             <v-container width="400px" class="filter-container" style="padding: 0px;">
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
@@ -26,8 +26,11 @@
         <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
       </template>
 
-      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"></v-btn>
-      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"></v-btn>
+      <!-- Botão para StopPointsFilter -->
+      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker" title="Filtro de Pontos de Parada"></v-btn>
+
+      <!-- Botão para GeographicAreasFilter -->
+      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search" title="Filtro de Áreas Geográficas"></v-btn>
     </v-speed-dial>
   </div>
 </template>
@@ -36,7 +39,8 @@
 import { ref } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
-import { FilterData } from "@/pages/MapView.vue";
+//@ts-ignore
+import MapView, { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 
 // Definindo as props
@@ -46,6 +50,7 @@ const props = defineProps<{
   onGeographicAreaConsult: (data: FilterData) => void;
   onStopPointsReceived: (stopPoints: any) => void;
 }>();
+
 
 const handleFilterData = (data: FilterData) => {
   props.onConsult(data);
@@ -78,11 +83,16 @@ const toggleDial = () => {
 
 const goToFilterStopPoints = () => {
   router.push("/stoppointsfilter");
+  //@ts-ignore
+  panel.value = 0; // Define o primeiro painel como aberto
   toggleDial();
 };
 
+
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
+  //@ts-ignore
+  panel.value = 0; // Define o primeiro painel como aberto
   toggleDial();
 };
 

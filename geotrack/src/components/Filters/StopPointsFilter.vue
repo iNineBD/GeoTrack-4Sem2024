@@ -3,7 +3,7 @@
     <v-col style="padding: 20px 20px 0 20px;">
       <!-- Users combobox -->
       <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
-        prepend-icon="mdi-filter-variant" chips clearable multiple>
+        prepend-icon="mdi-filter-variant" chips clearable multiple color="primary">
         <!-- Slot para customizar a exibição dos chips -->
         <template v-slot:selection="{ attrs, item, select, selected }">
           <v-chip v-bind="attrs" :model-value="selected" closable @click="select" @click:close="remove(item)">
@@ -15,53 +15,48 @@
 
       <!-- Date selection -->
       <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :readonly="dateInputDisabled"></v-date-input>
+        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
+        :readonly="dateInputDisabled"></v-date-input>
 
       <!-- Quick date filters using chips -->
-      <v-col style="padding: 0px; display: flex;">
-        <v-chip style="margin: 0px 2px !important;" size="small" v-for="(filter, index) in quickFilters"
-          :key="filter.label" @click="setQuickFilter(filter.range, index)"
+      <v-col style="padding: 0px; display: flex; justify-content: space-evenly;">
+        <v-chip v-for="(filter, index) in quickFilters" :key="filter.label" @click="setQuickFilter(filter.range, index)"
           :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
-          filter class="ma-2" variant="flat">
+          filter variant="flat" size="small">
           {{ filter.label }}
         </v-chip>
       </v-col>
     </v-col>
 
-    <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px;">
-      <v-row class="d-flex" no-gutters>
-        <v-col cols="8">
+    <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px;">
+      <v-row class="d-flex" no-gutters style="justify-content: space-around;">
+        <v-col cols="7">
           <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary" size="large"
-            variant="flat" block rounded="lg" @click="handleConsult">
+            variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
           <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="lg" @click="clearFields">
+            variant="flat" block rounded="xl" @click="clearFields">
             Limpar
           </v-btn>
         </v-col>
       </v-row>
     </v-card-actions>
-
   </v-card>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
-  <span style="font-weight: bold; font-size: 15px; color: white;">
-    {{ snackbarMessage }}
-  </span>
-  <template v-slot:actions>
-    <v-btn
-      color="white"
-      variant="text"
-      style="font-weight: bold; text-transform: uppercase; color: white;"
-      @click="snackbar = false"
-    >
-      Close
-    </v-btn>
-  </template>
-</v-snackbar>
+    <span style="font-weight: bold; font-size: 15px; color: white;">
+      {{ snackbarMessage }}
+    </span>
+    <template v-slot:actions>
+      <v-btn color="white" variant="text" style="font-weight: bold; text-transform: uppercase; color: white;"
+        @click="snackbar = false">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
 
 </template>
 
@@ -127,7 +122,7 @@ export default {
 
       const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
 
-      if(qtddias > 31){
+      if (qtddias > 31) {
         this.showSnackbar("Mais que 31 dias selecionados");
         return;
       }
@@ -164,8 +159,8 @@ export default {
       this.selectedUsers = this.selectedUsers.filter(user => user.id !== item.id);
     },
 
-      // Método para exibir o snackbar
-      showSnackbar(message, color = 'success') {
+    // Método para exibir o snackbar
+    showSnackbar(message, color = 'success') {
       this.snackbarMessage = message;
       this.snackbarColor = 'error';
       this.snackbar = true;
