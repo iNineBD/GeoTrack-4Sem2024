@@ -452,8 +452,11 @@ export default {
         id: circleDetails.value.id,
       };
 
-      if (cachedDetails) {
+      console.log(payload)
+
+      if (cachedDetails != null && Number.isInteger(parseInt(cachedDetails.id, 10))) {
         payload.id = cachedDetails.id
+        localStorage.removeItem('circleDetailsCached')
       }
 
       try {
