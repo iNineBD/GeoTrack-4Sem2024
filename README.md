@@ -30,9 +30,9 @@ npm install
 Para rodar o projeto, execute o comando:
 
 ```bash
-npm run serve
+npm run dev
 ```
 
 ## Acessando o Projeto
 
-Acesse o projeto em `http://localhost:8080/`
+Acesse o projeto em `http://localhost:3000/`

@@ -1,79 +1,112 @@
 <template>
-  <v-card >
-    <v-layout style="height: 100%;">
-      <!-- Sidebar para desktop -->
-      <v-navigation-drawer
-        v-if="!isMobile"
-        v-model="drawer"
-        :rail="rail"
-        permanent
-        @click="rail = false"
-      >
-        <v-list-item nav>
-          <v-img
-            :src="rail ? logoPin : logo"
-            height="32"
-            style="margin: 6px;"
-          />
-          <template v-slot:append>
-            <v-btn
-              v-if="!rail"
-              icon="mdi-chevron-left"
-              variant="text"
-              @click.stop="rail = !rail"
-            ></v-btn>
+  <div class="floating-panel">
+    <v-container width="400px" class="panel-container" style="padding: 0px;">
+      <v-expansion-panels v-model="panel" rounded="xl" elevation="4">
+        <v-expansion-panel>
+          <template v-slot:title>
+            <v-row class="panel-header" justify="center" align="center">
+              <v-img :src="logo" height="30" class="icon" />
+            </v-row>
           </template>
-        </v-list-item>
+          <v-expansion-panel-text style="padding: 0px;">
 
-        <!-- Divider -->
-        <v-divider></v-divider>
+            <v-container width="400px" class="filter-container" style="padding: 0px;">
+              <v-divider :thickness="2" />
+              <!-- Exibe o filtro correto com base na rota -->
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"/>
+              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsReceived"/>
+            </v-container>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </v-container>
 
-        <!-- Navigation List -->
-        <v-list density="compact" nav>
-          <v-list-item prepend-icon="mdi-home" title="Home" to="/" :color="drawer ? 'primary' : ''" @click.stop="rail = !rail"></v-list-item>
-          <v-list-item prepend-icon="mdi-filter" title="Filtrar" to="/filter" :color="drawer ? 'primary' : ''" @click.stop="rail = !rail"></v-list-item>
-        </v-list>
-      </v-navigation-drawer>
+    <v-speed-dial v-model="dial" location="bottom center" transition="scale-transition" class="speed-dial">
+      <template v-slot:activator="{ props: activatorProps }">
+        <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
+      </template>
 
-      <!-- Bottom Navigation para dispositivos móveis -->
-      <v-bottom-navigation v-if="isMobile" grow>
-        <v-btn value="home" to="/">
-          <v-icon>mdi-home</v-icon>
-          <span>Home</span>
-        </v-btn>
-        <v-btn value="filter" to="/filter">
-          <v-icon>mdi-filter</v-icon>
-          <span>Filtrar</span>
-        </v-btn>
-      </v-bottom-navigation>
+      <!-- Botão para StopPointsFilter -->
+      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker" title="Filtro de Pontos de Parada"></v-btn>
 
-      <v-main style="height: 250px"></v-main>
-    </v-layout>
-  </v-card>
+      <!-- Botão para GeographicAreasFilter -->
+      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search" title="Filtro de Áreas Geográficas"></v-btn>
+    </v-speed-dial>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from "vue";
+import StopPointsFilter from "../Filters/StopPointsFilter.vue";
+import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
+//@ts-ignore
+import MapView, { FilterData } from "@/pages/MapView.vue";
+import { useRoute, useRouter } from "vue-router";
 
-const isMobile = ref(false);
+// Definindo as props
+const props = defineProps<{
+  onConsult: (data: FilterData) => void;
+  onDrawCircle: () => void;
+  onGeographicAreaConsult: (data: FilterData) => void;
+  onStopPointsReceived: (stopPoints: any) => void;
+}>();
 
-const checkMobile = () => {
-  isMobile.value = window.innerWidth < 600; // Define o limite para dispositivos móveis
+
+const handleFilterData = (data: FilterData) => {
+  props.onConsult(data);
 };
 
-onMounted(() => {
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-});
+const handleDrawCircle = () => {
+  props.onDrawCircle();
+};
 
-const logo = '/src/assets/Logo.svg';
-const logoPin = '/src/assets/LogoPin.svg';
-const drawer = ref(true);
-const rail = ref(true);
+const handleGeographicAreaConsult = (data: FilterData) => {
+  console.log("Dados recebidos do GeographicAreasFilter:", data);
+  props.onGeographicAreaConsult(data);
+};
+
+const handleStopPointsReceived = (stopPoints: any) => {
+  console.log("Pontos de parada recebidos do GeographicAreasFilter:", stopPoints);
+  props.onStopPointsReceived(stopPoints);
+};
+
+const logo = "/src/assets/Logo.svg";
+const panel = ref([]);
+const dial = ref(false);
+
+const route = useRoute();
+const router = useRouter();
+
+const toggleDial = () => {
+  dial.value = !dial.value;
+};
+
+const goToFilterStopPoints = () => {
+  router.push("/stoppointsfilter");
+  //@ts-ignore
+  panel.value = 0; // Define o primeiro painel como aberto
+  toggleDial();
+};
+
+
+const goToFilterGeographicAreas = () => {
+  router.push("/geographicareasfilter");
+  //@ts-ignore
+  panel.value = 0; // Define o primeiro painel como aberto
+  toggleDial();
+};
+
 </script>
 
 <style scoped>
-.v-navigation-drawer {
-  height: 100vh;
+.floating-panel {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  max-width: calc(100% - 40px);
+  gap: 10px;
 }
 </style>

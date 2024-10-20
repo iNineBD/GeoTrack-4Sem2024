@@ -1,20 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import MapView from '../components/MapView.vue';
-import Filter from '../components/Filter.vue';
+import MapView from '../pages/MapView.vue';
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    redirect: '/stoppointsfilter',
+  },
+  {
+    path: '/stoppointsfilter',
+    name: 'StopPointFilter',
     component: MapView,
   },
   {
-    path: '/filter',
-    name: 'Filter',
-    components: {
-      default: MapView,
-      filter: Filter,
-    },
+    path: '/geographicareasfilter',
+    name: 'GeographicAreasFilter',
+    component: MapView,
   },
 ];
 

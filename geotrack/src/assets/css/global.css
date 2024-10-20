@@ -1,0 +1,10 @@
+.gm-style-mtc-bbw {
+    right: 45px !important;
+    left: auto !important;
+    top: auto !important;
+    position: absolute !important;
+  }
+
+  .v-expansion-panel-text__wrapper {
+    padding: 0px !important
+  }
