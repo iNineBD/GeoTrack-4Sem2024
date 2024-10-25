@@ -1,14 +1,11 @@
 <template>
   <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px;">
     <v-col style="padding: 20px 20px 0 20px;">
-      <!-- Users combobox -->
+      <!-- Users selection -->
       <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
         prepend-icon="mdi-filter-variant" chips clearable multiple color="primary">
-        <!-- Slot para customizar a exibição dos chips -->
         <template v-slot:selection="{ attrs, item, select, selected }">
           <v-chip v-bind="attrs" :model-value="selected" closable @click="select" @click:close="remove(item)">
-            <strong>{{ item.name }}</strong>&nbsp;<span>({{ item.deviceName }})</span>
-            <!-- Exibe o nome do dispositivo -->
           </v-chip>
         </template>
       </v-combobox>
@@ -31,14 +28,14 @@
     <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px;">
       <v-row class="d-flex" no-gutters style="justify-content: space-around;">
         <v-col cols="7">
-          <v-btn :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
             variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn :disabled="loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="xl" @click="clearFields">
+          <v-btn class="text-none" color="primary_light" size="large" variant="flat" block rounded="xl"
+            @click="clearFields">
             Limpar
           </v-btn>
         </v-col>
@@ -46,28 +43,13 @@
     </v-card-actions>
   </v-card>
 
-  <!-- Loading progress circular -->
-  <v-col v-if="loadingPage" class="d-flex justify-center mt-4">
-      <v-progress-circular color="primary" indeterminate></v-progress-circular>
-  </v-col>
-
-  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
-    <span style="font-weight: bold; font-size: 15px; color: white;">
-      {{ snackbarMessage }}
-    </span>
-    <template v-slot:actions>
-      <v-btn color="white" variant="text" style="font-weight: bold; text-transform: uppercase; color: white;"
-        @click="snackbar = false">
-        Close
-      </v-btn>
-    </template>
+  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
+    {{ snackbarMessage }}
   </v-snackbar>
-
 </template>
 
 <script>
-import { load } from 'ol/Image';
-import { fa } from 'vuetify/locale';
+import { eventBus } from '@/utils/EventBus';
 
 export default {
   data: () => ({
@@ -87,14 +69,16 @@ export default {
     ],
     selectedQuickFilter: null,
     dateInputDisabled: false,
-    snackbar: false, // Controla a exibição do snackbar
-    snackbarMessage: '', // Mensagem exibida no snackbar
-    snackbarColor: 'success', // Cor do snackbar
-    loadingPage: false,  // Variável para controlar o estado de carregamento
+
+    snackbar: false,
+    snackbarColor: "success",
+    snackbarMessage: "",
+
   }),
 
   mounted() {
     this.fetchUsers();
+    eventBus.on('stopIsLoading', this.stopIsLoading);
   },
 
   computed: {
@@ -104,6 +88,16 @@ export default {
   },
 
   methods: {
+    stopIsLoading() {
+      this.loading = false;
+    },
+
+    showSnackbar(message, color = "success") {
+      this.snackbarMessage = message; // Define a mensagem
+      this.snackbarColor = color; // Define a cor
+      this.snackbar = true; // Torna o snackbar visível
+    },
+
     async fetchUsers() {
       try {
         const response = await fetch("http://localhost:8080/filters/users?page=0&qtdPage=1000");
@@ -118,26 +112,23 @@ export default {
         console.log("Successfully fetched users:", this.users);
       } catch (error) {
         console.log("Error fetching users:", error);
-
       }
     },
 
     async handleConsult() {
-      if (this.selectedUsers.length === 0 || !this.date) return;    
-      // @ts-ignore
-            
-      this.loadingPage = true
-      
+      if (this.selectedUsers.length === 0 || !this.date) return;
+      this.loading = true;
+
       // Extraindo os IDs dos dispositivos dos usuários selecionados
       const deviceIds = this.selectedUsers.map(user => user.deviceId);
 
       const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
 
       if (qtddias > 31) {
-        this.showSnackbar("Mais que 31 dias selecionados");
+        this.showSnackbar("Mais que 31 dias selecionados", "error");
+        this.loading = false;
         return;
       }
-
 
       // Preparando os dados da requisição com todos os devices como um array e as datas uma única vez
       const requestData = {
@@ -149,22 +140,14 @@ export default {
       console.log("Dados enviados:", requestData);
 
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
-      
-
-      // while(true){
-      //   console.log('vendo', JSON.parse(localStorage.getItem('cachedLoading')))
-      //   if(!JSON.parse(localStorage.getItem('cachedLoading')).result){
-      //     document.getElementById("loadingStopPoints").style.display = "none";
-      //     this.loadingPage = false
-      //     break;
-      //   }
-      // }
-
-
     },
 
     clearFields() {
-      window.location.reload();
+      this.date = null;
+      this.selectedUsers = [];
+      this.devices = [];
+      this.selectedQuickFilter = null;
+      this.$emit("initializeMap");
     },
 
     setQuickFilter(range, index) {
@@ -182,29 +165,14 @@ export default {
     remove(item) {
       this.selectedUsers = this.selectedUsers.filter(user => user.id !== item.id);
     },
-
-    // Método para exibir o snackbar
-    showSnackbar(message, color = 'success') {
-      this.snackbarMessage = message;
-      this.snackbarColor = 'error';
-      this.snackbar = true;
-    },
   },
 
   watch: {
     selectedUsers(newValue) {
       if (newValue.length > 5) {
-        this.selectedUsers = newValue.slice(0, 5); // Mantém apenas os 5 primeiros usuários
+        this.selectedUsers = newValue.slice(0, 5);
       }
-      console.log(this.selectedUsers)
-    },
-    loading(val) {
-      if (!val) return;
-      setTimeout(() => (this.loading = false), 1000);
-    },
-    loadingPage(val) {
-      if (!val) return;
-      setTimeout(() => (this.loadingPage = false), 550);
+      console.log('users selecionados:', this.selectedUsers);
     },
   },
 };
