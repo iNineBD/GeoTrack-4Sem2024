@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import Login from '../pages/Login.vue'; 
 import MapView from '../pages/MapView.vue';
 
 const routes = [
   {
     path: '/',
-    redirect: '/stoppointsfilter',
+    name: 'Login',
+    component: Login,
   },
   {
     path: '/stoppointsfilter',
