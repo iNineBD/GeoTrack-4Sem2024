@@ -331,6 +331,8 @@ export default {
           circleDetails.value.center = `${center.lat}, ${center.lng}`;
           circleDetails.value.radius = `${radius}`;
 
+          circleForConsult();
+
           // Evento para abrir o modal quando o círculo for clicado
           google.maps.event.addListener(circle, "click", () => {
             dialog.value = true;
@@ -413,6 +415,22 @@ export default {
 
       console.log('Esperando o novo círculo ser desenhado...');
 
+
+    };
+
+    const circleForConsult = async () => {
+      const payload = {
+        name: circleDetails.value.name,
+        type: "CIRCLE",
+        center: {
+          longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
+          latitude: parseFloat(circleDetails.value.center.split(", ")[0])
+        },
+        radius: parseFloat(circleDetails.value.radius)
+      };
+
+        // Armazenando os dados no localStorage
+        localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
 
     };
 

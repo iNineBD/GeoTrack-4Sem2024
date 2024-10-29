@@ -125,6 +125,8 @@ export default {
       const cachedDetails = localStorage.getItem('cachedCircleDetails');
       const cachedCircle = JSON.parse(cachedDetails);
 
+      console.log('teste: ', cachedCircle)
+
       return !this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle);
     },
   },
