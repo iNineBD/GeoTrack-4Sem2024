@@ -5,7 +5,7 @@
         <v-card class="login-card">
           <v-card-title class="text-h5">Login</v-card-title>
           <v-card-text>
-            <v-form>
+            <v-form @submit.prevent="handleLogin">
               <v-text-field
                 v-model="username"
                 label="Usuário"
@@ -19,21 +19,25 @@
                 required
                 class="login-input"
               ></v-text-field>
-              <v-btn @click="handleLogin" color="#2B81C4" block>Entrar</v-btn> 
+              
+              <div class="primeiroAcesso">
+                <router-link to="/register">Primeiro acesso</router-link>
+              </div>
+
+              <v-btn @click="handleLogin" color="#2B81C4" block>Entrar</v-btn>
             </v-form>
           </v-card-text>
         </v-card>
       </v-col>
-
       <v-col class="white-section" cols="12" md="8">
       </v-col>
     </v-row>
-
   </v-container>
 </template>
 
 <script lang="ts">
 import { ref } from 'vue';
+import axios from 'axios';
 
 export default {
   name: 'Login',
@@ -41,10 +45,15 @@ export default {
     const username = ref('');
     const password = ref('');
 
-    const handleLogin = () => {
-      if (username.value === 'usuario' && password.value === 'senha') {
-        localStorage.setItem('isLoggedIn', 'true');
-      } else {
+    const handleLogin = async () => {
+      try {
+        const response = await axios.post('http://localhost:8080/auth/login', {
+          email: username.value,
+          password: password.value,
+        });
+        localStorage.setItem('token', response.data.token);
+        alert('Login bem-sucedido!');
+      } catch (error) {
         alert('Usuário ou senha inválidos');
       }
     };
@@ -88,4 +97,8 @@ export default {
   width: 100%;
 }
 
+.primeiroAcesso {
+  text-align:justify;
+  margin: 10px 0;
+}
 </style>
