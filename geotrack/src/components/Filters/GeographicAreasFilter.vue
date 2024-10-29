@@ -304,6 +304,7 @@ export default {
           console.log("Erro 404: ", errorData.message);
           this.showSnackbar("Dados não localizados para este usuário", "error");
           this.$emit("noPointsFound", errorData.message);
+          this.loading = false;
         }
       } catch (error) {
         console.log("Erro ao buscar pontos de parada:", error);
