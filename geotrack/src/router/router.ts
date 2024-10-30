@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../pages/Login.vue'; 
 import MapView from '../pages/MapView.vue';
+import Register from '../pages/Register.vue'; // Adicione esta linha
 
 const routes = [
   {
@@ -17,6 +18,11 @@ const routes = [
     path: '/geographicareasfilter',
     name: 'GeographicAreasFilter',
     component: MapView,
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
   },
 ];
 
