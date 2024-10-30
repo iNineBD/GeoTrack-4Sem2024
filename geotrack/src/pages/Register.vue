@@ -3,25 +3,25 @@
     <v-row>
       <v-col class="blue-section" cols="12" md="4">
         <v-card class="register-card" outlined>
-          <v-card-title class="text-h5">Crie sua conta</v-card-title>
+          <v-card-title class="text-h5">Cadastro de Usuário</v-card-title>
           <v-card-text>
             <p>Preencha os campos abaixo</p>
             <v-form @submit.prevent="handleRegister">
               <v-text-field
                 v-model="name"
-                label="Digite seu nome completo"
+                label="Nome completo"
                 required
                 class="register-input"
               ></v-text-field>
               <v-text-field
                 v-model="email"
-                label="Digite seu email"
+                label="Email"
                 required
                 class="register-input"
               ></v-text-field>
               <v-text-field
                 v-model="password"
-                label="Digite sua senha"
+                label="Senha"
                 type="password"
                 required
                 class="register-input"

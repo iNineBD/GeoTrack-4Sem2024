@@ -1,46 +1,66 @@
 <template>
-  <v-container fluid class="login-container">
-    <v-row>
-      <v-col class="blue-section" cols="12" md="4">
-        <v-card class="login-card" outlined>
-          <v-card-title class="text-h5">Entre na sua conta</v-card-title>
+  <v-container fluid class="login-container pa-0">
+    <v-row no-gutters style="height: 100%">
+      <v-col class="blue-section" cols="12" md="5">
+        <v-card class="login-card" elevation="2">
+          <v-card-title class="text-h5 font-weight-bold text-center">Entre na sua conta</v-card-title>
           <v-card-text>
-            <p>Preencha os campos abaixo</p>
+            <p class="subtitle-1 mb-6 text-body-2 text-center">Preencha os campos abaixo</p>
             <v-form @submit.prevent="handleLogin">
               <v-text-field
                 v-model="email"
-                label="Digite seu email"
+                label="Digite seu usuário"
                 required
-                class="login-input"
+                class="login-input mb-4"
+                variant="outlined"
+                density="comfortable"
               ></v-text-field>
+              
               <v-text-field
                 v-model="password"
                 label="Digite sua senha"
                 type="password"
                 required
-                class="login-input"
+                class="login-input mb-2"
+                variant="outlined"
+                density="comfortable"
               ></v-text-field>
               
-              <div class="primeiroAcesso">
-                <router-link to="/register">Primeiro acesso</router-link>
+              <div class="primeiro-acesso mb-4">
+                <a href="#" class="text-red">Primeiro acesso</a>
               </div>
 
-              <v-btn type="submit" color="#2B81C4" block>Entrar</v-btn>
+              <v-btn 
+                type="submit" 
+                block 
+                class="login-btn"
+                size="large"
+              >
+                Entrar
+              </v-btn>
             </v-form>
           </v-card-text>
         </v-card>
       </v-col>
       
-      <v-col class="white-section" cols="12" md="8">
-        <div class="logo">
-          <img :src="logoGeoTrack" alt="GeoTrack Logo">
-        </div>
-        <div class="mapa">
-          <img :src="mapImage" alt="Mapa do mundo">
-        </div>
-        <div class="logos-parceiros">
-          <img :src="logoIto1" alt="ITO1 Logo">
-          <img :src="logoInine" alt="INine Logo">
+      <v-col class="white-section" cols="12" md="7">
+        <div class="content-wrapper">
+          <div class="logo-container mb-8">
+            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo">
+          </div>
+          
+          <div class="map-container mb-8">
+            <img 
+              src="https://i.gifer.com/PX5H.gif" 
+              alt="World Animation" 
+              class="world-animation"
+            >
+          </div>
+          
+          <div class="partner-logos">
+            <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo">
+            <img :src="logoInine" alt="INine Logo" class="partner-logo">
+          </div>
         </div>
       </v-col>
     </v-row>
@@ -52,14 +72,13 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import logoGeoTrack from '../assets/GeoTrack-logo.png';
-import mapImage from '../assets/map.png';
 import logoIto1 from '../assets/ito1-logo.png';
 import logoInine from '../assets/inine-logo.png';
 
 export default {
   name: 'Login',
   setup() {
-    const email = ref(''); // Usando email em vez de username
+    const email = ref('');
     const password = ref('');
     const router = useRouter();
 
@@ -70,7 +89,6 @@ export default {
           password: password.value,
         });
         localStorage.setItem('token', response.data.token);
-        alert('Login bem-sucedido!');
         router.push('/stoppointsfilter');
       } catch (error) {
         alert(error.response?.data?.message || 'Usuário ou senha inválidos');
@@ -81,6 +99,9 @@ export default {
       email,
       password,
       handleLogin,
+      logoGeoTrack,
+      logoIto1,
+      logoInine,
     };
   },
 };
@@ -88,36 +109,129 @@ export default {
 
 <style scoped>
 .login-container {
-  height: 100vh; 
-  margin: 0; 
-  padding: 0; 
+  height: 100vh;
+  background-color: white;
 }
 
 .blue-section {
-  background-color: #3f51b5; 
-  color: white;
+  background-color: #2B81C4;
+  background-image: url('../assets/bridge-background.jpg');
+  background-size: cover;
+  background-position: center;
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
-  height: 100vh; 
-}
-
-.white-section {
-  background-color: white; 
+  padding: 2rem;
 }
 
 .login-card {
-  width: 100%; 
-  max-width: 400px; 
-  margin: auto; 
+  background: white !important;
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 8px;
 }
 
-.login-input {
+.login-card :deep(.v-card-title) {
+  color: #333;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.login-card :deep(.v-card-text) {
+  color: #666;
+  padding: 0;
+}
+
+.login-input :deep(.v-field) {
+  border-radius: 4px;
+}
+
+.primeiro-acesso {
+  text-align: left;
+}
+
+.primeiro-acesso a {
+  color: #ff0000;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.login-btn {
+  background-color: #2B81C4 !important;
+  color: white;
+  height: 48px;
+  font-weight: bold;
+}
+
+.white-section {
+  background-color: white;
+  padding: 2rem;
+}
+
+.content-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.logo-container {
+  width: 100%;
+  text-align: center;
+}
+
+.main-logo {
+  max-width: 250px;
+  height: auto;
+}
+
+.map-container {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.world-animation {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.partner-logos {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
   width: 100%;
 }
 
-.primeiroAcesso {
-  text-align: justify;
-  margin: 10px 0;
+.partner-logo {
+  height: 40px;
+  width: auto;
+}
+
+@media (max-width: 960px) {
+  .blue-section {
+    min-height: 100vh;
+  }
+  
+  .white-section {
+    min-height: 100vh;
+  }
+  
+  .content-wrapper {
+    padding: 2rem 0;
+  }
+
+  .world-animation {
+    max-width: 100%;
+  }
 }
 </style>
