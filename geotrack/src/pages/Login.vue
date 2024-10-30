@@ -69,9 +69,9 @@ export default {
           email: email.value,
           password: password.value,
         });
-        localStorage.setItem('token', response.data.token); // Armazena o token
+        localStorage.setItem('token', response.data.token);
         alert('Login bem-sucedido!');
-        router.push('/stoppointsfilter'); // Substitua '/dashboard' pela rota desejada após o login
+        router.push('/stoppointsfilter');
       } catch (error) {
         alert(error.response?.data?.message || 'Usuário ou senha inválidos');
       }

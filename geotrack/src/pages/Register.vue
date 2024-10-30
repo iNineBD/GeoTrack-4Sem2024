@@ -73,7 +73,7 @@ export default {
           password: password.value,
         });
         alert('Usuário cadastrado com sucesso!');
-        router.push('/login'); // Redireciona para a tela de login após o cadastro
+        router.push('/');
       } catch (error) {
         alert(error.response?.data?.message || 'Erro ao cadastrar usuário');
       }
