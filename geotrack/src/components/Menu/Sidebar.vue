@@ -5,6 +5,7 @@
         <v-expansion-panel>
           <template v-slot:title>
             <v-row class="panel-header" justify="center" align="center">
+              <v-img :src="logout" height="30" class="icon" />
               <v-img :src="logo" height="30" class="icon" />
             </v-row>
           </template>
@@ -71,6 +72,7 @@ const handleStopPointsReceived = (stopPoints: any) => {
 };
 
 const logo = "/src/assets/Logo.svg";
+const logout = "/src/assets/logout-icon.png";
 const panel = ref([]);
 const dial = ref(false);
 
