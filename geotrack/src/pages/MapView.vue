@@ -1,8 +1,14 @@
 <template>
+  
   <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
     @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 
+  <v-btn-toggle v-model="isDarkTheme" class="theme-toggle" mandatory>
+      <v-btn value="false" @click="toggleTheme(false)">Claro</v-btn>
+      <v-btn value="true" @click="toggleTheme(true)">Escuro</v-btn>
+  </v-btn-toggle>
+  
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px">
     <v-card rounded="xl">
@@ -88,6 +94,8 @@ export default {
     const snackbar = ref(false);
     const snackbarMessage = ref("");
     const snackbarColor = ref("success");
+    const isDarkTheme = ref(false);
+    const themeClass = ref("");
     const circleDetails = ref({
       id: "",
       name: "",
@@ -95,7 +103,10 @@ export default {
       center: "",
       radius: "",
     });
-
+    const toggleTheme = (isDark: boolean) => {
+      isDarkTheme.value = isDark;
+      themeClass.value = isDark ? "dark-theme" : "light-theme";
+    };
     // @ts-ignore
     let circleInstance: google.maps.Circle | null = null;
     // @ts-ignore
@@ -108,6 +119,7 @@ export default {
     }
 
     onMounted(() => {
+      toggleTheme(isDarkTheme.value);
       if (mapDiv.value) {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -641,6 +653,9 @@ export default {
     snackbar,
     snackbarMessage,
     snackbarColor,
+    isDarkTheme,
+    toggleTheme,
+    themeClass,
     drawCircleOnMap,
     handleGeographicAreaConsult,
     handleStopPointsOnMap,
@@ -649,4 +664,21 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+.light-theme {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.dark-theme {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+</style>
