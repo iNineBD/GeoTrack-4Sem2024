@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    DarkLightMode: typeof import('./src/components/Filters/DarkLightMode.vue')['default']
     GeographicAreasFilter: typeof import('./src/components/Filters/GeographicAreasFilter.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
