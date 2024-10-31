@@ -25,10 +25,6 @@
                 variant="outlined"
                 density="comfortable"
               ></v-text-field>
-              
-              <div class="primeiro-acesso mb-4">
-                <a href="#" class="text-red">Primeiro acesso</a>
-              </div>
 
               <v-btn 
                 type="submit" 
@@ -38,6 +34,12 @@
               >
                 Entrar
               </v-btn>
+
+               
+              <div class="register text-center mt-4">
+                <router-link to="/register">Faça seu cadastro</router-link>
+              </div>
+
             </v-form>
           </v-card-text>
         </v-card>
@@ -114,8 +116,7 @@ export default {
 }
 
 .blue-section {
-  background-color: #2B81C4;
-  background-image: url('../assets/bridge-background.jpg');
+  background-image: url('../assets/image-sjc.png');
   background-size: cover;
   background-position: center;
   display: flex;
@@ -147,14 +148,13 @@ export default {
   border-radius: 4px;
 }
 
-.primeiro-acesso {
+.register {
   text-align: left;
 }
 
-.primeiro-acesso a {
-  color: #ff0000;
-  text-decoration: none;
-  font-size: 0.9rem;
+.register a {
+  color: primary;
+  text-decoration: underline;
 }
 
 .login-btn {
@@ -182,6 +182,12 @@ export default {
 .logo-container {
   width: 100%;
   text-align: center;
+}
+
+.logo-container img {
+  width: 100%;
+  max-width: 400px;
+  height: auto; 
 }
 
 .main-logo {
