@@ -502,9 +502,10 @@ export default {
 
         dialog.value = false;
         removeCircle();
+        eventBus.emit('reloadGeoArea');
+        
       } catch (error) {
         console.log("Erro ao deletar os dados:", error);
-
         showSnackbar("Erro ao deletar a zona. Tente novamente.", "error");
       }
     };
