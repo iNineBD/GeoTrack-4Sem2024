@@ -4,12 +4,12 @@
     @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap"
     @initializeMap="initializeMap" @removeCircle="removeCircle" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
-
-  <v-btn-toggle v-model="isDarkTheme" class="theme-toggle" mandatory>
-      <v-btn value="false" @click="toggleTheme(false)">Claro</v-btn>
-      <v-btn value="true" @click="toggleTheme(true)">Escuro</v-btn>
-  </v-btn-toggle>
-  
+  <v-switch
+    v-model="model"
+    :label="`Switch: ${model.toString()}`"
+    hide-details
+    inset
+  ></v-switch>
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px">
     <v-card rounded="xl">
@@ -76,7 +76,14 @@ export interface FilterData {
 
 export default {
   name: "MapView",
+  data () {
+      return {
+        model: true,
+      }
+    },
+
   setup() {
+  
     const map = ref<google.maps.Map | null>(null);
     const mapDiv = ref<HTMLElement | null>(null);
     const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
@@ -125,6 +132,19 @@ export default {
       if (markers.length > 0) {
         clearMarkers();
       }
+      const darkModeStyles = [
+        { elementType: 'geometry', stylers: [{ color: '#212121' }] },
+        { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+        { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+        { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
+        { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
+        { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+        { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
+        { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#2c2c2c' }] },
+        { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8a8a8a' }] },
+        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
+        { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
+      ];
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -138,18 +158,18 @@ export default {
               center: userLocation,
               zoom: 12,
               minZoom: 4, // Limite inferior de zoom
+              styles: darkModeStyles, // Adicionando o tema dark
             });
             addCurrentLocationMarker(userLocation);
           },
           (error) => {
-            // Se a localização não for aceita, inicie o mapa com a localização padrão
             const defaultLocation = { lat: -14.235, lng: -51.9253 };
             map.value = new google.maps.Map(mapDiv.value!, {
               center: defaultLocation,
               zoom: 3,
-              minZoom: 4, // Limite inferior de zoom
+              minZoom: 4,
+              styles: darkModeStyles, // Adicionando o tema dark
             });
-            // Não chama addMarker se a geolocalização falhar
           }
         );
       } else {
@@ -158,10 +178,10 @@ export default {
           center: defaultLocation,
           zoom: 10,
           minZoom: 4,
+          styles: darkModeStyles, // Adicionando o tema dark
         });
       }
     };
-
     const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
       if (map.value) {
         new google.maps.Marker({
