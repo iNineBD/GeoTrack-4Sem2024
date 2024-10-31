@@ -114,6 +114,7 @@ export default {
     this.fetchGeoAreas();
     eventBus.on('clearSelectedGeoArea', this.clearSelectedGeoArea);
     eventBus.on('stopIsLoading', this.stopIsLoading);
+    eventBus.on('reloadGeoArea', this.reloadGeoArea);
   },
 
   computed: {
@@ -137,14 +138,18 @@ export default {
       this.snackbarColor = color; // Define a cor
       this.snackbar = true; // Torna o snackbar visível
     },
-    
+
     clearSelectedGeoArea() {
       this.selectedGeoArea = null;
-      console.log('GeoArea selecionada foi limpa:', this.selectedGeoArea); // Modifiquei aqui
     },
 
     stopIsLoading() {
       this.loading = false;
+    },
+
+    async reloadGeoArea() {
+      this.selectedGeoArea = null;
+      this.fetchGeoAreas();
     },
 
     async fetchUsers() {

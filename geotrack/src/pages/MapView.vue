@@ -469,6 +469,9 @@ export default {
         }
         showSnackbar("Zona salva com sucesso!", "success");
         dialog.value = false;
+
+        eventBus.emit('reloadGeoArea');
+
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
         showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
@@ -520,9 +523,7 @@ export default {
         circleInstance = null;
         localStorage.removeItem('cachedCircleDetails');
       }
-      console.log('Removendo círculo e emitindo evento...'); // Adicionado para verificação
-      // ... seu código existente
-      eventBus.emit('clearSelectedGeoArea'); // Emitir evento
+      eventBus.emit('clearSelectedGeoArea');
     };
 
     const drawCircleOnMap = (
