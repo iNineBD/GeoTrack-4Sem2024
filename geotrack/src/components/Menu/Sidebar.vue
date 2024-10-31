@@ -1,20 +1,22 @@
 <template>
   <div class="floating-panel">
     <v-container width="400px" class="panel-container" style="padding: 0px;">
-      <v-expansion-panels v-model="panel" rounded="xl" elevation="4">
+      <v-expansion-panels v-model="panel" rounded="xl" elevation="4" >
         <v-expansion-panel>
           <template v-slot:title>
-            <v-row class="panel-header" justify="center" align="center">
-              <v-img :src="logo" height="30" class="icon" />
+            <v-row class="panel-header" justify="center" align="center" @click="handlePanelChange" >
+              <v-img :src="logo" height="35" class="icon" />
             </v-row>
           </template>
           <v-expansion-panel-text style="padding: 0px;">
-
             <v-container width="400px" class="filter-container" style="padding: 0px;">
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
-              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"/>
-              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsReceived"/>
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" />
+              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle"
+                @consult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsReceived" />
+              <!-- Exibe a caixa de informações dos pontos de parada -->
+              <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -27,10 +29,12 @@
       </template>
 
       <!-- Botão para StopPointsFilter -->
-      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker" title="Filtro de Pontos de Parada"></v-btn>
+      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"
+        title="Filtro de Pontos de Parada"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
-      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search" title="Filtro de Áreas Geográficas"></v-btn>
+      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"
+        title="Filtro de Áreas Geográficas"></v-btn>
     </v-speed-dial>
   </div>
 </template>
@@ -39,21 +43,40 @@
 import { ref } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
+import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 //@ts-ignore
 import MapView, { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 
 // Definindo as props
 const props = defineProps<{
-  onConsult: (data: FilterData) => void;
+  onConsult: (data: FilterData) => any;
   onDrawCircle: () => void;
   onGeographicAreaConsult: (data: FilterData) => void;
   onStopPointsReceived: (stopPoints: any) => void;
 }>();
 
+interface StopPoint {
+  device: string;
+  user: string;
+  geoJsonDTO: any;
+}
 
-const handleFilterData = (data: FilterData) => {
-  props.onConsult(data);
+const showStopPointsInformation = ref(false);
+const stopPoints = ref<StopPoint[]>([]);
+
+const handleFilterData = async (data: FilterData) => {
+  const result = await props.onConsult(data);
+
+  if (result.success) {
+    showStopPointsInformation.value = true;
+    stopPoints.value = result.data;
+    console.log("Aqui está os pontos salvos: ", stopPoints.value)
+  } else {
+    showStopPointsInformation.value = false;
+    stopPoints.value = [];
+    console.log("Aqui está a lista vazia: ", stopPoints.value)
+  }
 };
 
 const handleDrawCircle = () => {
@@ -88,12 +111,15 @@ const goToFilterStopPoints = () => {
   toggleDial();
 };
 
-
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
   //@ts-ignore
   panel.value = 0; // Define o primeiro painel como aberto
   toggleDial();
+};
+
+const handlePanelChange = () => {
+  showStopPointsInformation.value = false;
 };
 
 </script>

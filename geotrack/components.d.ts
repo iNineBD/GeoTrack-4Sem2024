@@ -12,5 +12,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Menu/Sidebar.vue')['default']
     StopPointsFilter: typeof import('./src/components/Filters/StopPointsFilter.vue')['default']
+    StopPointsInformation: typeof import('./src/components/Menu/StopPointsInformation.vue')['default']
   }
 }

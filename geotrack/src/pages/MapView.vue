@@ -35,8 +35,8 @@
             rounded="xl">
             Editar
           </v-btn>
-          <v-btn v-if="Number.isInteger(parseInt(circleDetails.id,10))" variant="flat" color="red" @click="deleteCircle"
-            style="margin: 0px 10px 15px 10px" rounded="xl">
+          <v-btn v-if="Number.isInteger(parseInt(circleDetails.id, 10))" variant="flat" color="red"
+            @click="deleteCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
             Deletar
           </v-btn>
         </v-row>
@@ -45,19 +45,15 @@
   </v-dialog>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
-  <span style="font-weight: bold; font-size: 15px; color: white;">  
-    {{ snackbarMessage }}
-  </span>
-  <template v-slot:actions>
-    <v-btn
-      color="white"
-      variant="text"
-      style="font-weight: bold; text-transform: uppercase; color: white;"
-      @click="snackbar = false"
-    >
-      Close
-    </v-btn>
-  </template>  
+    <span style="font-weight: bold; font-size: 15px; color: white;">
+      {{ snackbarMessage }}
+    </span>
+    <template v-slot:actions>
+      <v-btn color="white" variant="text" style="font-weight: bold; text-transform: uppercase; color: white;"
+        @click="snackbar = false">
+        Close
+      </v-btn>
+    </template>
   </v-snackbar>
 </template>
 
@@ -135,7 +131,7 @@ export default {
                 minZoom: 4, // Limite inferior de zoom
               });
               // Não chama addMarker se a geolocalização falhar
-              showSnackbar('Falha ao obter a localização.Usando localização padrão.','warning');
+              showSnackbar('Falha ao obter a localização.Usando localização padrão.', 'warning');
             }
           );
         } else {
@@ -146,7 +142,7 @@ export default {
             minZoom: 4, // Limite inferior de zoom
           });
           // Não chama addMarker se geolocalização não estiver disponível
-          showSnackbar('Geolocalização não suportada pelo navegador.','error');
+          showSnackbar('Geolocalização não suportada pelo navegador.', 'error');
         }
       }
     });
@@ -251,7 +247,7 @@ export default {
             geoJsonDTO.features.forEach((feature: GeoJsonFeature) => {
               const coords = feature.geometry.coordinates;
               if (coords && coords.length >= 2) {
-                localStorage.setItem('cachedLoading',JSON.stringify({result: false}));
+                localStorage.setItem('cachedLoading', JSON.stringify({ result: false }));
                 const position = { lat: coords[1], lng: coords[0] }; // Coordenadas: lat e lng
 
                 // Gera as iniciais do usuário
@@ -304,8 +300,12 @@ export default {
             console.warn("Nenhum dado GeoJSON disponível para o usuário:", user);
           }
         });
+
+        // Retorna sucesso se dados válidos foram encontrados
+        return { success: true, data: geoJsonResponses };
       } catch (error) {
         showSnackbar('Nenhuma localização encontrada para este período', 'error');
+        return { success: false, data: [] }; // Retorna falha em caso de erro
       }
     };
 
@@ -394,8 +394,8 @@ export default {
         radius: parseFloat(circleDetails.value.radius)
       };
 
-        // Armazenando os dados no localStorage
-        localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
+      // Armazenando os dados no localStorage
+      localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
 
     };
 
@@ -458,9 +458,9 @@ export default {
 
         localStorage.removeItem('circleDetailsCached');
 
-         setTimeout(() => {
-           window.location.reload();
-         }, 500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
 
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
@@ -501,10 +501,10 @@ export default {
         setTimeout(() => {
           window.location.reload();
         }, 500);
-               
+
         removeCircle()
       } catch (error) {
-        showSnackbar('Erro ao enviar os dados.','error');
+        showSnackbar('Erro ao enviar os dados.', 'error');
         console.log('Erro ao enviar os dados:', error);
 
         snackbarMessage.value = "Erro ao deletar a zona. Tente novamente.";
@@ -527,125 +527,125 @@ export default {
         circleInstance = null;
         localStorage.removeItem('cachedCircleDetails');
       };
-  };
-
-  const drawCircleOnMap = (
-    latitude: number,
-    longitude: number,
-    radius: number
-  ) => {
-    if (circleInstance) {
-      circleInstance.setMap(null);
-    }
-
-    const circleCenter = { lat: latitude, lng: longitude };
-
-    // @ts-ignore
-    circleInstance = new google.maps.Circle({
-      map: map.value,
-      center: circleCenter,
-      radius: radius,
-      fillColor: "#18FFFF",
-      fillOpacity: 0.3,
-      strokeWeight: 2,
-      strokeColor: "#0097A7",
-      clickable: true,
-    });
-
-    google.maps.event.addListener(circleInstance, "click", () => {
-      dialog.value = true;
-    });
-
-    map.value?.panTo(circleCenter);
-    map.value?.setZoom(14);
-  };
-
-  const handleGeographicAreaConsult = (data: any) => {
-    console.log("Dados geográficos recebidos do Sidebar:", data);
-    circleDetails.value = {
-      id: data.id,
-      name: data.name,
-      type: "CIRCLE",
-      center: `${data.latitude}, ${data.longitude}`,
-      radius: `${data.radius}`,
     };
 
-    drawCircleOnMap(data.latitude, data.longitude, data.radius);
-  };
+    const drawCircleOnMap = (
+      latitude: number,
+      longitude: number,
+      radius: number
+    ) => {
+      if (circleInstance) {
+        circleInstance.setMap(null);
+      }
 
-  const handleStopPointsOnMap = (points: any) => {
-    console.log("Pontos de parada recebidos do Sidebar:", points);
+      const circleCenter = { lat: latitude, lng: longitude };
 
-    points.coords.forEach((item: any) => {
-      const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
-
-      console.log('name ', points)
-
-      // Gera as iniciais do usuário
-      const initials = points.userName.split(" ")
-        .slice(0, 2)
-        .map((name: string) => name[0])
-        .join("");
-
-      const marker = new google.maps.Marker({
-        position,
+      // @ts-ignore
+      circleInstance = new google.maps.Circle({
         map: map.value,
-        label: {
-          text: initials,
-          color: "white",
-          fontWeight: "bold",
-          fontSize: "14px",
-        },
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 15,
-          fillColor: "#000B62",
-          fillOpacity: 1,
-          strokeWeight: 2,
-          strokeColor: "#ffffff",
-        },
+        center: circleCenter,
+        radius: radius,
+        fillColor: "#18FFFF",
+        fillOpacity: 0.3,
+        strokeWeight: 2,
+        strokeColor: "#0097A7",
+        clickable: true,
       });
 
-      const infoWindow = new google.maps.InfoWindow({
-        content: `<div>
+      google.maps.event.addListener(circleInstance, "click", () => {
+        dialog.value = true;
+      });
+
+      map.value?.panTo(circleCenter);
+      map.value?.setZoom(14);
+    };
+
+    const handleGeographicAreaConsult = (data: any) => {
+      console.log("Dados geográficos recebidos do Sidebar:", data);
+      circleDetails.value = {
+        id: data.id,
+        name: data.name,
+        type: "CIRCLE",
+        center: `${data.latitude}, ${data.longitude}`,
+        radius: `${data.radius}`,
+      };
+
+      drawCircleOnMap(data.latitude, data.longitude, data.radius);
+    };
+
+    const handleStopPointsOnMap = (points: any) => {
+      console.log("Pontos de parada recebidos do Sidebar:", points);
+
+      points.coords.forEach((item: any) => {
+        const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
+
+        console.log('name ', points)
+
+        // Gera as iniciais do usuário
+        const initials = points.userName.split(" ")
+          .slice(0, 2)
+          .map((name: string) => name[0])
+          .join("");
+
+        const marker = new google.maps.Marker({
+          position,
+          map: map.value,
+          label: {
+            text: initials,
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "14px",
+          },
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 15,
+            fillColor: "#000B62",
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: "#ffffff",
+          },
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<div>
                           <strong>Usuário:</strong> ${points.userName}<br>
                           <strong>Dispositivo:</strong> ${points.device}<br>
                           <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
                          </div>`,
+        });
+
+        google.maps.event.addListener(marker, "click", () => {
+          infoWindow.open(map.value!, marker);
+        });
+
+        google.maps.event.addListener(map.value, "click", () => {
+          infoWindow.close();
+        });
+
+        centerMapOnMarker(position);
       });
 
-      google.maps.event.addListener(marker, "click", () => {
-        infoWindow.open(map.value!, marker);
-      });
+    };
 
-      google.maps.event.addListener(map.value, "click", () => {
-        infoWindow.close();
-      });
-
-      centerMapOnMarker(position);
-    });
-    
-  };
-
-  return {
-    map,
-    mapDiv,
-    fetchGeoJsonData,
-    enableCircleDrawing,
-    dialog,
-    circleDetails,
-    editCircle,
-    saveCircle,
-    deleteCircle,
-    removeCircle,
-    snackbar,
-    snackbarMessage,
-    snackbarColor,
-    drawCircleOnMap,
-    handleGeographicAreaConsult,
-    handleStopPointsOnMap,
-  };
-},
+    return {
+      map,
+      mapDiv,
+      fetchGeoJsonData,
+      enableCircleDrawing,
+      dialog,
+      circleDetails,
+      editCircle,
+      saveCircle,
+      deleteCircle,
+      removeCircle,
+      snackbar,
+      snackbarMessage,
+      snackbarColor,
+      drawCircleOnMap,
+      handleGeographicAreaConsult,
+      handleStopPointsOnMap,
+    };
+  },
 };
 </script>
 

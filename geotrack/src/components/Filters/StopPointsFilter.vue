@@ -1,6 +1,6 @@
 <template>
   <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px;">
-    <v-col style="padding: 20px 20px 0 20px;">
+    <v-col style="padding: 20px 20px 0px 20px;">
       <!-- Users combobox -->
       <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
         prepend-icon="mdi-filter-variant" chips clearable multiple color="primary">
@@ -31,14 +31,14 @@
     <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px;">
       <v-row class="d-flex" no-gutters style="justify-content: space-around;">
         <v-col cols="7">
-          <v-btn :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
-            variant="flat" block rounded="xl" @click="handleConsult">
+          <v-btn :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large" variant="flat"
+            block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn :disabled="loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="xl" @click="clearFields">
+          <v-btn :disabled="loading" class="text-none" color="primary_light" size="large" variant="flat" block
+            rounded="xl" @click="clearFields">
             Limpar
           </v-btn>
         </v-col>
@@ -48,7 +48,7 @@
 
   <!-- Loading progress circular -->
   <v-col v-if="loadingPage" class="d-flex justify-center mt-4">
-      <v-progress-circular color="primary" indeterminate></v-progress-circular>
+    <v-progress-circular color="primary" indeterminate></v-progress-circular>
   </v-col>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
@@ -68,6 +68,7 @@
 <script>
 import { load } from 'ol/Image';
 import { fa } from 'vuetify/locale';
+import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 
 export default {
   data: () => ({
@@ -91,7 +92,10 @@ export default {
     snackbarMessage: '', // Mensagem exibida no snackbar
     snackbarColor: 'success', // Cor do snackbar
     loadingPage: false,  // Variável para controlar o estado de carregamento
+    showStopPointsInformation: false,
   }),
+
+  emits: ['consult'],
 
   mounted() {
     this.fetchUsers();
@@ -123,11 +127,10 @@ export default {
     },
 
     async handleConsult() {
-      if (this.selectedUsers.length === 0 || !this.date) return;    
-      // @ts-ignore
-            
+      if (this.selectedUsers.length === 0 || !this.date) return;
+
       this.loadingPage = true
-      
+
       // Extraindo os IDs dos dispositivos dos usuários selecionados
       const deviceIds = this.selectedUsers.map(user => user.deviceId);
 
@@ -137,7 +140,6 @@ export default {
         this.showSnackbar("Mais que 31 dias selecionados");
         return;
       }
-
 
       // Preparando os dados da requisição com todos os devices como um array e as datas uma única vez
       const requestData = {
@@ -149,17 +151,12 @@ export default {
       console.log("Dados enviados:", requestData);
 
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
-      
 
-      // while(true){
-      //   console.log('vendo', JSON.parse(localStorage.getItem('cachedLoading')))
-      //   if(!JSON.parse(localStorage.getItem('cachedLoading')).result){
-      //     document.getElementById("loadingStopPoints").style.display = "none";
-      //     this.loadingPage = false
-      //     break;
-      //   }
-      // }
-
+      // Simulação do retorno dos postos de parada
+      setTimeout(() => {
+        this.showStopPointsInformation = true;  // Exibe o novo componente
+        this.loadingPage = false;
+      }, 2000); // Simulando o tempo de resposta
 
     },
 
