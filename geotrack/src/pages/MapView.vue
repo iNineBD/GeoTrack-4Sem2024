@@ -1,7 +1,8 @@
 <template>
   
   <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
-    @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap" />
+    @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap"
+    @initializeMap="initializeMap" @removeCircle="removeCircle" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
 
   <v-btn-toggle v-model="isDarkTheme" class="theme-toggle" mandatory>
@@ -41,7 +42,7 @@
             rounded="xl">
             Editar
           </v-btn>
-          <v-btn v-if="Number.isInteger(parseInt(circleDetails.id,10))" variant="flat" color="red" @click="deleteCircle"
+          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="red" @click="deleteCircle"
             style="margin: 0px 10px 15px 10px" rounded="xl">
             Deletar
           </v-btn>
@@ -51,26 +52,15 @@
   </v-dialog>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
-  <span style="font-weight: bold; font-size: 15px; color: white;">  
     {{ snackbarMessage }}
-  </span>
-  <template v-slot:actions>
-    <v-btn
-      color="white"
-      variant="text"
-      style="font-weight: bold; text-transform: uppercase; color: white;"
-      @click="snackbar = false"
-    >
-      Close
-    </v-btn>
-  </template>  
   </v-snackbar>
 </template>
 
 <script lang="ts">
-import axios from "axios";
 import { onMounted, ref } from "vue";
+import axios from "axios";
 import { id } from "vuetify/locale";
+import { eventBus } from '@/utils/EventBus'; // Importando o EventBus
 
 interface GeoJsonFeature {
   geometry: {
@@ -91,11 +81,22 @@ export default {
     const mapDiv = ref<HTMLElement | null>(null);
     const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
     const dialog = ref(false);
-    const snackbar = ref(false);
-    const snackbarMessage = ref("");
-    const snackbarColor = ref("success");
     const isDarkTheme = ref(false);
     const themeClass = ref("");
+
+    const snackbar = ref(false); // Controle de visibilidade do snackbar
+    const snackbarColor = ref("success"); // Inicializa a cor do snackbar como "success"
+    const snackbarMessage = ref(""); // Mensagem do snackbar
+
+    // Método para exibir o snackbar
+    //@ts-ignore
+    const showSnackbar = (message, color = "success") => {
+      snackbarMessage.value = message; // Define a mensagem
+      snackbarColor.value = color; // Define a cor
+      snackbar.value = true; // Torna o snackbar visível
+    };
+
+    let markers: google.maps.Marker[] = [];
     const circleDetails = ref({
       id: "",
       name: "",
@@ -112,56 +113,197 @@ export default {
     // @ts-ignore
     const circles = ref<{ circle: google.maps.Circle; details: any }[]>([]);
 
-    const showSnackbar = (message: string, color: string = 'sucess') => {
-      snackbarMessage.value = message;
-      snackbarColor.value = color;
-      snackbar.value = true;
-    }
-
     onMounted(() => {
       toggleTheme(isDarkTheme.value);
       if (mapDiv.value) {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              };
-
-              map.value = new google.maps.Map(mapDiv.value!, {
-                center: userLocation,
-                zoom: 12,
-                minZoom: 4, // Limite inferior de zoom
-              });
-
-              addCurrentLocationMarker(userLocation);
-              initializeDrawingManager();
-            },
-            (error) => {
-              // Se a localização não for aceita, inicie o mapa com a localização padrão
-              const defaultLocation = { lat: -14.235, lng: -51.9253 };
-              map.value = new google.maps.Map(mapDiv.value!, {
-                center: defaultLocation,
-                zoom: 3,
-                minZoom: 4, // Limite inferior de zoom
-              });
-              // Não chama addMarker se a geolocalização falhar
-              showSnackbar('Falha ao obter a localização.Usando localização padrão.','warning');
-            }
-          );
-        } else {
-          const defaultLocation = { lat: 2.8266, lng: -60.6623 };
-          map.value = new google.maps.Map(mapDiv.value!, {
-            center: defaultLocation,
-            zoom: 10,
-            minZoom: 4, // Limite inferior de zoom
-          });
-          // Não chama addMarker se geolocalização não estiver disponível
-          showSnackbar('Geolocalização não suportada pelo navegador.','error');
-        }
+        initializeDrawingManager();
+        initializeMap();
       }
     });
+
+    const initializeMap = () => {
+      if (markers.length > 0) {
+        clearMarkers();
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+
+            map.value = new google.maps.Map(mapDiv.value!, {
+              center: userLocation,
+              zoom: 12,
+              minZoom: 4, // Limite inferior de zoom
+            });
+            addCurrentLocationMarker(userLocation);
+          },
+          (error) => {
+            // Se a localização não for aceita, inicie o mapa com a localização padrão
+            const defaultLocation = { lat: -14.235, lng: -51.9253 };
+            map.value = new google.maps.Map(mapDiv.value!, {
+              center: defaultLocation,
+              zoom: 3,
+              minZoom: 4, // Limite inferior de zoom
+            });
+            // Não chama addMarker se a geolocalização falhar
+          }
+        );
+      } else {
+        const defaultLocation = { lat: 2.8266, lng: -60.6623 };
+        map.value = new google.maps.Map(mapDiv.value!, {
+          center: defaultLocation,
+          zoom: 10,
+          minZoom: 4,
+        });
+      }
+    };
+
+    const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
+      if (map.value) {
+        new google.maps.Marker({
+          position,
+          map: map.value,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: "#4285F4",
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: "#ffffff",
+          },
+          title: "Sua Localização Atual",
+        });
+      }
+    };
+
+    const centerMapOnMarker = (position: google.maps.LatLngLiteral) => {
+      if (map.value) {
+        map.value.panTo(position);
+        map.value.setZoom(15);
+      }
+    };
+
+    const clearMarkers = () => {
+      markers.forEach((marker) => {
+        marker.setMap(null);  // Remove o marcador do mapa
+      });
+      markers = [];  // Limpa o array de marcadores
+    };
+
+    const fetchGeoJsonData = async (filterData: FilterData) => {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/stoppoint/find",
+          filterData
+        );
+
+        // Verifica se a resposta está dentro do intervalo de sucesso
+        if (response.status >= 200 && response.status < 300) {
+          const geoJsonResponses = response.data;
+
+          // Limpa os marcadores anteriores no mapa
+          clearMarkers();
+
+          // Processa cada item da resposta GeoJSON
+          geoJsonResponses.forEach((item: any) => {
+            const { user, device, geoJsonDTO } = item;
+
+            if (geoJsonDTO.features && geoJsonDTO.features.length > 0) {
+              geoJsonDTO.features.forEach((feature: GeoJsonFeature) => {
+                const coords = feature.geometry.coordinates;
+                if (coords && coords.length >= 2) {
+                  // Plota o ponto diretamente no mapa
+                  plotPointOnMap({
+                    userName: user,
+                    device: device,
+                    coords: { latitude: coords[1], longitude: coords[0] }
+                  });
+                }
+              });
+            }
+          });
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          if (error.response.status === 404) {
+            console.log("Erro 404: ", error.response.data.message);
+            showSnackbar(error.response.data.message, "error");
+          } else {
+            console.error("Erro ao buscar os dados GeoJSON:", error.response.data);
+          }
+        } else {
+          console.error("Erro de rede ou outro erro:", error);
+        }
+      } finally {
+        eventBus.emit('stopIsLoading');
+      }
+    };
+
+    const handleStopPointsOnMap = (points: any) => {
+      clearMarkers();
+      points.coords.forEach((item: any) => {
+        plotPointOnMap({
+          userName: points.userName,
+          device: points.device,
+          coords: { latitude: item.latitude, longitude: item.longitude }
+        });
+      });
+      eventBus.emit('stopIsLoading');
+    };
+
+    const plotPointOnMap = (userData: any) => {
+      const position = { lat: userData.coords.latitude, lng: userData.coords.longitude }; // Coordenadas
+
+      // Gera as iniciais do usuário
+      const initials = userData.userName.split(" ")
+        .slice(0, 2)
+        .map((name: string) => name[0])
+        .join("");
+
+      const marker = new google.maps.Marker({
+        position,
+        map: map.value,
+        label: {
+          text: initials,
+          color: "white",
+          fontWeight: "bold",
+          fontSize: "14px",
+        },
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 15,
+          fillColor: "#000B62",
+          fillOpacity: 1,
+          strokeWeight: 2,
+          strokeColor: "#ffffff",
+        },
+      });
+
+      // Adiciona o marcador no array global para controle
+      markers.push(marker);
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `<div>
+              <strong>Usuário:</strong> ${userData.userName}<br>
+              <strong>Dispositivo:</strong> ${userData.device}<br>
+              <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
+            </div>`,
+      });
+
+      google.maps.event.addListener(marker, "click", () => {
+        infoWindow.open(map.value!, marker);
+      });
+
+      google.maps.event.addListener(map.value, "click", () => {
+        infoWindow.close();
+      });
+
+      centerMapOnMarker(position);
+    };
 
     const initializeDrawingManager = () => {
       drawingManager.value = new google.maps.drawing.DrawingManager({
@@ -200,8 +342,6 @@ export default {
           circleDetails.value.center = `${center.lat}, ${center.lng}`;
           circleDetails.value.radius = `${radius}`;
 
-          circleForConsult();
-
           // Evento para abrir o modal quando o círculo for clicado
           google.maps.event.addListener(circle, "click", () => {
             dialog.value = true;
@@ -215,119 +355,11 @@ export default {
       );
     };
 
-    const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
-      if (map.value) {
-        new google.maps.Marker({
-          position,
-          map: map.value,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: "#4285F4",
-            fillOpacity: 1,
-            strokeWeight: 2,
-            strokeColor: "#ffffff",
-          },
-          title: "Sua Localização Atual",
-        });
-      }
-    };
-
-    const centerMapOnMarker = (position: google.maps.LatLngLiteral) => {
-      if (map.value) {
-        map.value.panTo(position);
-        map.value.setZoom(15);
-      }
-    };
-
-    const fetchGeoJsonData = async (filterData: FilterData) => {
-      console.log("Filter data recebido:", filterData);
-      try {
-        const requestData = { ...filterData }; // Formato dos dados que você espera no backend
-
-        console.log("dados recebidos:", requestData);
-
-        const response = await axios.post(
-          "http://localhost:8080/stoppoint/find",
-          requestData
-        );
-
-        // Resposta esperada: uma matriz de objetos
-        const geoJsonResponses = response.data;
-        console.log("geoJsonResponses:", geoJsonResponses);
-
-        geoJsonResponses.forEach((item: any) => {
-          const { user, device, geoJsonDTO } = item;
-
-          if (geoJsonDTO.features && geoJsonDTO.features.length > 0) {
-            geoJsonDTO.features.forEach((feature: GeoJsonFeature) => {
-              const coords = feature.geometry.coordinates;
-              if (coords && coords.length >= 2) {
-                localStorage.setItem('cachedLoading',JSON.stringify({result: false}));
-                const position = { lat: coords[1], lng: coords[0] }; // Coordenadas: lat e lng
-
-                // Gera as iniciais do usuário
-                const initials = user
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((name: string) => name[0])
-                  .join("");
-
-                const marker = new google.maps.Marker({
-                  position,
-                  map: map.value,
-                  label: {
-                    text: initials,
-                    color: "white",
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                  },
-                  icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 15,
-                    fillColor: "#000B62",
-                    fillOpacity: 1,
-                    strokeWeight: 2,
-                    strokeColor: "#ffffff",
-                  },
-                });
-
-                const infoWindow = new google.maps.InfoWindow({
-                  content: `<div>
-                          <strong>Usuário:</strong> ${user}<br>
-                          <strong>Dispositivo:</strong> ${device}<br>
-                          <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
-                         </div>`,
-                });
-
-                google.maps.event.addListener(marker, "click", () => {
-                  infoWindow.open(map.value!, marker);
-                });
-
-                google.maps.event.addListener(map.value, "click", () => {
-                  infoWindow.close();
-                });
-
-                centerMapOnMarker(position);
-              }
-            });
-          } else {
-            showSnackbar('Nenhum dado GeoJSON disponível para o usuário', 'warning');
-            console.warn("Nenhum dado GeoJSON disponível para o usuário:", user);
-          }
-        });
-      } catch (error) {
-        showSnackbar('Nenhuma localização encontrada para este período', 'error');
-      }
-    };
-
     const enableCircleDrawing = () => {
       if (drawingManager.value && map.value) {
         drawingManager.value.setDrawingMode(
           google.maps.drawing.OverlayType.CIRCLE
         );
-        circleDetails.value.name = 'ZONA 1'
-        circleDetails.value.type = 'CIRCLE'
         drawingManager.value.setMap(map.value);
       }
     };
@@ -395,22 +427,6 @@ export default {
 
     };
 
-    const circleForConsult = async () => {
-      const payload = {
-        name: circleDetails.value.name,
-        type: "CIRCLE",
-        center: {
-          longitude: parseFloat(circleDetails.value.center.split(", ")[1]),
-          latitude: parseFloat(circleDetails.value.center.split(", ")[0])
-        },
-        radius: parseFloat(circleDetails.value.radius)
-      };
-
-        // Armazenando os dados no localStorage
-        localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
-
-    };
-
     const saveCircle = async () => {
       const cached = localStorage.getItem('circleDetailsCached');
       // @ts-ignore
@@ -462,23 +478,14 @@ export default {
           console.log("Dados enviados com sucesso para update:", response.data);
 
         }
-        snackbarMessage.value = "Zona salva com sucesso!";
-        snackbarColor.value = "success";
-        snackbar.value = true;
-
+        showSnackbar("Zona salva com sucesso!", "success");
         dialog.value = false;
 
-        localStorage.removeItem('circleDetailsCached');
-
-         setTimeout(() => {
-           window.location.reload();
-         }, 500);
+        eventBus.emit('reloadGeoArea');
 
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
-        snackbarMessage.value = "Erro ao salvar a zona. Nome Já existe.";
-        snackbarColor.value = "error";
-        snackbar.value = true;
+        showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
       }
 
     };
@@ -492,11 +499,8 @@ export default {
         id: circleDetails.value.id,
       };
 
-      console.log(payload)
-
-      if (cachedDetails != null && Number.isInteger(parseInt(cachedDetails.id, 10))) {
+      if (cachedDetails) {
         payload.id = cachedDetails.id
-        localStorage.removeItem('circleDetailsCached')
       }
 
       try {
@@ -505,162 +509,108 @@ export default {
         });
         console.log("Dados enviados com sucesso:", response.data);
         console.log({ data: payload });
-        snackbarMessage.value = "Zona deletada com sucesso!";
-        snackbarColor.value = "success";
-        snackbar.value = true;
+        showSnackbar("Zona deletada com sucesso!", "success");
 
         dialog.value = false;
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-               
-        removeCircle()
+        removeCircle();
+        eventBus.emit('reloadGeoArea');
+        
       } catch (error) {
-        showSnackbar('Erro ao enviar os dados.','error');
-        console.log('Erro ao enviar os dados:', error);
-
-        snackbarMessage.value = "Erro ao deletar a zona. Tente novamente.";
-        snackbarColor.value = "error";
-        snackbar.value = true;
+        console.log("Erro ao deletar os dados:", error);
+        showSnackbar("Erro ao deletar a zona. Tente novamente.", "error");
       }
     };
 
     const removeCircle = () => {
-      dialog.value = false;
       circleDetails.value = {
-        id: '',
-        name: '',
-        type: "CIRCLE",
-        center: ``,
-        radius: ``,
+        id: "",
+        name: "",
+        type: "",
+        center: "",
+        radius: "",
       };
+      dialog.value = false;
       if (circleInstance) {
         circleInstance.setMap(null);
         circleInstance = null;
         localStorage.removeItem('cachedCircleDetails');
-      };
-  };
-
-  const drawCircleOnMap = (
-    latitude: number,
-    longitude: number,
-    radius: number
-  ) => {
-    if (circleInstance) {
-      circleInstance.setMap(null);
-    }
-
-    const circleCenter = { lat: latitude, lng: longitude };
-
-    // @ts-ignore
-    circleInstance = new google.maps.Circle({
-      map: map.value,
-      center: circleCenter,
-      radius: radius,
-      fillColor: "#18FFFF",
-      fillOpacity: 0.3,
-      strokeWeight: 2,
-      strokeColor: "#0097A7",
-      clickable: true,
-    });
-
-    google.maps.event.addListener(circleInstance, "click", () => {
-      dialog.value = true;
-    });
-
-    map.value?.panTo(circleCenter);
-    map.value?.setZoom(14);
-  };
-
-  const handleGeographicAreaConsult = (data: any) => {
-    console.log("Dados geográficos recebidos do Sidebar:", data);
-    circleDetails.value = {
-      id: data.id,
-      name: data.name,
-      type: "CIRCLE",
-      center: `${data.latitude}, ${data.longitude}`,
-      radius: `${data.radius}`,
+      }
+      eventBus.emit('clearSelectedGeoArea');
     };
 
-    drawCircleOnMap(data.latitude, data.longitude, data.radius);
-  };
+    const drawCircleOnMap = (
+      latitude: number,
+      longitude: number,
+      radius: number
+    ) => {
+      if (circleInstance) {
+        circleInstance.setMap(null);
+      }
 
-  const handleStopPointsOnMap = (points: any) => {
-    console.log("Pontos de parada recebidos do Sidebar:", points);
 
-    points.coords.forEach((item: any) => {
-      const position = { lat: item.latitude, lng: item.longitude }; // Coordenadas: lat e lng
+      const circleCenter = { lat: latitude, lng: longitude };
 
-      console.log('name ', points)
-
-      // Gera as iniciais do usuário
-      const initials = points.userName.split(" ")
-        .slice(0, 2)
-        .map((name: string) => name[0])
-        .join("");
-
-      const marker = new google.maps.Marker({
-        position,
+      // @ts-ignore
+      circleInstance = new google.maps.Circle({
         map: map.value,
-        label: {
-          text: initials,
-          color: "white",
-          fontWeight: "bold",
-          fontSize: "14px",
-        },
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 15,
-          fillColor: "#000B62",
-          fillOpacity: 1,
-          strokeWeight: 2,
-          strokeColor: "#ffffff",
-        },
+        center: circleCenter,
+        radius: radius,
+        fillColor: "#18FFFF",
+        fillOpacity: 0.3,
+        strokeWeight: 2,
+        strokeColor: "#0097A7",
+        clickable: true,
       });
 
-      const infoWindow = new google.maps.InfoWindow({
-        content: `<div>
-                          <strong>Usuário:</strong> ${points.userName}<br>
-                          <strong>Dispositivo:</strong> ${points.device}<br>
-                          <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
-                         </div>`,
+      google.maps.event.addListener(circleInstance, "click", () => {
+        dialog.value = true;
       });
 
-      google.maps.event.addListener(marker, "click", () => {
-        infoWindow.open(map.value!, marker);
-      });
+      map.value?.panTo(circleCenter);
+      map.value?.setZoom(14);
+    };
 
-      google.maps.event.addListener(map.value, "click", () => {
-        infoWindow.close();
-      });
+    const handleGeographicAreaConsult = (data: any) => {
+      console.log("Dados geográficos recebidos do Sidebar:", data);
+      circleDetails.value = {
+        id: data.id,
+        name: data.name,
+        type: "CIRCLE",
+        center: `${data.latitude}, ${data.longitude}`,
+        radius: `${data.radius}`,
+      };
 
-      centerMapOnMarker(position);
-    });
-    
-  };
+      drawCircleOnMap(data.latitude, data.longitude, data.radius);
+    };
 
-  return {
-    map,
-    mapDiv,
-    fetchGeoJsonData,
-    enableCircleDrawing,
-    dialog,
-    circleDetails,
-    editCircle,
-    saveCircle,
-    deleteCircle,
-    removeCircle,
-    snackbar,
-    snackbarMessage,
-    snackbarColor,
-    isDarkTheme,
-    toggleTheme,
-    themeClass,
-    drawCircleOnMap,
-    handleGeographicAreaConsult,
-    handleStopPointsOnMap,
-  };
-},
+    return {
+      initializeMap,
+      map,
+      mapDiv,
+      fetchGeoJsonData,
+      enableCircleDrawing,
+      dialog,
+      circleDetails,
+      editCircle,
+      saveCircle,
+      deleteCircle,
+      removeCircle,
+
+      snackbar,
+      snackbarColor,
+      snackbarMessage,
+      showSnackbar,
+
+      drawCircleOnMap,
+      handleGeographicAreaConsult,
+      handleStopPointsOnMap,
+
+      isDarkTheme,
+      toggleTheme,
+      themeClass,
+    };
+  },
+  
 };
 </script>
 
