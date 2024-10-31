@@ -51,7 +51,7 @@ const getUserInitials = (fullName: string) => {
 
 const getFormattedAddress = async (lat: number, lng: number) => {
     const apiKey = 'AIzaSyD7OMuCxvuTi0AfzyZLoChSWkjUzNQj8Lk';
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lng},${lat}&key=${apiKey}&language=BR&region`;
 
     try {
         const response = await axios.get(url);
