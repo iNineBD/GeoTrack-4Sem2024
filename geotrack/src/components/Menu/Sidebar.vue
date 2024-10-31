@@ -5,15 +5,16 @@
         <v-expansion-panel>
           <template v-slot:title>
             <v-row class="panel-header" justify="center" align="center">
-              <v-img :src="logout" height="30" class="icon" />
+              <!-- Botão de Logout -->
+              <v-btn icon @click="handleLogout">
+                <span class="material-symbols-outlined logout-icon" style="font-size: 30px;">logout</span>
+              </v-btn>
               <v-img :src="logo" height="30" class="icon" />
             </v-row>
           </template>
           <v-expansion-panel-text style="padding: 0px;">
-
             <v-container width="400px" class="filter-container" style="padding: 0px;">
               <v-divider :thickness="2" />
-              <!-- Exibe o filtro correto com base na rota -->
               <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"/>
               <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsReceived"/>
             </v-container>
@@ -27,10 +28,7 @@
         <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
       </template>
 
-      <!-- Botão para StopPointsFilter -->
       <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker" title="Filtro de Pontos de Parada"></v-btn>
-
-      <!-- Botão para GeographicAreasFilter -->
       <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search" title="Filtro de Áreas Geográficas"></v-btn>
     </v-speed-dial>
   </div>
@@ -52,7 +50,6 @@ const props = defineProps<{
   onStopPointsReceived: (stopPoints: any) => void;
 }>();
 
-
 const handleFilterData = (data: FilterData) => {
   props.onConsult(data);
 };
@@ -72,7 +69,6 @@ const handleStopPointsReceived = (stopPoints: any) => {
 };
 
 const logo = "/src/assets/Logo.svg";
-const logout = "/src/assets/logout-icon.png";
 const panel = ref([]);
 const dial = ref(false);
 
@@ -90,7 +86,6 @@ const goToFilterStopPoints = () => {
   toggleDial();
 };
 
-
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
   //@ts-ignore
@@ -98,9 +93,16 @@ const goToFilterGeographicAreas = () => {
   toggleDial();
 };
 
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  router.push({ name: "Login" });
+};
+
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
 .floating-panel {
   position: fixed;
   top: 10px;
@@ -110,5 +112,13 @@ const goToFilterGeographicAreas = () => {
   align-items: flex-start;
   max-width: calc(100% - 40px);
   gap: 10px;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+}
+
+.logout-icon {
+  color: #000B62 !important;
 }
 </style>
