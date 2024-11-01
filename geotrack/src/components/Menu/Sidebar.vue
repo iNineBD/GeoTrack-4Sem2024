@@ -5,10 +5,6 @@
         <v-expansion-panel>
           <template v-slot:title>
             <v-row class="panel-header" justify="center" align="center">
-              <!-- Botão de Logout -->
-              <v-btn icon @click="handleLogout">
-                <span class="material-symbols-outlined logout-icon" style="font-size: 30px;">logout</span>
-              </v-btn>
               <v-img :src="logo" height="30" class="icon" />
             </v-row>
           </template>
@@ -30,6 +26,7 @@
 
       <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker" title="Filtro de Pontos de Parada"></v-btn>
       <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search" title="Filtro de Áreas Geográficas"></v-btn>
+      <v-btn  key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída"></v-btn>
     </v-speed-dial>
   </div>
 </template>
