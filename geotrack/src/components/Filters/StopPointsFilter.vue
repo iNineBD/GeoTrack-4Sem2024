@@ -79,6 +79,7 @@ export default {
   mounted() {
     this.fetchUsers();
     eventBus.on('stopIsLoading', this.stopIsLoading);
+    this.applyTheme(this.isDarkTheme);
   },
 
   computed: {

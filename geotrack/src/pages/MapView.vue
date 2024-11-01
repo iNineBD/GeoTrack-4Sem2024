@@ -5,12 +5,13 @@
     @initializeMap="initializeMap" @removeCircle="removeCircle" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
   <v-switch
-    v-model="model"
-    :label="`Switch: ${model.toString()}`"
+    v-model="isDarkTheme"
+    label="Modo Escuro"
     hide-details
     inset
-  ></v-switch>
-  <!-- Modal dialog para detalhes do círculo -->
+    @change="toggleTheme"
+    style="position: fixed; top: 10px; right: 10px; z-index: 10;"
+  ></v-switch>  <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px">
     <v-card rounded="xl">
       <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
@@ -158,7 +159,7 @@ export default {
               center: userLocation,
               zoom: 12,
               minZoom: 4, // Limite inferior de zoom
-              styles: darkModeStyles, // Adicionando o tema dark
+              styles: isDarkTheme.value ? darkModeStyles : []  // Adicionando o tema dark
             });
             addCurrentLocationMarker(userLocation);
           },
@@ -168,7 +169,7 @@ export default {
               center: defaultLocation,
               zoom: 3,
               minZoom: 4,
-              styles: darkModeStyles, // Adicionando o tema dark
+              styles: isDarkTheme.value ? darkModeStyles : []// Adicionando o tema dark
             });
           }
         );
@@ -178,7 +179,7 @@ export default {
           center: defaultLocation,
           zoom: 10,
           minZoom: 4,
-          styles: darkModeStyles, // Adicionando o tema dark
+          styles: isDarkTheme.value ? darkModeStyles : [] // Adicionando o tema dark
         });
       }
     };
