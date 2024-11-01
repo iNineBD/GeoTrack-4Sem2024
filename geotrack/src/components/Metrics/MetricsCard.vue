@@ -42,19 +42,6 @@ const isGeographicAreasRoute = computed(
   () => route.name === "GeographicAreasFilter"
 );
 
-// const isStoppingPointsRoute = computed(() => route.name === "StopPointFilter");
-
-// Estilo condicional para os cards de métricas dependendo da rota
-// const metricsContainerStyle = computed(() => {
-//   if (isGeographicAreasRoute.value) {
-//     return { bottom: "155px" };
-//   } else if (isStoppingPointsRoute.value) {
-//     return { bottom: "275px" };
-//   } else {
-//     return { bottom: "100px" };
-//   }
-// });
-
 const fetchMetrics = async () => {
   try {
     const response = await axios.get("http://localhost:8080/metrics");
