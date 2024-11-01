@@ -3,6 +3,18 @@
     @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap"
     @initializeMap="initializeMap" @removeCircle="removeCircle" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
+  <v-switch
+    v-model="isDarkTheme"
+    hide-details
+    inset
+    style="position: fixed; top: -5px; right: 240px; z-index: 10; transform: scale(1.3); transform-origin: top right;"
+     @update:modelValue="initializeMap">
+
+     <template v-slot:thumb>
+        <v-icon>{{ isDarkTheme ? 'mdi-weather-night' : 'mdi-weather-sunny' }}</v-icon>
+      </template>
+    
+    </v-switch>
 
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px">
@@ -51,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import axios from "axios";
 import { id } from "vuetify/locale";
 import { eventBus } from '@/utils/EventBus'; // Importando o EventBus
@@ -70,11 +82,18 @@ export interface FilterData {
 
 export default {
   name: "MapView",
+  data () {
+      return {
+        isDark: false,
+      }
+    },
   setup() {
     const map = ref<google.maps.Map | null>(null);
     const mapDiv = ref<HTMLElement | null>(null);
     const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
     const dialog = ref(false);
+    const isDarkTheme = ref(false);
+    const themeClass = ref("");
 
     const snackbar = ref(false); // Controle de visibilidade do snackbar
     const snackbarColor = ref("success"); // Inicializa a cor do snackbar como "success"
@@ -115,6 +134,27 @@ export default {
         clearMarkers();
       }
 
+      const darkModeStyles = [
+        { elementType: 'geometry', stylers: [{ color: '#212121' }] },
+        { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+        { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+        { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
+        { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
+        { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+        { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
+        { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#2c2c2c' }] },
+        { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8a8a8a' }] },
+        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
+        { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
+      ];
+
+      let estilo = null;
+
+      if(isDarkTheme.value){
+        estilo = darkModeStyles
+      }
+
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -127,6 +167,8 @@ export default {
               center: userLocation,
               zoom: 12,
               minZoom: 4, // Limite inferior de zoom
+              // @ts-ignore
+              styles: estilo
             });
             addCurrentLocationMarker(userLocation);
           },
@@ -137,6 +179,8 @@ export default {
               center: defaultLocation,
               zoom: 3,
               minZoom: 4, // Limite inferior de zoom
+              // @ts-ignore
+              styles: estilo
             });
             // Não chama addMarker se a geolocalização falhar
           }
@@ -147,6 +191,8 @@ export default {
           center: defaultLocation,
           zoom: 10,
           minZoom: 4,
+          // @ts-ignore
+          styles: estilo
         });
       }
     };
@@ -572,6 +618,12 @@ export default {
       drawCircleOnMap(data.latitude, data.longitude, data.radius);
     };
 
+       // Observando o valor de `isDarkTheme`
+    watch(isDarkTheme, (newValue) => {
+      console.log('Tema atual:', newValue ? 'Escuro' : 'Claro');
+      
+    });
+
     return {
       initializeMap,
       map,
@@ -584,6 +636,9 @@ export default {
       saveCircle,
       deleteCircle,
       removeCircle,
+
+      isDarkTheme,
+      themeClass,
 
       snackbar,
       snackbarColor,
