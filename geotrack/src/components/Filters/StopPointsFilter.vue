@@ -11,22 +11,37 @@
       </v-combobox>
 
       <!-- Date selection -->
-      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
-        :readonly="dateInputDisabled"></v-date-input>
+      <v-date-input
+        v-model="date"
+        label="Selecione o período"
+        multiple="range"
+        color="primary"
+        :max="today"
+        :locale="locale"
+        :format="customDateFormat"
+        placeholder="dd/MM/yyyy"
+        :readonly="dateInputDisabled"
+      ></v-date-input>
 
       <!-- Quick date filters using chips -->
-      <v-col style="padding: 0px; display: flex; justify-content: space-evenly;">
-        <v-chip v-for="(filter, index) in quickFilters" :key="filter.label" @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
-          filter variant="flat" size="small">
+      <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
+        <v-chip
+          v-for="(filter, index) in quickFilters"
+          :key="filter.label"
+          @click="setQuickFilter(filter.range, index)"
+          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
+          :active="selectedQuickFilter === index"
+          filter
+          variant="flat"
+          size="small"
+        >
           {{ filter.label }}
         </v-chip>
       </v-col>
     </v-col>
 
-    <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px;">
-      <v-row class="d-flex" no-gutters style="justify-content: space-around;">
+    <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px">
+      <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
           <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
             variant="flat" block rounded="xl" @click="handleConsult">
@@ -43,12 +58,22 @@
     </v-card-actions>
   </v-card>
 
+  <!-- Loading progress circular -->
+  <v-col v-if="loadingPage" class="d-flex justify-center mt-4">
+    <v-progress-circular color="primary" indeterminate></v-progress-circular>
+  </v-col>
+
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
+
+  <MetricsCard />
 </template>
 
 <script>
+import { load } from "ol/Image";
+import { fa } from "vuetify/locale";
+import MetricsCard from "../Metrics/MetricsCard.vue";
 import { eventBus } from '@/utils/EventBus';
 
 export default {
@@ -59,16 +84,26 @@ export default {
     users: [], // Lista de usuários
     selectedUsers: [], // Armazena múltiplos usuários selecionados
     devices: [],
-    locale: 'pt',
-    customDateFormat: 'dd/MM/yyyy',
+    locale: "pt",
+    customDateFormat: "dd/MM/yyyy",
     quickFilters: [
       { label: "Hoje", range: [new Date(), new Date()] },
-      { label: "Últimos 3 dias", range: [new Date(Date.now() - 3 * 864e5), new Date()] },
-      { label: "Última semana", range: [new Date(Date.now() - 7 * 864e5), new Date()] },
-      { label: "Último mês", range: [new Date(Date.now() - 30 * 864e5), new Date()] }
+      {
+        label: "Últimos 3 dias",
+        range: [new Date(Date.now() - 3 * 864e5), new Date()],
+      },
+      {
+        label: "Última semana",
+        range: [new Date(Date.now() - 7 * 864e5), new Date()],
+      },
+      {
+        label: "Último mês",
+        range: [new Date(Date.now() - 30 * 864e5), new Date()],
+      },
     ],
     selectedQuickFilter: null,
     dateInputDisabled: false,
+
 
     snackbar: false,
     snackbarColor: "success",
@@ -100,11 +135,13 @@ export default {
 
     async fetchUsers() {
       try {
-        const response = await fetch("http://localhost:8080/filters/users?page=0&qtdPage=1000");
+        const response = await fetch(
+          "http://localhost:8080/filters/users?page=0&qtdPage=1000"
+        );
         const data = await response.json();
 
         // Mapeando a resposta da API para o formato correto
-        this.users = data.listUsers.map(user => ({
+        this.users = data.listUsers.map((user) => ({
           name: user.userName.toUpperCase(), // Nome do usuário
           deviceId: user.idDevice, // ID do dispositivo associado
         }));
@@ -117,12 +154,16 @@ export default {
 
     async handleConsult() {
       if (this.selectedUsers.length === 0 || !this.date) return;
+
       this.loading = true;
 
       // Extraindo os IDs dos dispositivos dos usuários selecionados
-      const deviceIds = this.selectedUsers.map(user => user.deviceId);
+      const deviceIds = this.selectedUsers.map((user) => user.deviceId);
 
-      const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
+      const qtddias = Math.round(
+        (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
+          (1000 * 60 * 60 * 24)
+      );
 
       if (qtddias > 31) {
         this.showSnackbar("Mais que 31 dias selecionados", "error");
@@ -132,9 +173,11 @@ export default {
 
       // Preparando os dados da requisição com todos os devices como um array e as datas uma única vez
       const requestData = {
-        devices: deviceIds,  // Array de IDs dos dispositivos
-        startDate: new Date(this.date[0]).toLocaleDateString('en-CA'),  // Data de início
-        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString('en-CA') // Data de fim
+        devices: deviceIds, // Array de IDs dos dispositivos
+        startDate: new Date(this.date[0]).toLocaleDateString("en-CA"), // Data de início
+        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString(
+          "en-CA"
+        ), // Data de fim
       };
 
       console.log("Dados enviados:", requestData);
@@ -157,13 +200,21 @@ export default {
         this.dateInputDisabled = false;
       } else {
         this.selectedQuickFilter = index;
-        this.date = range.map(date => date.toISOString().substr(0, 10));
+        this.date = range.map((date) => date.toISOString().substr(0, 10));
         this.dateInputDisabled = true;
       }
     },
 
     remove(item) {
-      this.selectedUsers = this.selectedUsers.filter(user => user.id !== item.id);
+      this.selectedUsers = this.selectedUsers.filter(
+        (user) => user.id !== item.id
+      );
+    },
+    // Método para exibir o snackbar
+    showSnackbar(message, color = "success") {
+      this.snackbarMessage = message;
+      this.snackbarColor = "error";
+      this.snackbar = true;
     },
   },
 

@@ -1,6 +1,6 @@
 <template>
   <div class="floating-panel">
-    <v-container width="400px" class="panel-container" style="padding: 0px;">
+    <v-container width="400px" class="panel-container" style="padding: 0px">
       <v-expansion-panels v-model="panel" rounded="xl" elevation="4">
         <v-expansion-panel>
           <template v-slot:title>
@@ -8,9 +8,12 @@
               <v-img :src="logo" height="30" class="icon" />
             </v-row>
           </template>
-          <v-expansion-panel-text style="padding: 0px;">
-
-            <v-container width="400px" class="filter-container" style="padding: 0px;">
+          <v-expansion-panel-text style="padding: 0px">
+            <v-container
+              width="400px"
+              class="filter-container"
+              style="padding: 0px"
+            >
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
               <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" @initializeMap="initializeMap"/>
@@ -23,12 +26,23 @@
       </v-expansion-panels>
     </v-container>
 
-    <v-speed-dial v-model="dial" location="bottom center" transition="scale-transition" class="speed-dial">
+    <v-speed-dial
+      v-model="dial"
+      location="bottom center"
+      transition="scale-transition"
+      class="speed-dial"
+    >
       <template v-slot:activator="{ props: activatorProps }">
-        <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
+        <v-btn
+          v-bind="activatorProps"
+          icon="mdi-menu"
+          large
+          elevation="4"
+        ></v-btn>
       </template>
 
       <!-- Botão para StopPointsFilter -->
+
       <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"
         title="Filtro de Pontos de Parada"></v-btn>
 
@@ -84,31 +98,40 @@ const handleGeographicAreaConsult = (data: FilterData) => {
 };
 
 const handleStopPointsReceived = (stopPoints: any) => {
-  console.log("Pontos de parada recebidos do GeographicAreasFilter:", stopPoints);
+  console.log(
+    "Pontos de parada recebidos do GeographicAreasFilter:",
+    stopPoints
+  );
   props.onStopPointsReceived(stopPoints);
 };
 
-const initializeMap = () => {
-  emit("initializeMap");
+
+const logo = "/src/assets/Logo.svg";
+const panel = ref<number[]>([]);
+const dial = ref(false);
+
+const route = useRoute();
+const router = useRouter();
+
+const toggleDial = () => {
+  dial.value = !dial.value;
 };
 
 const goToFilterStopPoints = () => {
   router.push("/stoppointsfilter");
   //@ts-ignore
-  panel.value = 0; // Define o primeiro painel como aberto
+  panel.value = [0]; // Define o painel como aberto
   toggleDial();
   emit("initializeMap");
 };
-
 
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
   //@ts-ignore
-  panel.value = 0; // Define o primeiro painel como aberto
+  panel.value = [0]; // Define o painel como aberto
   toggleDial();
   emit("initializeMap");
 };
-
 </script>
 
 <style scoped>
