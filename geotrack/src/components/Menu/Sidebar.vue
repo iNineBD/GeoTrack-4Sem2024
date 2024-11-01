@@ -105,16 +105,8 @@ const handleStopPointsReceived = (stopPoints: any) => {
   props.onStopPointsReceived(stopPoints);
 };
 
-
-const logo = "/src/assets/Logo.svg";
-const panel = ref<number[]>([]);
-const dial = ref(false);
-
-const route = useRoute();
-const router = useRouter();
-
-const toggleDial = () => {
-  dial.value = !dial.value;
+const initializeMap = () => {
+  emit("initializeMap");
 };
 
 const goToFilterStopPoints = () => {

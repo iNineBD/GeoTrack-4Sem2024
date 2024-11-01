@@ -121,7 +121,6 @@
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
    </v-snackbar>
-    </template>
 
 
   <MetricsCard />
