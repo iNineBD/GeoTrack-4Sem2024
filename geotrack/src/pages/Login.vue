@@ -35,11 +35,9 @@
                 Entrar
               </v-btn>
 
-               
               <div class="register text-center mt-4">
                 <router-link to="/register">Faça seu cadastro</router-link>
               </div>
-
             </v-form>
           </v-card-text>
         </v-card>
@@ -66,6 +64,26 @@
         </div>
       </v-col>
     </v-row>
+
+    <!-- Snackbar para exibir mensagens -->
+    <v-snackbar
+      v-model="snackbar"
+      :color="snackbarColor"
+      timeout="3000"
+      top
+    >
+      {{ snackbarMessage }}
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="white"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Fechar
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -84,16 +102,33 @@ export default {
     const password = ref('');
     const router = useRouter();
 
+    const snackbar = ref(false);
+    const snackbarMessage = ref('');
+    const snackbarColor = ref('');
+
     const handleLogin = async () => {
       try {
         const response = await axios.post('http://localhost:8080/auth/login', {
           email: email.value,
           password: password.value,
         });
+        
+        console.info("Login bem-sucedido:", response.data);
         localStorage.setItem('token', response.data.token);
+        
+        // Exibe mensagem de sucesso no snackbar
+        snackbarMessage.value = "Login bem-sucedido!";
+        snackbarColor.value = "success";
+        snackbar.value = true;
+
         router.push('/stoppointsfilter'); 
       } catch (error) {
-        alert(error.response?.data?.message || 'Usuário ou senha inválidos');
+        console.error("Erro no login:", error.response?.data || error.message);
+
+        // Exibe mensagem de erro no snackbar
+        snackbarMessage.value = error.response?.data?.message || 'Erro desconhecido no login';
+        snackbarColor.value = "error";
+        snackbar.value = true;
       }
     };
 
@@ -104,7 +139,9 @@ export default {
       logoGeoTrack,
       logoIto1,
       logoInine,
-      localStorage
+      snackbar,
+      snackbarMessage,
+      snackbarColor,
     };
   },
 };
