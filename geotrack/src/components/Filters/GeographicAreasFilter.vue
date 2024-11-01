@@ -94,32 +94,14 @@
     >
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn
-            :disabled="ButtonDisabled || loading"
-            :loading="loading"
-            class="text-none"
-            color="primary"
-            size="large"
-            variant="flat"
-            block
-            rounded="xl"
-            @click="handleConsult"
-          >
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
+            variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn
-            :disabled="loading"
-            :loading="loading"
-            class="text-none"
-            color="primary_light"
-            size="large"
-            variant="flat"
-            block
-            rounded="xl"
-            @click="clearFields"
-          >
+          <v-btn class="text-none" color="primary_light" size="large"
+            variant="flat" block rounded="xl" @click="clearFields">
             Limpar
           </v-btn>
         </v-col>
@@ -136,32 +118,23 @@
     <v-progress-circular color="primary" indeterminate></v-progress-circular>
   </v-col>
 
-  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
-    <span style="font-weight: bold; font-size: 15px; color: white">
-      {{ snackbarMessage }}
-    </span>
-    <template v-slot:actions>
-      <v-btn
-        color="white"
-        variant="text"
-        style="font-weight: bold; text-transform: uppercase; color: white"
-        @click="snackbar = false"
-      >
-        Close
-      </v-btn>
+  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
+    {{ snackbarMessage }}
+   </v-snackbar>
     </template>
-  </v-snackbar>
+
 
   <MetricsCard />
 </template>
 
 <script>
 import MetricsCard from "../Metrics/MetricsCard.vue";
+import { eventBus } from '@/utils/EventBus';
+
 
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
-    loadingPage: false,
     loading: false,
     date: null,
     users: [], // Lista de usuários
@@ -191,14 +164,17 @@ export default {
     longitude: null,
     radius: null,
     circleDrawn: false,
-    snackbar: false, // Controla a exibição do snackbar
-    snackbarMessage: "", // Mensagem exibida no snackbar
-    snackbarColor: "success", // Cor do snackbar
+    snackbar: false,
+    snackbarColor: "success",
+    snackbarMessage: "",
   }),
 
   mounted() {
     this.fetchUsers();
     this.fetchGeoAreas();
+    eventBus.on('clearSelectedGeoArea', this.clearSelectedGeoArea);
+    eventBus.on('stopIsLoading', this.stopIsLoading);
+    eventBus.on('reloadGeoArea', this.reloadGeoArea);
   },
 
   computed: {
@@ -210,15 +186,33 @@ export default {
       const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
 
-      return (
-        !this.selectedUser ||
-        !this.date ||
-        (!this.selectedGeoArea && !cachedCircle)
-      );
+
+      console.log('teste: ', cachedCircle)
+
+      return !this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle);
     },
   },
 
   methods: {
+    showSnackbar(message, color = "success") {
+      this.snackbarMessage = message; // Define a mensagem
+      this.snackbarColor = color; // Define a cor
+      this.snackbar = true; // Torna o snackbar visível
+    },
+
+    clearSelectedGeoArea() {
+      this.selectedGeoArea = null;
+    },
+
+    stopIsLoading() {
+      this.loading = false;
+    },
+
+    async reloadGeoArea() {
+      this.selectedGeoArea = null;
+      this.fetchGeoAreas();
+    },
+
     async fetchUsers() {
       try {
         const response = await fetch(
@@ -257,7 +251,13 @@ export default {
     },
 
     async handleGeoAreaChange() {
-      const cachedDetails = localStorage.getItem("cachedCircleDetails");
+      if (!this.selectedGeoArea) {
+        console.log("Área geográfica não selecionada ou foi limpa");
+        this.$emit("removeCircle");
+        return; // Interrompe a execução da função
+      }
+
+      const cachedDetails = localStorage.getItem('cachedCircleDetails');
       const cachedCircle = JSON.parse(cachedDetails);
 
       const selectedArea = this.geoAreas.find(
@@ -287,7 +287,8 @@ export default {
     },
 
     async handleConsult() {
-      const cachedDetails = localStorage.getItem("cachedCircleDetails");
+      this.loading = true;
+      const cachedDetails = localStorage.getItem('cachedCircleDetails');
       const cachedCircle = JSON.parse(cachedDetails);
       let selectedArea = null;
 
@@ -297,23 +298,23 @@ export default {
         (!this.selectedGeoArea && !cachedCircle)
       ) {
         console.log("Dados incompletos para a consulta");
+        this.loading = false;
         return;
       }
 
       if (this.selectedGeoArea) {
-        selectedArea = this.geoAreas.find(
-          (area) => area.id === this.selectedGeoArea.id
-        );
 
+        selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
         if (!selectedArea) {
           console.log("Área geográfica não encontrada");
+          this.loading = false;
           return;
         }
       } else {
         selectedArea = cachedCircle;
         selectedArea.latitude = selectedArea.center.latitude;
         selectedArea.longitude = selectedArea.center.longitude;
-        console.log("passooou ", selectedArea);
+        console.log('passooou ', selectedArea)
       }
 
       const qtddias = Math.round(
@@ -322,11 +323,10 @@ export default {
       );
 
       if (qtddias > 31) {
-        this.showSnackbar("Mais que 31 dias selecionados");
+        this.showSnackbar("Mais que 31 dias selecionados", "error");
+        this.loading = false;
         return;
       }
-
-      this.loadingPage = true;
 
       const requestData = {
         deviceId: this.selectedUser.deviceId,
@@ -377,8 +377,9 @@ export default {
 
           console.log("Erro 404: ", errorData.message);
 
-          this.showSnackbar("Dados não localizados para este usuário");
+          this.showSnackbar("Dados não localizados para este usuário", "error");
           this.$emit("noPointsFound", errorData.message);
+          this.loading = false;
         }
       } catch (error) {
         console.log("Erro ao buscar pontos de parada:", error);
@@ -386,14 +387,16 @@ export default {
     },
 
     clearFields() {
-      window.location.reload();
-    },
-
-    // Método para exibir o snackbar
-    showSnackbar(message, color = "success") {
-      this.snackbarMessage = message;
-      this.snackbarColor = "error";
-      this.snackbar = true;
+      this.date = null;
+      this.selectedUser = null;
+      this.devices = [];
+      this.selectedQuickFilter = null;
+      this.selectedGeoArea = null;
+      this.latitude = null;
+      this.longitude = null;
+      this.radius = null;
+      this.circleDrawn = false;
+      this.$emit("initializeMap");
     },
 
     drawCircle() {
@@ -409,17 +412,6 @@ export default {
         this.date = range.map((date) => date.toISOString().substr(0, 10));
         this.dateInputDisabled = true;
       }
-    },
-  },
-
-  watch: {
-    loading(val) {
-      if (!val) return;
-      setTimeout(() => (this.loading = false), 1000);
-    },
-    loadingPage(val) {
-      if (!val) return;
-      setTimeout(() => (this.loadingPage = false), 550);
     },
   },
 };

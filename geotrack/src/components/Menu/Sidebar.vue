@@ -16,16 +16,10 @@
             >
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
-              <StopPointsFilter
-                v-if="route.path === '/stoppointsfilter'"
-                @consult="handleFilterData"
-              />
-              <GeographicAreasFilter
-                v-if="route.path === '/geographicareasfilter'"
-                @drawCircle="handleDrawCircle"
-                @consult="handleGeographicAreaConsult"
-                @stopPointsReceived="handleStopPointsReceived"
-              />
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" @initializeMap="initializeMap"/>
+              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @removeCircle="handleRemoveCircle"
+                @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
+                @stopPointsReceived="handleStopPointsReceived"  @initializeMap="initializeMap"/>
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -48,20 +42,13 @@
       </template>
 
       <!-- Botão para StopPointsFilter -->
-      <v-btn
-        key="map-marker"
-        @click="goToFilterStopPoints"
-        icon="mdi-map-marker"
-        title="Filtro de Pontos de Parada"
-      ></v-btn>
+
+      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"
+        title="Filtro de Pontos de Parada"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
-      <v-btn
-        key="map-marker"
-        @click="goToFilterGeographicAreas"
-        icon="mdi-map-search"
-        title="Filtro de Áreas Geográficas"
-      ></v-btn>
+      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"
+        title="Filtro de Áreas Geográficas"></v-btn>
     </v-speed-dial>
   </div>
 </template>
@@ -70,9 +57,19 @@
 import { ref } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
-//@ts-ignore
-import MapView, { FilterData } from "@/pages/MapView.vue";
+import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
+
+
+const logo = "/src/assets/Logo.svg";
+const panel = ref([]);
+const dial = ref(false);
+const route = useRoute();
+const router = useRouter();
+const emit = defineEmits(["initializeMap", "removeCircle"]);
+const toggleDial = () => {
+  dial.value = !dial.value;
+};
 
 // Definindo as props
 const props = defineProps<{
@@ -90,6 +87,11 @@ const handleDrawCircle = () => {
   props.onDrawCircle();
 };
 
+const handleRemoveCircle = () => {
+  emit('removeCircle');
+};
+
+
 const handleGeographicAreaConsult = (data: FilterData) => {
   console.log("Dados recebidos do GeographicAreasFilter:", data);
   props.onGeographicAreaConsult(data);
@@ -102,6 +104,7 @@ const handleStopPointsReceived = (stopPoints: any) => {
   );
   props.onStopPointsReceived(stopPoints);
 };
+
 
 const logo = "/src/assets/Logo.svg";
 const panel = ref<number[]>([]);
@@ -119,6 +122,7 @@ const goToFilterStopPoints = () => {
   //@ts-ignore
   panel.value = [0]; // Define o painel como aberto
   toggleDial();
+  emit("initializeMap");
 };
 
 const goToFilterGeographicAreas = () => {
@@ -126,6 +130,7 @@ const goToFilterGeographicAreas = () => {
   //@ts-ignore
   panel.value = [0]; // Define o painel como aberto
   toggleDial();
+  emit("initializeMap");
 };
 </script>
 
