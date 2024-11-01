@@ -144,7 +144,7 @@ export default {
         { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
         { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#2c2c2c' }] },
         { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8a8a8a' }] },
-        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
+        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#424242' }] },
         { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
       ];
 
