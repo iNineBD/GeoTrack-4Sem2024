@@ -1,28 +1,59 @@
 <template>
-  <div class="metrics-container">
+  <div class="metrics-container" :style="metricsContainerStyle">
     <v-card class="metric-card" rounded="xl" elevation="4" outlined>
       <div class="metric-text">
         USUÁRIOS MONITORADOS: {{ metrics?.qtdMonitored }}
       </div>
     </v-card>
-    <v-card class="metric-card" rounded="xl" elevation="4" outlined>
+    <v-card
+      v-if="isGeographicAreasRoute"
+      class="metric-card"
+      rounded="xl"
+      elevation="4"
+      outlined
+    >
       <div class="metric-text">
         ÁREAS GEOGRÁFICAS: {{ metrics?.qtdSessions }}
+      </div>
+    </v-card>
+    <v-card class="metric-card" rounded="xl" elevation="4" outlined>
+      <div class="metric-text">
+        USUÁRIOS REGISTRADOS: {{ metrics?.qtdAdmins }}
       </div>
     </v-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect, onMounted } from "vue";
+import { ref, watchEffect, onMounted, computed } from "vue";
 import axios from "axios";
+import { useRoute } from "vue-router";
 
 interface Metrics {
   qtdMonitored: number;
   qtdSessions: number;
+  qtdAdmins: number;
 }
 
 const metrics = ref<Metrics | null>(null);
+const route = useRoute();
+
+const isGeographicAreasRoute = computed(
+  () => route.name === "GeographicAreasFilter"
+);
+
+const isStoppingPointsRoute = computed(() => route.name === "StopPointFilter");
+
+// Estilo condicional para os cards de métricas dependendo da rota
+const metricsContainerStyle = computed(() => {
+  if (isGeographicAreasRoute.value) {
+    return { bottom: "155px" };
+  } else if (isStoppingPointsRoute.value) {
+    return { bottom: "275px" };
+  } else {
+    return { bottom: "100px" };
+  }
+});
 
 const fetchMetrics = async () => {
   try {
@@ -46,12 +77,12 @@ onMounted(() => {
 .metrics-container {
   position: fixed;
   left: 10px;
-  bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   z-index: 10;
   max-width: calc(100% - 40px);
+  width: 400px;
 }
 .metric-card {
   width: 100%;

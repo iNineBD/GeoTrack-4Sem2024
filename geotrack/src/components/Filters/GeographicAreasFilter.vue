@@ -1,20 +1,39 @@
 <template>
-  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px">
+  <v-card
+    class="mx-auto"
+    width="100%"
+    style="box-shadow: none; border-radius: 0; margin-bottom: 25px"
+  >
     <v-col style="padding: 20px 20px 0 20px">
       <!-- Card das áreas geográficas -->
       <v-card-actions class="d-flex justify-space-between">
         <v-row class="d-flex align-center no-gutters">
           <v-col cols="100%" style="padding: 0px">
             <!-- Combobox de áreas geográficas -->
-            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary" v-model="selectedGeoArea"
-              :items="geoAreas" item-value="id" item-title="name" clearable :multiple="false"
-              @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
+            <v-combobox
+              :disabled="disabledTexts"
+              label="Áreas geográficas"
+              color="primary"
+              v-model="selectedGeoArea"
+              :items="geoAreas"
+              item-value="id"
+              item-title="name"
+              clearable
+              :multiple="false"
+              @update:model-value="handleGeoAreaChange"
+              prepend-icon="mdi-map-search"
+            >
             </v-combobox>
           </v-col>
 
           <v-col cols="auto" style="padding: 0px 0px 20px 10px">
             <div class="icon-container">
-              <v-btn icon @click="drawCircle" class="no-shadow rounded" :disabled="disableDrawButton">
+              <v-btn
+                icon
+                @click="drawCircle"
+                class="no-shadow rounded"
+                :disabled="disableDrawButton"
+              >
                 <v-icon>mdi-circle-outline</v-icon>
                 <v-icon class="plus-icon">mdi-plus</v-icon>
               </v-btn>
@@ -24,37 +43,83 @@
       </v-card-actions>
 
       <!-- Users combobox -->
-      <v-combobox v-model="selectedUser" label="Usuário" :items="users" item-title="name" item-value="deviceId"
-        prepend-icon="mdi-filter-variant" clearable :multiple="false" color="primary">
+      <v-combobox
+        v-model="selectedUser"
+        label="Usuário"
+        :items="users"
+        item-title="name"
+        item-value="deviceId"
+        prepend-icon="mdi-filter-variant"
+        clearable
+        :multiple="false"
+        color="primary"
+      >
       </v-combobox>
 
       <!-- Date selection -->
-      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
-        :readonly="dateInputDisabled"></v-date-input>
+      <v-date-input
+        v-model="date"
+        label="Selecione o período"
+        multiple="range"
+        color="primary"
+        :max="today"
+        :locale="locale"
+        :format="customDateFormat"
+        placeholder="dd/MM/yyyy"
+        :readonly="dateInputDisabled"
+      ></v-date-input>
 
       <!-- Quick date filters using chips -->
-      <v-col style="padding: 0px; display: flex; justify-content: space-evenly;">
-        <v-chip style="margin: 0px 2px !important" size="small" v-for="(filter, index) in quickFilters"
-          :key="filter.label" @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
-          filter class="ma-2" variant="flat">
+      <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
+        <v-chip
+          style="margin: 0px 2px !important"
+          size="small"
+          v-for="(filter, index) in quickFilters"
+          :key="filter.label"
+          @click="setQuickFilter(filter.range, index)"
+          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
+          :active="selectedQuickFilter === index"
+          filter
+          class="ma-2"
+          variant="flat"
+        >
           {{ filter.label }}
         </v-chip>
       </v-col>
     </v-col>
 
-    <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
-      <v-row class="d-flex" no-gutters style="justify-content: space-around;">
+    <v-card-actions
+      class="d-flex justify-space-between"
+      style="padding: 20px 20px 0 20px"
+    >
+      <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary" size="large"
-            variant="flat" block rounded="xl" @click="handleConsult">
+          <v-btn
+            :disabled="ButtonDisabled || loading"
+            :loading="loading"
+            class="text-none"
+            color="primary"
+            size="large"
+            variant="flat"
+            block
+            rounded="xl"
+            @click="handleConsult"
+          >
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="xl" @click="clearFields">
+          <v-btn
+            :disabled="loading"
+            :loading="loading"
+            class="text-none"
+            color="primary_light"
+            size="large"
+            variant="flat"
+            block
+            rounded="xl"
+            @click="clearFields"
+          >
             Limpar
           </v-btn>
         </v-col>
@@ -62,26 +127,37 @@
     </v-card-actions>
   </v-card>
 
-    <!-- Loading progress circular -->
-  <v-col v-if="loadingPage"  id="loadingStopPoints" class="d-flex justify-center mt-4">
-      <v-progress-circular color="primary" indeterminate></v-progress-circular>
+  <!-- Loading progress circular -->
+  <v-col
+    v-if="loadingPage"
+    id="loadingStopPoints"
+    class="d-flex justify-center mt-4"
+  >
+    <v-progress-circular color="primary" indeterminate></v-progress-circular>
   </v-col>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
-    <span style="font-weight: bold; font-size: 15px; color: white;">
+    <span style="font-weight: bold; font-size: 15px; color: white">
       {{ snackbarMessage }}
     </span>
     <template v-slot:actions>
-      <v-btn color="white" variant="text" style="font-weight: bold; text-transform: uppercase; color: white;"
-        @click="snackbar = false">
+      <v-btn
+        color="white"
+        variant="text"
+        style="font-weight: bold; text-transform: uppercase; color: white"
+        @click="snackbar = false"
+      >
         Close
       </v-btn>
     </template>
   </v-snackbar>
 
+  <MetricsCard />
 </template>
 
 <script>
+import MetricsCard from "../Metrics/MetricsCard.vue";
+
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
@@ -116,8 +192,8 @@ export default {
     radius: null,
     circleDrawn: false,
     snackbar: false, // Controla a exibição do snackbar
-    snackbarMessage: '', // Mensagem exibida no snackbar
-    snackbarColor: 'success', // Cor do snackbar
+    snackbarMessage: "", // Mensagem exibida no snackbar
+    snackbarColor: "success", // Cor do snackbar
   }),
 
   mounted() {
@@ -131,10 +207,14 @@ export default {
     },
 
     ButtonDisabled() {
-      const cachedDetails = localStorage.getItem('cachedCircleDetails');
+      const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
 
-      return !this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle);
+      return (
+        !this.selectedUser ||
+        !this.date ||
+        (!this.selectedGeoArea && !cachedCircle)
+      );
     },
   },
 
@@ -177,11 +257,9 @@ export default {
     },
 
     async handleGeoAreaChange() {
-
-      const cachedDetails = localStorage.getItem('cachedCircleDetails');
+      const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
 
-      
       const selectedArea = this.geoAreas.find(
         (area) => area.id === this.selectedGeoArea.id
       );
@@ -209,37 +287,46 @@ export default {
     },
 
     async handleConsult() {
-      const cachedDetails = localStorage.getItem('cachedCircleDetails');
+      const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
-      let selectedArea = null
+      let selectedArea = null;
 
-      if (!this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle)) {
+      if (
+        !this.selectedUser ||
+        !this.date ||
+        (!this.selectedGeoArea && !cachedCircle)
+      ) {
         console.log("Dados incompletos para a consulta");
         return;
       }
 
-            if(this.selectedGeoArea){
-                selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+      if (this.selectedGeoArea) {
+        selectedArea = this.geoAreas.find(
+          (area) => area.id === this.selectedGeoArea.id
+        );
 
-                if (!selectedArea) {
-                    console.log("Área geográfica não encontrada");
-                    return;
-                }
-            }else{
-                selectedArea = cachedCircle;
-                selectedArea.latitude = selectedArea.center.latitude;
-                selectedArea.longitude = selectedArea.center.longitude;
-                console.log('passooou ', selectedArea)
-            }
+        if (!selectedArea) {
+          console.log("Área geográfica não encontrada");
+          return;
+        }
+      } else {
+        selectedArea = cachedCircle;
+        selectedArea.latitude = selectedArea.center.latitude;
+        selectedArea.longitude = selectedArea.center.longitude;
+        console.log("passooou ", selectedArea);
+      }
 
-      const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
+      const qtddias = Math.round(
+        (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
+          (1000 * 60 * 60 * 24)
+      );
 
       if (qtddias > 31) {
         this.showSnackbar("Mais que 31 dias selecionados");
         return;
       }
 
-      this.loadingPage = true
+      this.loadingPage = true;
 
       const requestData = {
         deviceId: this.selectedUser.deviceId,
@@ -289,8 +376,8 @@ export default {
           const errorData = await response.json();
 
           console.log("Erro 404: ", errorData.message);
-          
-          this.showSnackbar('Dados não localizados para este usuário');
+
+          this.showSnackbar("Dados não localizados para este usuário");
           this.$emit("noPointsFound", errorData.message);
         }
       } catch (error) {
@@ -303,9 +390,9 @@ export default {
     },
 
     // Método para exibir o snackbar
-    showSnackbar(message, color = 'success') {
+    showSnackbar(message, color = "success") {
       this.snackbarMessage = message;
-      this.snackbarColor = 'error';
+      this.snackbarColor = "error";
       this.snackbar = true;
     },
 

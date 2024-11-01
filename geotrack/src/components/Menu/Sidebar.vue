@@ -32,8 +32,6 @@
       </v-expansion-panels>
     </v-container>
 
-    <MetricsCard v-if="isPanelOpen" />
-
     <v-speed-dial
       v-model="dial"
       location="bottom center"
@@ -69,13 +67,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
 //@ts-ignore
 import MapView, { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
-import MetricsCard from "../Metrics/MetricsCard.vue";
 
 // Definindo as props
 const props = defineProps<{
@@ -113,10 +110,6 @@ const dial = ref(false);
 const route = useRoute();
 const router = useRouter();
 
-const isPanelOpen = computed(
-  () => Array.isArray(panel.value) && panel.value.length > 0
-);
-
 const toggleDial = () => {
   dial.value = !dial.value;
 };
@@ -124,14 +117,14 @@ const toggleDial = () => {
 const goToFilterStopPoints = () => {
   router.push("/stoppointsfilter");
   //@ts-ignore
-  panel.value = [0]; // Define o primeiro painel como aberto
+  panel.value = [0]; // Define o painel como aberto
   toggleDial();
 };
 
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
   //@ts-ignore
-  panel.value = [0]; // Define o primeiro painel como aberto
+  panel.value = [0]; // Define o painel como aberto
   toggleDial();
 };
 </script>
