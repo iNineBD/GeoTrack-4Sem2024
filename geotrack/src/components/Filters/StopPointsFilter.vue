@@ -31,14 +31,14 @@
     <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px;">
       <v-row class="d-flex" no-gutters style="justify-content: space-around;">
         <v-col cols="7">
-          <v-btn :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
-            variant="flat" block rounded="xl" @click="handleConsult">
+          <v-btn :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large" variant="flat"
+            block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn :disabled="loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="xl" @click="clearFields">
+          <v-btn :disabled="loading" class="text-none" color="primary_light" size="large" variant="flat" block
+            rounded="xl" @click="clearFields">
             Limpar
           </v-btn>
         </v-col>
@@ -48,7 +48,7 @@
 
   <!-- Loading progress circular -->
   <v-col v-if="loadingPage" class="d-flex justify-center mt-4">
-      <v-progress-circular color="primary" indeterminate></v-progress-circular>
+    <v-progress-circular color="primary" indeterminate></v-progress-circular>
   </v-col>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
@@ -91,6 +91,7 @@ export default {
     snackbarMessage: '', // Mensagem exibida no snackbar
     snackbarColor: 'success', // Cor do snackbar
     loadingPage: false,  // Variável para controlar o estado de carregamento
+    token: localStorage.getItem('token'),
   }),
 
   mounted() {
@@ -106,7 +107,12 @@ export default {
   methods: {
     async fetchUsers() {
       try {
-        const response = await fetch("http://localhost:8080/filters/users?page=0&qtdPage=1000");
+        console.log("token:",this.token)
+        const response = await fetch("http://localhost:8080/filters/users?page=0&qtdPage=1000", {
+          headers: {
+            'Authorization': `Bearer ${this.token}`, // Incluindo o token de autenticação
+          }
+        });
         const data = await response.json();
 
         // Mapeando a resposta da API para o formato correto
@@ -123,11 +129,11 @@ export default {
     },
 
     async handleConsult() {
-      if (this.selectedUsers.length === 0 || !this.date) return;    
+      if (this.selectedUsers.length === 0 || !this.date) return;
       // @ts-ignore
-            
+
       this.loadingPage = true
-      
+
       // Extraindo os IDs dos dispositivos dos usuários selecionados
       const deviceIds = this.selectedUsers.map(user => user.deviceId);
 
@@ -149,7 +155,7 @@ export default {
       console.log("Dados enviados:", requestData);
 
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
-      
+
 
       // while(true){
       //   console.log('vendo', JSON.parse(localStorage.getItem('cachedLoading')))

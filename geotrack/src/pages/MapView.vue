@@ -88,6 +88,7 @@ export default {
     const snackbar = ref(false);
     const snackbarMessage = ref("");
     const snackbarColor = ref("success");
+    const token = localStorage.getItem('token');
     const circleDetails = ref({
       id: "",
       name: "",

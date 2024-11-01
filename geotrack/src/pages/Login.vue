@@ -91,7 +91,7 @@ export default {
           password: password.value,
         });
         localStorage.setItem('token', response.data.token);
-        router.push('/stoppointsfilter');
+        router.push('/stoppointsfilter'); 
       } catch (error) {
         alert(error.response?.data?.message || 'Usuário ou senha inválidos');
       }
@@ -104,6 +104,7 @@ export default {
       logoGeoTrack,
       logoIto1,
       logoInine,
+      localStorage
     };
   },
 };
