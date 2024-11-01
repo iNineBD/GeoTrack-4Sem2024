@@ -39,6 +39,9 @@
             </div>
           </v-card-text>
         </v-card>
+        <v-snackbar v-model="snackbar" :color="snackbarColor" top :timeout="3000" class="text-center">
+          {{ snackbarMessage }}
+        </v-snackbar>
       </v-col>
       
       <v-col class="white-section" cols="12" md="7">
@@ -80,18 +83,33 @@ export default {
     const email = ref('');
     const password = ref('');
     const router = useRouter();
+    
+    const snackbar = ref(false);
+    const snackbarMessage = ref('');
+    const snackbarColor = ref('');
 
     const handleRegister = async () => {
+      if (!name.value || !email.value || !password.value) {
+        snackbarMessage.value = 'Por favor, preencha todos os campos!';
+        snackbarColor.value = 'error';
+        snackbar.value = true;
+        return; 
+      }
+
       try {
         await axios.post('http://localhost:8080/auth/register', {
           name: name.value,
           email: email.value,
           password: password.value,
         });
-        alert('Usuário cadastrado com sucesso!');
+        snackbarMessage.value = 'Usuário cadastrado com sucesso!';
+        snackbarColor.value = 'success';
+        snackbar.value = true;
         router.push('/');
       } catch (error) {
-        alert(error.response?.data?.message || 'Erro ao cadastrar usuário');
+        snackbarMessage.value = error.response?.data?.message || 'Erro ao cadastrar usuário';
+        snackbarColor.value = 'error';
+        snackbar.value = true;
       }
     };
 
@@ -103,6 +121,9 @@ export default {
       logoGeoTrack,
       logoIto1,
       logoInine,
+      snackbar,
+      snackbarMessage,
+      snackbarColor,
     };
   },
 };
@@ -199,6 +220,10 @@ export default {
 .login-link a {
   color: #2B81C4;
   text-decoration: none;
+}
+
+.v-snackbar {
+  text-align: center;
 }
 
 @media (max-width: 960px) {
