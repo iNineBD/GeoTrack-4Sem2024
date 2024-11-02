@@ -28,6 +28,9 @@
         <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
       </template>
 
+      <!--Botão home-->
+      <v-btn key="home" @click="goHome" icon="mdi-home" title="Home"></v-btn> 
+
       <!-- Botão para StopPointsFilter -->
       <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"
         title="Filtro de Pontos de Parada"></v-btn>
@@ -35,6 +38,8 @@
       <!-- Botão para GeographicAreasFilter -->
       <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"
         title="Filtro de Áreas Geográficas"></v-btn>
+
+        
     </v-speed-dial>
   </div>
 </template>
@@ -90,6 +95,13 @@ const handleStopPointsReceived = (stopPoints: any) => {
 
 const initializeMap = () => {
   emit("initializeMap");
+};
+
+const goHome = () => {
+  emit("initializeMap"); // Centraliza o mapa na posição inicial
+  panel.value = []; // Fecha qualquer painel aberto, se necessário
+  // Adicione outras lógicas de reset, se necessário
+  console.log("Mapa centralizado e filtros limpos");
 };
 
 const goToFilterStopPoints = () => {
