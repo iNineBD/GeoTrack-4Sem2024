@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import Vue from 'vue';
+import Router from 'vue-router';
 import Login from '../pages/Login.vue'; 
 import MapView from '../pages/MapView.vue';
 import Register from '../pages/Register.vue';
@@ -49,6 +51,19 @@ function isTokenExpired() {
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+  
+  const requiresAuth = to.name !== 'Login';
+
+  if (requiresAuth && (!token || isTokenExpired(token))) {
+    next({
+      name: 'Login'});
+  } else {
+    next();
+  }
 });
 
 export default router;
