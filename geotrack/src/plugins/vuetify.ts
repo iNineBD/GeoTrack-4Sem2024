@@ -7,13 +7,22 @@ import { pt } from 'vuetify/locale' // Importando locale para português
 
 export default createVuetify({
   theme: {
-    defaultTheme: 'light',
+    defaultTheme: 'light', // Começa com o tema claro
     themes: {
       light: {
+        dark: false,
         colors: {
           primary: '#000B62',
-          primary_light:'#d5d9ff',
+          primary_light: '#d5d9ff',
           secondary: '#FFFFFF',
+        },
+      },
+      dark: {
+        dark: true,
+        colors: {
+          primary: '#242c3c', // botao consultar
+          primary_light: '#d5d9ff', //botoes filtro rapidos e limpar
+          secondary: '#6A5ACD', // nao sabemos ainda
         },
       },
     },

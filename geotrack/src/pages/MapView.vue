@@ -1,55 +1,109 @@
 <template>
-  <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
-    @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap"
-    @initializeMap="initializeMap" @removeCircle="removeCircle" />
+  <Sidebar
+    @consult="fetchGeoJsonData"
+    @drawCircle="enableCircleDrawing"
+    @geographicAreaConsult="handleGeographicAreaConsult"
+    @stopPointsReceived="handleStopPointsOnMap"
+    @initializeMap="initializeMap"
+    @removeCircle="removeCircle"
+  />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
   <v-switch
     v-model="isDarkTheme"
     hide-details
     inset
-    style="position: fixed; top: -5px; right: 240px; z-index: 10; transform: scale(1.3); transform-origin: top right;"
-     @update:modelValue="initializeMap">
-
-     <template v-slot:thumb>
-        <v-icon>{{ isDarkTheme ? 'mdi-weather-night' : 'mdi-weather-sunny' }}</v-icon>
-      </template>
-    
-    </v-switch>
+    style="
+      position: fixed;
+      top: -5px;
+      right: 240px;
+      z-index: 10;
+      transform: scale(1.3);
+      transform-origin: top right;
+    "
+    @update:modelValue="initializeMap"
+  >
+    <template v-slot:thumb>
+      <v-icon>{{
+        isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
+      }}</v-icon>
+    </template>
+  </v-switch>
 
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px">
     <v-card rounded="xl">
-      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px;">
+      <v-card-title class="text-center" style="padding: 10px 15px 0px 15px">
         <span class="headline">Detalhes da zona selecionada</span>
       </v-card-title>
 
-      <v-card-text style="padding: 10px 15px 0px 15px;">
+      <v-card-text style="padding: 10px 15px 0px 15px">
         <v-form>
-          <v-text-field v-model="circleDetails.name" label="Nome" color="primary"></v-text-field>
-          <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%"
-            color="primary"></v-text-field>
-          <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
-            style="opacity: 75%" color="primary"></v-text-field>
-          <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly style="opacity: 75%"
-            color="primary"></v-text-field>
+          <v-text-field
+            v-model="circleDetails.name"
+            label="Nome"
+            color="primary"
+          ></v-text-field>
+          <v-text-field
+            v-model="circleDetails.type"
+            label="Tipo"
+            readonly
+            style="opacity: 75%"
+            color="primary"
+          ></v-text-field>
+          <v-text-field
+            v-model="circleDetails.center"
+            label="Coordenadas do Centro (latitude/longitude)"
+            readonly
+            style="opacity: 75%"
+            color="primary"
+          ></v-text-field>
+          <v-text-field
+            v-model="circleDetails.radius"
+            label="Raio (metros)"
+            readonly
+            style="opacity: 75%"
+            color="primary"
+          ></v-text-field>
         </v-form>
       </v-card-text>
 
       <v-card-actions>
         <v-row justify="center">
-          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
+          <v-btn
+            variant="flat"
+            color="primary"
+            @click="saveCircle"
+            style="margin: 0px 10px 15px 10px"
+            rounded="xl"
+          >
             Salvar
           </v-btn>
-          <v-btn variant="flat" color="primary_light" @click="removeCircle" style="margin: 0px 10px 15px 10px"
-            rounded="xl">
+          <v-btn
+            variant="flat"
+            color="primary_light"
+            @click="removeCircle"
+            style="margin: 0px 10px 15px 10px"
+            rounded="xl"
+          >
             Remover
           </v-btn>
-          <v-btn variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
-            rounded="xl">
+          <v-btn
+            variant="flat"
+            color="primary_light"
+            @click="editCircle"
+            style="margin: 0px 10px 15px 10px"
+            rounded="xl"
+          >
             Editar
           </v-btn>
-          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="red" @click="deleteCircle"
-            style="margin: 0px 10px 15px 10px" rounded="xl">
+          <v-btn
+            v-if="!(circleDetails.id == '')"
+            variant="flat"
+            color="red"
+            @click="deleteCircle"
+            style="margin: 0px 10px 15px 10px"
+            rounded="xl"
+          >
             Deletar
           </v-btn>
         </v-row>
@@ -66,7 +120,8 @@
 import { onMounted, ref, watch } from "vue";
 import axios from "axios";
 import { id } from "vuetify/locale";
-import { eventBus } from '@/utils/EventBus'; // Importando o EventBus
+import { eventBus } from "@/utils/EventBus"; // Importando o EventBus
+import vuetify from "@/plugins/vuetify";
 
 interface GeoJsonFeature {
   geometry: {
@@ -82,17 +137,17 @@ export interface FilterData {
 
 export default {
   name: "MapView",
-  data () {
-      return {
-        isDark: false,
-      }
-    },
+  data() {
+    return {
+      isDark: false,
+    };
+  },
   setup() {
     const map = ref<google.maps.Map | null>(null);
     const mapDiv = ref<HTMLElement | null>(null);
     const drawingManager = ref<google.maps.drawing.DrawingManager | null>(null);
     const dialog = ref(false);
-    const isDarkTheme = ref(false);
+    const isDarkTheme = ref<boolean>(vuetify.theme.global.name === "dark");
     const themeClass = ref("");
 
     const snackbar = ref(false); // Controle de visibilidade do snackbar
@@ -135,7 +190,7 @@ export default {
       }
 
       const darkModeStyles = [
-      { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+        { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
         { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
         { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
         {
@@ -212,15 +267,14 @@ export default {
           featureType: "water",
           elementType: "labels.text.stroke",
           stylers: [{ color: "#17263c" }],
-        }
+        },
       ];
 
       let estilo = null;
 
-      if(isDarkTheme.value){
-        estilo = darkModeStyles
+      if (isDarkTheme.value) {
+        estilo = darkModeStyles;
       }
-
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -235,7 +289,7 @@ export default {
               zoom: 12,
               minZoom: 4, // Limite inferior de zoom
               // @ts-ignore
-              styles: estilo
+              styles: estilo,
             });
             addCurrentLocationMarker(userLocation);
           },
@@ -247,7 +301,7 @@ export default {
               zoom: 3,
               minZoom: 4, // Limite inferior de zoom
               // @ts-ignore
-              styles: estilo
+              styles: estilo,
             });
             // Não chama addMarker se a geolocalização falhar
           }
@@ -259,7 +313,7 @@ export default {
           zoom: 10,
           minZoom: 4,
           // @ts-ignore
-          styles: estilo
+          styles: estilo,
         });
       }
     };
@@ -291,9 +345,9 @@ export default {
 
     const clearMarkers = () => {
       markers.forEach((marker) => {
-        marker.setMap(null);  // Remove o marcador do mapa
+        marker.setMap(null); // Remove o marcador do mapa
       });
-      markers = [];  // Limpa o array de marcadores
+      markers = []; // Limpa o array de marcadores
     };
 
     const fetchGeoJsonData = async (filterData: FilterData) => {
@@ -322,7 +376,7 @@ export default {
                   plotPointOnMap({
                     userName: user,
                     device: device,
-                    coords: { latitude: coords[1], longitude: coords[0] }
+                    coords: { latitude: coords[1], longitude: coords[0] },
                   });
                 }
               });
@@ -335,13 +389,16 @@ export default {
             console.log("Erro 404: ", error.response.data.message);
             showSnackbar(error.response.data.message, "error");
           } else {
-            console.error("Erro ao buscar os dados GeoJSON:", error.response.data);
+            console.error(
+              "Erro ao buscar os dados GeoJSON:",
+              error.response.data
+            );
           }
         } else {
           console.error("Erro de rede ou outro erro:", error);
         }
       } finally {
-        eventBus.emit('stopIsLoading');
+        eventBus.emit("stopIsLoading");
       }
     };
 
@@ -351,17 +408,25 @@ export default {
         plotPointOnMap({
           userName: points.userName,
           device: points.device,
-          coords: { latitude: item.latitude, longitude: item.longitude }
+          coords: { latitude: item.latitude, longitude: item.longitude },
         });
       });
-      eventBus.emit('stopIsLoading');
+      eventBus.emit("stopIsLoading");
     };
 
+    function toggleTheme(): void {
+      vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
+    }
+
     const plotPointOnMap = (userData: any) => {
-      const position = { lat: userData.coords.latitude, lng: userData.coords.longitude }; // Coordenadas
+      const position = {
+        lat: userData.coords.latitude,
+        lng: userData.coords.longitude,
+      }; // Coordenadas
 
       // Gera as iniciais do usuário
-      const initials = userData.userName.split(" ")
+      const initials = userData.userName
+        .split(" ")
         .slice(0, 2)
         .map((name: string) => name[0])
         .join("");
@@ -426,7 +491,6 @@ export default {
         "circlecomplete",
         // @ts-ignore
         (circle: google.maps.Circle) => {
-
           if (circleInstance) {
             circleInstance.setMap(null);
             circleInstance = null;
@@ -470,14 +534,16 @@ export default {
       const id = circleDetails.value.id;
       const type = circleDetails.value.type;
 
-      console.log('id antigo', circleDetails.value);
+      console.log("id antigo", circleDetails.value);
 
       // Fecha o dialog inicialmente
       dialog.value = false;
 
       // Inicia o modo de desenho de círculo
       if (drawingManager.value && map.value) {
-        drawingManager.value.setDrawingMode(google.maps.drawing.OverlayType.CIRCLE);
+        drawingManager.value.setDrawingMode(
+          google.maps.drawing.OverlayType.CIRCLE
+        );
         drawingManager.value.setMap(map.value);
       }
 
@@ -511,10 +577,13 @@ export default {
             },
           };
 
-          console.log('Novos detalhes do círculo', circleDetails.value);
+          console.log("Novos detalhes do círculo", circleDetails.value);
 
           // Armazenando os dados no localStorage
-          localStorage.setItem('circleDetailsCached', JSON.stringify(circleDetails.value));
+          localStorage.setItem(
+            "circleDetailsCached",
+            JSON.stringify(circleDetails.value)
+          );
 
           // Reabre o dialog após o círculo ser desenhado
           dialog.value = true;
@@ -522,18 +591,19 @@ export default {
       };
 
       // Adiciona o listener para overlaycomplete
-      google.maps.event.addListener(drawingManager.value, 'overlaycomplete', overlayCompleteListener);
+      google.maps.event.addListener(
+        drawingManager.value,
+        "overlaycomplete",
+        overlayCompleteListener
+      );
 
-      console.log('Esperando o novo círculo ser desenhado...');
-
-
+      console.log("Esperando o novo círculo ser desenhado...");
     };
 
     const saveCircle = async () => {
-      const cached = localStorage.getItem('circleDetailsCached');
+      const cached = localStorage.getItem("circleDetailsCached");
       // @ts-ignore
       const cachedDetails = JSON.parse(cached);
-
 
       const updateZone = {
         id: circleDetails.value.id,
@@ -544,10 +614,10 @@ export default {
           latitude: parseFloat(circleDetails.value.center.split(", ")[0]),
         },
         radius: parseFloat(circleDetails.value.radius),
-      }
+      };
 
       if (cachedDetails) {
-        updateZone.id = cachedDetails.id
+        updateZone.id = cachedDetails.id;
       }
 
       const payload = {
@@ -570,30 +640,25 @@ export default {
           );
 
           console.log("Dados enviados com sucesso:", response.data);
-        }
-
-        else {
+        } else {
           const response = await axios.put(
             "http://localhost:8080/zone",
             updateZone
           );
           console.log("Dados enviados com sucesso para update:", response.data);
-
         }
         showSnackbar("Zona salva com sucesso!", "success");
         dialog.value = false;
 
-        eventBus.emit('reloadGeoArea');
-
+        eventBus.emit("reloadGeoArea");
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
         showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
       }
-
     };
 
     const deleteCircle = async () => {
-      const cached = localStorage.getItem('circleDetailsCached');
+      const cached = localStorage.getItem("circleDetailsCached");
       // @ts-ignore
       const cachedDetails = JSON.parse(cached);
 
@@ -602,7 +667,7 @@ export default {
       };
 
       if (cachedDetails) {
-        payload.id = cachedDetails.id
+        payload.id = cachedDetails.id;
       }
 
       try {
@@ -615,8 +680,7 @@ export default {
 
         dialog.value = false;
         removeCircle();
-        eventBus.emit('reloadGeoArea');
-        
+        eventBus.emit("reloadGeoArea");
       } catch (error) {
         console.log("Erro ao deletar os dados:", error);
         showSnackbar("Erro ao deletar a zona. Tente novamente.", "error");
@@ -635,9 +699,9 @@ export default {
       if (circleInstance) {
         circleInstance.setMap(null);
         circleInstance = null;
-        localStorage.removeItem('cachedCircleDetails');
+        localStorage.removeItem("cachedCircleDetails");
       }
-      eventBus.emit('clearSelectedGeoArea');
+      eventBus.emit("clearSelectedGeoArea");
     };
 
     const drawCircleOnMap = (
@@ -648,7 +712,6 @@ export default {
       if (circleInstance) {
         circleInstance.setMap(null);
       }
-
 
       const circleCenter = { lat: latitude, lng: longitude };
 
@@ -685,10 +748,10 @@ export default {
       drawCircleOnMap(data.latitude, data.longitude, data.radius);
     };
 
-       // Observando o valor de `isDarkTheme`
+    // Observando o valor de `isDarkTheme`
     watch(isDarkTheme, (newValue) => {
-      console.log('Tema atual:', newValue ? 'Escuro' : 'Claro');
-      
+      console.log("Tema atual:", newValue ? "Escuro" : "Claro");
+      toggleTheme();
     });
 
     return {
