@@ -1,14 +1,14 @@
 <template>
   <div class="floating-panel">
     <v-container width="400px" class="panel-container" style="padding: 0px">
-      <v-expansion-panels v-model="panel" rounded="xl" elevation="4">
+      <v-expansion-panels v-model="panel" rounded="xl" elevation="4" color="primary">
         <v-expansion-panel>
           <template v-slot:title>
             <v-row class="panel-header" justify="center" align="center">
               <v-img :src="logo" height="30" class="icon" />
             </v-row>
           </template>
-          <v-expansion-panel-text style="padding: 0px">
+          <v-expansion-panel-text style="padding: 0px" >
             <v-container
               width="400px"
               class="filter-container"
@@ -38,17 +38,18 @@
           icon="mdi-menu"
           large
           elevation="4"
+          color="primary"
         ></v-btn>
       </template>
 
       <!-- Botão para StopPointsFilter -->
 
       <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"
-        title="Filtro de Pontos de Parada"></v-btn>
+        title="Filtro de Pontos de Parada" color="primary"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
       <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"
-        title="Filtro de Áreas Geográficas"></v-btn>
+        title="Filtro de Áreas Geográficas" color="primary"></v-btn>
     </v-speed-dial>
   </div>
 </template>

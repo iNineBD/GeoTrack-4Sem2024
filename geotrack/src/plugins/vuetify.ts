@@ -12,16 +12,16 @@ export default createVuetify({
       light: {
         dark: false,
         colors: {
-          primary: '#000B62',
-          primary_light: '#d5d9ff',
+          primary: '#f2f3f5',
+          primary_light: '#b8beff',
           secondary: '#FFFFFF',
         },
       },
       dark: {
         dark: true,
         colors: {
-          primary: '#242c3c', // botao consultar
-          primary_light: '#d5d9ff', //botoes filtro rapidos e limpar
+          primary: '#242f3e', // botao consultar
+          primary_light: '#b8beff', //botoes filtro rapidos e limpar
           secondary: '#6A5ACD', // nao sabemos ainda
         },
       },

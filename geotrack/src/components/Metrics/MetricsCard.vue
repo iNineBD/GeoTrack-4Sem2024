@@ -73,7 +73,7 @@ onMounted(() => {
 }
 .metric-card {
   width: 100%;
-  background-color: #767cab96;
+  background-color: #b8beff;
   padding: 10px;
 }
 .metric-text {

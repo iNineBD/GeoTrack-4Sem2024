@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px;">
+  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px;" color="primary">
     <v-col style="padding: 20px 20px 0 20px;">
       <!-- Users selection -->
       <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
@@ -43,7 +43,7 @@
     <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px">
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary_light" size="large"
             variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
