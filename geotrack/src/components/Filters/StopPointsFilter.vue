@@ -15,7 +15,7 @@
         v-model="date"
         label="Selecione o período"
         multiple="range"
-        color="primary"
+        color="secondary"
         :max="today"
         :locale="locale"
         :format="customDateFormat"
@@ -43,7 +43,7 @@
     <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px">
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary_light" size="large"
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary" size="large"
             variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>

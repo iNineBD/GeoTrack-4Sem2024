@@ -20,7 +20,7 @@
       transform: scale(1.3);
       transform-origin: top right;
     "
-    @update:modelValue="initializeMap"
+    @update:modelValue="darkMode"
   >
     <template v-slot:thumb>
       <v-icon>{{
@@ -184,10 +184,8 @@ export default {
       }
     });
 
-    const initializeMap = () => {
-      if (markers.length > 0) {
-        clearMarkers();
-      }
+
+    const darkMode = () => {
 
       const darkModeStyles = [
         { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
@@ -269,6 +267,31 @@ export default {
           stylers: [{ color: "#17263c" }],
         },
       ];
+
+      let estilo = null;
+
+      if (isDarkTheme.value) {
+        estilo = darkModeStyles;
+      }
+
+      if (map.value) {
+    map.value.setOptions({ styles: estilo });
+  } else {
+    // Caso o mapa ainda não tenha sido inicializado, inicialize-o
+    const defaultLocation = { lat: -14.235, lng: -51.9253 };
+    map.value = new google.maps.Map(mapDiv.value!, {
+      center: defaultLocation,
+      zoom: 3,
+      minZoom: 4,
+      styles: estilo,
+    });
+  }
+    }
+
+    const initializeMap = () => {
+      if (markers.length > 0) {
+        clearMarkers();
+      }
 
       let estilo = null;
 
@@ -769,6 +792,7 @@ export default {
 
       isDarkTheme,
       themeClass,
+      darkMode,
 
       snackbar,
       snackbarColor,
