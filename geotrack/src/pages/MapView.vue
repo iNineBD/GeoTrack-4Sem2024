@@ -29,6 +29,20 @@
     </template>
   </v-switch>
 
+  <div>
+    <v-btn
+    title="Relátorios de métricas"
+    color="primary" 
+    icon="mdi-text-box-search-outline"
+    @click="togglePanel" 
+    style="position: fixed; top: 14px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;">
+  </v-btn>
+  
+  <MetricsCard v-if="isPanelOpen" style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
+  </MetricsCard>
+</div>
+
+
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px">
     <v-card rounded="xl">
@@ -116,12 +130,14 @@
   </v-snackbar>
 </template>
 
+
 <script lang="ts">
 import { onMounted, ref, watch } from "vue";
 import axios from "axios";
 import { id } from "vuetify/locale";
 import { eventBus } from "@/utils/EventBus"; // Importando o EventBus
 import vuetify from "@/plugins/vuetify";
+import MetricsCard from "../Metrics/MetricsCard.vue";
 
 interface GeoJsonFeature {
   geometry: {
@@ -140,6 +156,7 @@ export default {
   data() {
     return {
       isDark: false,
+      isPanelOpen: false,
     };
   },
   setup() {
@@ -149,6 +166,8 @@ export default {
     const dialog = ref(false);
     const isDarkTheme = ref<boolean>(vuetify.theme.global.name === "dark");
     const themeClass = ref("");
+
+    const isPanelOpen = ref(false);
 
     const snackbar = ref(false); // Controle de visibilidade do snackbar
     const snackbarColor = ref("success"); // Inicializa a cor do snackbar como "success"
@@ -439,6 +458,9 @@ export default {
 
     function toggleTheme(): void {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
+
+
+      
     }
 
     const plotPointOnMap = (userData: any) => {
@@ -477,7 +499,7 @@ export default {
       markers.push(marker);
 
       const infoWindow = new google.maps.InfoWindow({
-        content: `<div>
+        content: `<div style="color: black;">
               <strong>Usuário:</strong> ${userData.userName}<br>
               <strong>Dispositivo:</strong> ${userData.device}<br>
               <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
@@ -771,10 +793,19 @@ export default {
       drawCircleOnMap(data.latitude, data.longitude, data.radius);
     };
 
+    const togglePanel = () => {
+      isPanelOpen.value = !isPanelOpen.value;
+    };
+
     // Observando o valor de `isDarkTheme`
     watch(isDarkTheme, (newValue) => {
       console.log("Tema atual:", newValue ? "Escuro" : "Claro");
       toggleTheme();
+    });
+
+        // Observando o valor de `isDarkTheme`
+    watch(isPanelOpen, (newValue) => {
+      console.log('chegou',newValue)
     });
 
     return {
@@ -802,6 +833,9 @@ export default {
       drawCircleOnMap,
       handleGeographicAreaConsult,
       handleStopPointsOnMap,
+
+      isPanelOpen,
+      togglePanel,
     };
   },
 };
