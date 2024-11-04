@@ -314,6 +314,7 @@ export default {
     const initializeMap = () => {
       if (markers.length > 0) {
         clearMarkers();
+        removeCircle();
       }
 
       let estilo = null;
