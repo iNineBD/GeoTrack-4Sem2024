@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     GeographicAreasFilter: typeof import('./src/components/Filters/GeographicAreasFilter.vue')['default']
+    MetricsCard: typeof import('./src/components/Metrics/MetricsCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Menu/Sidebar.vue')['default']
