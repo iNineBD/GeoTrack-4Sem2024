@@ -55,21 +55,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
 import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
+import { eventBus } from '@/utils/EventBus'; // Verifique se está importado corretamente
 
-
-const logo = "/src/assets/Logo.svg";
 const panel = ref([]);
 const dial = ref(false);
 const route = useRoute();
 const router = useRouter();
 const emit = defineEmits(["initializeMap", "removeCircle"]);
+const logo = ref("/src/assets/Logo.svg");
+
+onMounted(() => {
+  eventBus.on("changeLogo", updateLogo);
+});
+
+onUnmounted(() => {
+  eventBus.off("changeLogo", updateLogo);
+});
+
 const toggleDial = () => {
   dial.value = !dial.value;
+};
+
+const updateLogo = () => {
+  logo.value = logo.value === "/src/assets/Logo.svg" ? "/src/assets/LogoWhite.svg" : "/src/assets/Logo.svg";
 };
 
 // Definindo as props
@@ -92,17 +105,13 @@ const handleRemoveCircle = () => {
   emit('removeCircle');
 };
 
-
 const handleGeographicAreaConsult = (data: FilterData) => {
   console.log("Dados recebidos do GeographicAreasFilter:", data);
   props.onGeographicAreaConsult(data);
 };
 
 const handleStopPointsReceived = (stopPoints: any) => {
-  console.log(
-    "Pontos de parada recebidos do GeographicAreasFilter:",
-    stopPoints
-  );
+  console.log("Pontos de parada recebidos do GeographicAreasFilter:", stopPoints);
   props.onStopPointsReceived(stopPoints);
 };
 
@@ -113,19 +122,20 @@ const initializeMap = () => {
 const goToFilterStopPoints = () => {
   router.push("/stoppointsfilter");
   //@ts-ignore
-  panel.value = [0]; // Define o painel como aberto
+  panel.value = [0];
   toggleDial();
   emit("initializeMap");
 };
 
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
-  //@ts-ignore
-  panel.value = [0]; // Define o painel como aberto
+    //@ts-ignore
+  panel.value = [0];
   toggleDial();
   emit("initializeMap");
 };
 </script>
+
 
 <style scoped>
 .floating-panel {

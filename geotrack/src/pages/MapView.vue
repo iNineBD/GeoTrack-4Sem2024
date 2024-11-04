@@ -20,7 +20,7 @@
       transform: scale(1.3);
       transform-origin: top right;
     "
-    @update:modelValue="darkMode"
+    @update:modelValue="updateDarkMode"
   >
     <template v-slot:thumb>
       <v-icon>{{
@@ -201,7 +201,12 @@ export default {
         initializeMap();
       }
     });
-
+    
+    const updateDarkMode = () => {
+      darkMode();
+      toggleTheme();
+      eventBus.emit("changeLogo");
+    };
 
     const darkMode = () => {
 
@@ -797,10 +802,10 @@ export default {
     };
 
     // Observando o valor de `isDarkTheme`
-    watch(isDarkTheme, (newValue) => {
-      console.log("Tema atual:", newValue ? "Escuro" : "Claro");
-      toggleTheme();
-    });
+    // watch(isDarkTheme, (newValue) => {
+    //   console.log("Tema atual:", newValue ? "Escuro" : "Claro");
+      
+    // });
 
         // Observando o valor de `isDarkTheme`
     watch(isPanelOpen, (newValue) => {
@@ -823,6 +828,7 @@ export default {
       isDarkTheme,
       themeClass,
       darkMode,
+      updateDarkMode,
 
       snackbar,
       snackbarColor,
