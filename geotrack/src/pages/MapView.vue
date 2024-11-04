@@ -137,7 +137,6 @@ import axios from "axios";
 import { id } from "vuetify/locale";
 import { eventBus } from "@/utils/EventBus"; // Importando o EventBus
 import vuetify from "@/plugins/vuetify";
-import MetricsCard from "../Metrics/MetricsCard.vue";
 
 interface GeoJsonFeature {
   geometry: {
