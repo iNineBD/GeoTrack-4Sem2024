@@ -62,23 +62,24 @@ onMounted(() => {
 
 <style scoped>
 .metrics-container {
-  position: relative;
+  position: fixed;
   display: flex;
   flex-direction: column;
   gap: 10px;
   z-index: 10;
-  width: 350px;
-  padding-bottom: 20px;
+  width: 250px;
+  padding-bottom: 30px;
   margin: auto;
+  margin-top: 10px; /* Ajuste este valor conforme necessário */
 }
 .metric-card {
   width: 100%;
-  background-color: #767cab96;
+  background-color: "primary_light";
   padding: 10px;
 }
 .metric-text {
-  font-size: 13px;
-  color: black;
+  font-size: 11px;
+  color: "primary";
   font-weight: bold;
   text-align: center;
 }

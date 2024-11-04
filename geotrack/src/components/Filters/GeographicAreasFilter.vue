@@ -2,7 +2,8 @@
   <v-card
     class="mx-auto"
     width="100%"
-    style="box-shadow: none; border-radius: 0; margin-bottom: 25px"
+    style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; height: 350px;"
+    color="primary"
   >
     <v-col style="padding: 20px 20px 0 20px">
       <!-- Card das áreas geográficas -->
@@ -61,7 +62,7 @@
         v-model="date"
         label="Selecione o período"
         multiple="range"
-        color="primary"
+        color="secondary"
         :max="today"
         :locale="locale"
         :format="customDateFormat"
@@ -94,7 +95,7 @@
     >
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary_light" size="large"
             variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
@@ -121,13 +122,9 @@
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
    </v-snackbar>
-
-
-  <MetricsCard />
 </template>
 
 <script>
-import MetricsCard from "../Metrics/MetricsCard.vue";
 import { eventBus } from '@/utils/EventBus';
 
 

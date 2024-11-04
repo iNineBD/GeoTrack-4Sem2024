@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px;">
+  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; " color="primary">
     <v-col style="padding: 20px 20px 0 20px;">
       <!-- Users selection -->
       <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
@@ -15,7 +15,7 @@
         v-model="date"
         label="Selecione o período"
         multiple="range"
-        color="primary"
+        color="secondary"
         :max="today"
         :locale="locale"
         :format="customDateFormat"
@@ -40,10 +40,10 @@
       </v-col>
     </v-col>
 
-    <v-card-actions class="d-flex" style="padding: 20px 20px 0 20px">
+    <v-card-actions class="d-flex" style="padding: 20px 20px 10px 20px">
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary" size="large"
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary" size="large"
             variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
@@ -66,14 +66,11 @@
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
-
-  <MetricsCard />
 </template>
 
 <script>
 import { load } from "ol/Image";
 import { fa } from "vuetify/locale";
-import MetricsCard from "../Metrics/MetricsCard.vue";
 import { eventBus } from '@/utils/EventBus';
 
 export default {
