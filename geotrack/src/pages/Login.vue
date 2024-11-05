@@ -65,8 +65,13 @@
       </v-col>
     </v-row>
 
+    <!-- Snackbar para exibir mensagens -->
     <v-snackbar
-      v-model="snackbar" :color="snackbarColor" timeout="3000" top class="text-center">
+      v-model="snackbar"
+      :color="snackbarColor"
+      timeout="3000"
+      top
+    >
       {{ snackbarMessage }}
       <template v-slot:action="{ attrs }">
         <v-btn
@@ -111,6 +116,7 @@ export default {
         console.info("Login bem-sucedido:", response.data);
         localStorage.setItem('token', response.data.token);
         
+        // Exibe mensagem de sucesso no snackbar
         snackbarMessage.value = "Login bem-sucedido!";
         snackbarColor.value = "success";
         snackbar.value = true;
@@ -119,6 +125,7 @@ export default {
       } catch (error) {
         console.error("Erro no login:", error.response?.data || error.message);
 
+        // Exibe mensagem de erro no snackbar
         snackbarMessage.value = error.response?.data?.message || 'Erro desconhecido no login';
         snackbarColor.value = "error";
         snackbar.value = true;
