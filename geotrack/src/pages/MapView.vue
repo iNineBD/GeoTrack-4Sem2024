@@ -257,7 +257,7 @@ export default {
     }
 
     const initializeMapDark = () => {
-      console.log("chamou aqui")
+      console.log("quantidade de marcadores: ", markers.length)
       if (markers.length > 0) {
         clearMarkers();
         removeCircle();

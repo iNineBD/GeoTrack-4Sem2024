@@ -16,10 +16,10 @@
             >
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
-              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" @initializeMap="initializeMap"/>
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"/>
               <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @removeCircle="handleRemoveCircle"
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
-                @stopPointsReceived="handleStopPointsReceived"  @initializeMap="initializeMap"/>
+                @stopPointsReceived="handleStopPointsReceived"  @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"/>
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>

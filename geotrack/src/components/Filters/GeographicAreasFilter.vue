@@ -398,7 +398,8 @@ export default {
       this.radius = null;
       this.circleDrawn = false;
 
-      if(update){
+      console.log("tasxza>: ", this.update)
+      if(this.update){
         this.$emit("initializeMapDark");
       }else{
         this.$emit("initializeMap");

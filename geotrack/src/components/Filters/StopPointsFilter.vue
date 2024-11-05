@@ -183,7 +183,6 @@ export default {
       };
 
       console.log("Dados enviados:", requestData);
-
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
     },
 
@@ -193,7 +192,8 @@ export default {
       this.devices = [];
       this.selectedQuickFilter = null;
 
-      if(update){
+      console.log("Hora de limpar: ", this.update)
+      if(this.update){
         this.$emit("initializeMapDark");
       }else{
         this.$emit("initializeMap");
