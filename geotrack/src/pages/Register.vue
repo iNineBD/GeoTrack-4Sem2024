@@ -4,17 +4,17 @@
       <v-col class="blue-section" cols="12">
         <v-card class="register-card" elevation="2">
           <div class="logo-container">
-            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-4">
+            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-2">
           </div>
           <v-card-title class="text-h5 font-weight-bold text-center">Cadastro de Usuário</v-card-title>
           <v-card-text>
-            <p class="subtitle-1 mb-6 text-body-2 text-center ">Preencha os campos abaixo</p>
+            <p class="subtitle-1 mb-4 text-body-2 text-center ">Preencha os campos abaixo</p>
             <v-form @submit.prevent="handleRegister">
               <v-text-field
                 v-model="name"
                 label="Nome completo"
                 required
-                class="register-input mb-4"
+                class="register-input mb-2"
                 variant="outlined"
                 density="comfortable"
                 style="width: 300px;"
@@ -24,7 +24,7 @@
                 v-model="email"
                 label="Email"
                 required
-                class="register-input mb-4"
+                class="register-input mb-2"
                 variant="outlined"
                 density="comfortable"
               ></v-text-field>
@@ -45,7 +45,7 @@
               <router-link to="/">Já possui cadastro? Faça login</router-link>
             </div>
           </v-card-text>
-          <div class="partner-logos mt-6">
+          <div class="partner-logos mt-4">
             <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo">
             <img :src="logoInine" alt="INine Logo" class="partner-logo">
           </div>
@@ -181,9 +181,8 @@ export default {
 
 .register-card {
   background: white !important;
-  width: 100%;
-  max-width: 400px;
-  padding: 2rem;
+  width: min(90vw, 450px); 
+  padding: 2vw; 
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -194,6 +193,11 @@ export default {
   color: #333;
   padding: 0;
   margin-bottom: 1rem;
+}
+
+.register-card :deep(.v-card-text) {
+  color: #666;
+  padding: 0;
 }
 
 .register-input {

@@ -4,17 +4,17 @@
       <v-col class="blue-section" cols="12">
         <v-card class="login-card" elevation="2">
           <div class="logo-container">
-            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-4">
+            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-2">
           </div>
           <v-card-title class="text-h5 font-weight-bold text-center">Entre na sua conta</v-card-title>
           <v-card-text>
-            <p class="subtitle-1 mb-6 text-body-2 text-center">Preencha os campos abaixo</p>
+            <p class="subtitle-1 mb-4 text-body-2 text-center">Preencha os campos abaixo</p>
             <v-form @submit.prevent="handleLogin">
               <v-text-field
                 v-model="email"
                 label="Digite seu usuário"
                 required
-                class="login-input mb-4"
+                class="login-input mb-2"
                 variant="outlined"
                 density="comfortable"
                 style="width: 300px;"
@@ -25,7 +25,7 @@
                 label="Digite sua senha"
                 type="password"
                 required
-                class="login-input mb-2"
+                class="login-input mb-4"
                 variant="outlined"
                 density="comfortable"
               ></v-text-field>
@@ -142,14 +142,13 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  height: 100vh; /* Preenche toda a altura da tela */
+  height: 100vh; 
 }
 
 .login-card {
   background: white !important;
-  width: 100%;
-  max-width: 400px;
-  padding: 2rem;
+  width: min(90vw, 450px); 
+  padding: 2vw; 
   border-radius: 8px;
   display: flex;
   flex-direction: column;
