@@ -1,8 +1,11 @@
 <template>
   <v-container fluid class="login-container pa-0">
     <v-row no-gutters style="height: 100%">
-      <v-col class="blue-section" cols="12" md="5">
+      <v-col class="blue-section" cols="12">
         <v-card class="login-card" elevation="2">
+          <div class="logo-container">
+            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-4">
+          </div>
           <v-card-title class="text-h5 font-weight-bold text-center">Entre na sua conta</v-card-title>
           <v-card-text>
             <p class="subtitle-1 mb-6 text-body-2 text-center">Preencha os campos abaixo</p>
@@ -14,6 +17,7 @@
                 class="login-input mb-4"
                 variant="outlined"
                 density="comfortable"
+                style="width: 300px;"
               ></v-text-field>
               
               <v-text-field
@@ -40,38 +44,17 @@
               </div>
             </v-form>
           </v-card-text>
-        </v-card>
-      </v-col>
-      
-      <v-col class="white-section" cols="12" md="7">
-        <div class="content-wrapper">
-          <div class="logo-container mb-8">
-            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo">
-          </div>
-          
-          <div class="map-container mb-8">
-            <img 
-              src="https://i.gifer.com/PX5H.gif" 
-              alt="World Animation" 
-              class="world-animation"
-            >
-          </div>
-          
-          <div class="partner-logos">
+
+          <div class="partner-logos mt-6">
             <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo">
             <img :src="logoInine" alt="INine Logo" class="partner-logo">
           </div>
-        </div>
+        </v-card>
       </v-col>
     </v-row>
 
-    <!-- Snackbar para exibir mensagens -->
     <v-snackbar
-      v-model="snackbar"
-      :color="snackbarColor"
-      timeout="3000"
-      top
-    >
+      v-model="snackbar" :color="snackbarColor" timeout="3000" top class="text-center">
       {{ snackbarMessage }}
       <template v-slot:action="{ attrs }">
         <v-btn
@@ -116,7 +99,6 @@ export default {
         console.info("Login bem-sucedido:", response.data);
         localStorage.setItem('token', response.data.token);
         
-        // Exibe mensagem de sucesso no snackbar
         snackbarMessage.value = "Login bem-sucedido!";
         snackbarColor.value = "success";
         snackbar.value = true;
@@ -125,7 +107,6 @@ export default {
       } catch (error) {
         console.error("Erro no login:", error.response?.data || error.message);
 
-        // Exibe mensagem de erro no snackbar
         snackbarMessage.value = error.response?.data?.message || 'Erro desconhecido no login';
         snackbarColor.value = "error";
         snackbar.value = true;
@@ -161,6 +142,7 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 2rem;
+  height: 100vh; /* Preenche toda a altura da tela */
 }
 
 .login-card {
@@ -169,6 +151,33 @@ export default {
   max-width: 400px;
   padding: 2rem;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-container {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.main-logo {
+  max-width: 200px;
+  height: auto;
+}
+
+.partner-logos {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.partner-logo {
+  height: 30px;
+  width: auto;
 }
 
 .login-card :deep(.v-card-title) {
@@ -186,10 +195,6 @@ export default {
   border-radius: 4px;
 }
 
-.register {
-  text-align: left;
-}
-
 .register a {
   color: primary;
   text-decoration: underline;
@@ -202,80 +207,9 @@ export default {
   font-weight: bold;
 }
 
-.white-section {
-  background-color: white;
-  padding: 2rem;
-}
-
-.content-wrapper {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.logo-container {
-  width: 100%;
-  text-align: center;
-}
-
-.logo-container img {
-  width: 100%;
-  max-width: 400px;
-  height: auto; 
-}
-
-.main-logo {
-  max-width: 250px;
-  height: auto;
-}
-
-.map-container {
-  width: 100%;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.world-animation {
-  width: 100%;
-  max-width: 500px;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.partner-logos {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  width: 100%;
-}
-
-.partner-logo {
-  height: 40px;
-  width: auto;
-}
-
 @media (max-width: 960px) {
   .blue-section {
     min-height: 100vh;
-  }
-  
-  .white-section {
-    min-height: 100vh;
-  }
-  
-  .content-wrapper {
-    padding: 2rem 0;
-  }
-
-  .world-animation {
-    max-width: 100%;
   }
 }
 </style>
