@@ -1,11 +1,14 @@
 <template>
   <v-container fluid class="register-container pa-0">
     <v-row no-gutters style="height: 100%">
-      <v-col class="blue-section" cols="12" md="5">
+      <v-col class="blue-section" cols="12">
         <v-card class="register-card" elevation="2">
+          <div class="logo-container">
+            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-4">
+          </div>
           <v-card-title class="text-h5 font-weight-bold text-center">Cadastro de Usuário</v-card-title>
           <v-card-text>
-            <p class="subtitle-1 mb-6 text-body-2 text-center">Preencha os campos abaixo</p>
+            <p class="subtitle-1 mb-6 text-body-2 text-center ">Preencha os campos abaixo</p>
             <v-form @submit.prevent="handleRegister">
               <v-text-field
                 v-model="name"
@@ -14,7 +17,9 @@
                 class="register-input mb-4"
                 variant="outlined"
                 density="comfortable"
+                style="width: 300px;"
               ></v-text-field>
+
               <v-text-field
                 v-model="email"
                 label="Email"
@@ -23,6 +28,7 @@
                 variant="outlined"
                 density="comfortable"
               ></v-text-field>
+
               <v-text-field
                 v-model="password"
                 label="Senha"
@@ -32,38 +38,23 @@
                 variant="outlined"
                 density="comfortable"
               ></v-text-field>
+              
               <v-btn type="submit" block class="register-btn" size="large">Cadastrar</v-btn>
             </v-form>
             <div class="login text-center mt-4">
               <router-link to="/">Já possui cadastro? Faça login</router-link>
             </div>
           </v-card-text>
+          <div class="partner-logos mt-6">
+            <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo">
+            <img :src="logoInine" alt="INine Logo" class="partner-logo">
+          </div>
         </v-card>
         <v-snackbar v-model="snackbar" :color="snackbarColor" top :timeout="3000" class="text-center">
           {{ snackbarMessage }}
         </v-snackbar>
       </v-col>
       
-      <v-col class="white-section" cols="12" md="7">
-        <div class="content-wrapper">
-          <div class="logo-container mb-8">
-            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo">
-          </div>
-          
-          <div class="map-container mb-8">
-            <img 
-              src="https://i.gifer.com/PX5H.gif" 
-              alt="World Animation" 
-              class="world-animation"
-            >
-          </div>
-          
-          <div class="partner-logos">
-            <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo">
-            <img :src="logoInine" alt="INine Logo" class="partner-logo">
-          </div>
-        </div>
-      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -146,10 +137,6 @@ export default {
   padding: 2rem;
 }
 
-.white-section {
-  background-color: white;
-}
-
 .content-wrapper {
   height: 100%;
   display: flex;
@@ -163,10 +150,11 @@ export default {
 .logo-container {
   width: 100%;
   text-align: center;
+  margin-bottom: 1rem;
 }
 
 .main-logo {
-  max-width: 250px;
+  max-width: 200px;
   height: auto;
 }
 
@@ -178,23 +166,16 @@ export default {
   align-items: center;
 }
 
-.world-animation {
-  width: 100%;
-  max-width: 500px;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
 .partner-logos {
   display: flex;
   justify-content: center;
   gap: 2rem;
   width: 100%;
+  margin-top: 2rem;
 }
 
 .partner-logo {
-  height: 40px;
+  height: 30px;
   width: auto;
 }
 
@@ -204,6 +185,15 @@ export default {
   max-width: 400px;
   padding: 2rem;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.register-card :deep(.v-card-title) {
+  color: #333;
+  padding: 0;
+  margin-bottom: 1rem;
 }
 
 .register-input {
@@ -229,18 +219,6 @@ export default {
 @media (max-width: 960px) {
   .blue-section {
     min-height: 100vh;
-  }
-  
-  .white-section {
-    min-height: 100vh;
-  }
-  
-  .content-wrapper {
-    padding: 2rem 0;
-  }
-
-  .world-animation {
-    max-width: 100%;
   }
 }
 </style>
