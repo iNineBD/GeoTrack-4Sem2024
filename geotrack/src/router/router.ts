@@ -55,12 +55,15 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
-  
   const requiresAuth = to.name !== 'Login';
 
-  if (requiresAuth && (!token || isTokenExpired(token))) {
-    next({
-      name: 'Login'});
+  console.log('testando: ', to.name == 'Register');
+
+  if (to.name === 'Register' && from.name !== 'Register') {
+    // Só redireciona se a navegação não veio de 'Register'
+    next();
+  } else if (requiresAuth && (!token || isTokenExpired())) {
+    next({ name: 'Login' });
   } else {
     next();
   }
