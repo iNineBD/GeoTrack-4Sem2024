@@ -70,13 +70,14 @@
 
 <script>
 import { load } from "ol/Image";
-import { fa } from "vuetify/locale";
+import { fa, tr } from "vuetify/locale";
 import { eventBus } from '@/utils/EventBus';
 
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
     loading: false,
+    update: false,
     date: null,
     users: [], // Lista de usuários
     selectedUsers: [], // Armazena múltiplos usuários selecionados
@@ -111,6 +112,7 @@ export default {
   mounted() {
     this.fetchUsers();
     eventBus.on('stopIsLoading', this.stopIsLoading);
+    eventBus.on("changeLogo", this.change);
   },
 
   computed: {
@@ -122,6 +124,9 @@ export default {
   methods: {
     stopIsLoading() {
       this.loading = false;
+    },
+    change(){
+      this.update = true
     },
 
     showSnackbar(message, color = "success") {
@@ -187,7 +192,12 @@ export default {
       this.selectedUsers = [];
       this.devices = [];
       this.selectedQuickFilter = null;
-      this.$emit("initializeMap");
+
+      if(update){
+        this.$emit("initializeMapDark");
+      }else{
+        this.$emit("initializeMap");
+      }
     },
 
     setQuickFilter(range, index) {

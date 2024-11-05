@@ -132,6 +132,7 @@ export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
     loading: false,
+    update: false,
     date: null,
     users: [], // Lista de usuários
     selectedUser: null,
@@ -171,6 +172,7 @@ export default {
     eventBus.on('clearSelectedGeoArea', this.clearSelectedGeoArea);
     eventBus.on('stopIsLoading', this.stopIsLoading);
     eventBus.on('reloadGeoArea', this.reloadGeoArea);
+    eventBus.on("changeLogo", this.change);
   },
 
   computed: {
@@ -198,6 +200,9 @@ export default {
 
     clearSelectedGeoArea() {
       this.selectedGeoArea = null;
+    },
+    change(){
+      this.update = true
     },
 
     stopIsLoading() {
@@ -392,7 +397,12 @@ export default {
       this.longitude = null;
       this.radius = null;
       this.circleDrawn = false;
-      this.$emit("initializeMap");
+
+      if(update){
+        this.$emit("initializeMapDark");
+      }else{
+        this.$emit("initializeMap");
+      }
     },
 
     drawCircle() {

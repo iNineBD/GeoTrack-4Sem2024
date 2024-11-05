@@ -44,6 +44,14 @@
 
       <!-- Botão para StopPointsFilter -->
 
+      <v-btn
+        key="map-marker"
+        @click="logo === '/src/assets/LogoWhite.svg' ? initializeMapDark() : initializeMap()"
+        icon="mdi-home"
+        title="Home"
+        color="primary"
+      ></v-btn>
+
       <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"
         title="Filtro de Pontos de Parada" color="primary"></v-btn>
 
@@ -66,8 +74,9 @@ const panel = ref([]);
 const dial = ref(false);
 const route = useRoute();
 const router = useRouter();
-const emit = defineEmits(["initializeMap", "removeCircle"]);
+const emit = defineEmits(["initializeMap", "removeCircle","initializeMapDark"]);
 const logo = ref("/src/assets/Logo.svg");
+
 
 onMounted(() => {
   eventBus.on("changeLogo", updateLogo);
@@ -116,7 +125,13 @@ const handleStopPointsReceived = (stopPoints: any) => {
 };
 
 const initializeMap = () => {
+  console.log('Aquiiiiiiiiiiiii')
   emit("initializeMap");
+};
+
+const initializeMapDark = () => {
+  console.log('Aquiiiiiiiiiiiii novo')
+  emit("initializeMapDark");
 };
 
 const goToFilterStopPoints = () => {
@@ -124,7 +139,12 @@ const goToFilterStopPoints = () => {
   //@ts-ignore
   panel.value = [0];
   toggleDial();
-  emit("initializeMap");
+
+  if(logo.value === "/src/assets/Logo.svg"){
+    emit("initializeMap");
+  }else{
+    emit("initializeMapDark");
+  }
 };
 
 const goToFilterGeographicAreas = () => {
@@ -132,7 +152,11 @@ const goToFilterGeographicAreas = () => {
     //@ts-ignore
   panel.value = [0];
   toggleDial();
-  emit("initializeMap");
+  if(logo.value === "/src/assets/Logo.svg"){
+    emit("initializeMap");
+  }else{
+    emit("initializeMapDark");
+  }
 };
 </script>
 

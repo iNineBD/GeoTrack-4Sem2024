@@ -1,46 +1,32 @@
 <template>
-  <Sidebar
-    @consult="fetchGeoJsonData"
-    @drawCircle="enableCircleDrawing"
-    @geographicAreaConsult="handleGeographicAreaConsult"
-    @stopPointsReceived="handleStopPointsOnMap"
-    @initializeMap="initializeMap"
-    @removeCircle="removeCircle"
-  />
+  <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
+    @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap"
+    @initializeMap="initializeMap" @removeCircle="removeCircle" @initializeMapDark="initializeMapDark" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
-  <v-switch
-    v-model="isDarkTheme"
-    hide-details
-    inset
-    style="
+  <v-switch v-model="isDarkTheme" hide-details inset style="
       position: fixed;
       top: -5px;
       right: 240px;
       z-index: 10;
       transform: scale(1.3);
       transform-origin: top right;
-    "
-    @update:modelValue="updateDarkMode"
-  >
+    " @update:modelValue="updateDarkMode">
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-      }}</v-icon>
+        }}</v-icon>
     </template>
   </v-switch>
 
   <div>
-    <v-btn
-    title="Relátorios de métricas"
-    color="primary" 
-    icon="mdi-text-box-search-outline"
-    @click="togglePanel" 
-    style="position: fixed; top: 12px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;">
-  </v-btn>
-  
-  <MetricsCard v-if="isPanelOpen" style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
-  </MetricsCard>
-</div>
+    <v-btn title="Relátorios de métricas" color="primary" icon="mdi-text-box-search-outline" @click="togglePanel"
+      style="position: fixed; top: 12px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;">
+    </v-btn>
+
+    <MetricsCard v-if="isPanelOpen"
+      style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
+    </MetricsCard>
+  </div>
 
 
   <!-- Modal dialog para detalhes do círculo -->
@@ -52,72 +38,31 @@
 
       <v-card-text style="padding: 10px 15px 0px 15px">
         <v-form>
-          <v-text-field
-            v-model="circleDetails.name"
-            label="Nome"
-            color="primary"
-          ></v-text-field>
-          <v-text-field
-            v-model="circleDetails.type"
-            label="Tipo"
-            readonly
-            style="opacity: 75%"
-            color="primary"
-          ></v-text-field>
-          <v-text-field
-            v-model="circleDetails.center"
-            label="Coordenadas do Centro (latitude/longitude)"
-            readonly
-            style="opacity: 75%"
-            color="primary"
-          ></v-text-field>
-          <v-text-field
-            v-model="circleDetails.radius"
-            label="Raio (metros)"
-            readonly
-            style="opacity: 75%"
-            color="primary"
-          ></v-text-field>
+          <v-text-field v-model="circleDetails.name" label="Nome" color="primary"></v-text-field>
+          <v-text-field v-model="circleDetails.type" label="Tipo" readonly style="opacity: 75%"
+            color="primary"></v-text-field>
+          <v-text-field v-model="circleDetails.center" label="Coordenadas do Centro (latitude/longitude)" readonly
+            style="opacity: 75%" color="primary"></v-text-field>
+          <v-text-field v-model="circleDetails.radius" label="Raio (metros)" readonly style="opacity: 75%"
+            color="primary"></v-text-field>
         </v-form>
       </v-card-text>
 
       <v-card-actions>
         <v-row justify="center">
-          <v-btn
-            variant="flat"
-            color="primary"
-            @click="saveCircle"
-            style="margin: 0px 10px 15px 10px"
-            rounded="xl"
-          >
+          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
             Salvar
           </v-btn>
-          <v-btn
-            variant="flat"
-            color="primary_light"
-            @click="removeCircle"
-            style="margin: 0px 10px 15px 10px"
-            rounded="xl"
-          >
+          <v-btn variant="flat" color="primary_light" @click="removeCircle" style="margin: 0px 10px 15px 10px"
+            rounded="xl">
             Remover
           </v-btn>
-          <v-btn
-            variant="flat"
-            color="primary_light"
-            @click="editCircle"
-            style="margin: 0px 10px 15px 10px"
-            rounded="xl"
-          >
+          <v-btn variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
+            rounded="xl">
             Editar
           </v-btn>
-          <v-btn
-            v-if="!(circleDetails.id == '')"
-            variant="flat"
-            color="red"
-            @click="deleteCircle"
-            style="margin: 0px 10px 15px 10px"
-            rounded="xl"
-          >
+          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="red" @click="deleteCircle"
+            style="margin: 0px 10px 15px 10px" rounded="xl">
             Deletar
           </v-btn>
         </v-row>
@@ -201,7 +146,7 @@ export default {
         initializeMap();
       }
     });
-    
+
     const updateDarkMode = () => {
       darkMode();
       toggleTheme();
@@ -298,17 +243,147 @@ export default {
       }
 
       if (map.value) {
-    map.value.setOptions({ styles: estilo });
-  } else {
-    // Caso o mapa ainda não tenha sido inicializado, inicialize-o
-    const defaultLocation = { lat: -14.235, lng: -51.9253 };
-    map.value = new google.maps.Map(mapDiv.value!, {
-      center: defaultLocation,
-      zoom: 3,
-      minZoom: 4,
-      styles: estilo,
-    });
-  }
+        map.value.setOptions({ styles: estilo });
+      } else {
+        // Caso o mapa ainda não tenha sido inicializado, inicialize-o
+        const defaultLocation = { lat: -14.235, lng: -51.9253 };
+        map.value = new google.maps.Map(mapDiv.value!, {
+          center: defaultLocation,
+          zoom: 3,
+          minZoom: 4,
+          styles: estilo,
+        });
+      }
+    }
+
+    const initializeMapDark = () => {
+      console.log("chamou aqui")
+      if (markers.length > 0) {
+        clearMarkers();
+        removeCircle();
+      }
+
+      const darkModeStyles = [
+        { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+        {
+          featureType: "administrative.locality",
+          elementType: "labels.text.fill",
+          stylers: [{ color: "#d59563" }],
+        },
+        {
+          featureType: "poi",
+          elementType: "labels.text.fill",
+          stylers: [{ color: "#d59563" }],
+        },
+        {
+          featureType: "poi.park",
+          elementType: "geometry",
+          stylers: [{ color: "#263c3f" }],
+        },
+        {
+          featureType: "poi.park",
+          elementType: "labels.text.fill",
+          stylers: [{ color: "#6b9a76" }],
+        },
+        {
+          featureType: "road",
+          elementType: "geometry",
+          stylers: [{ color: "#38414e" }],
+        },
+        {
+          featureType: "road",
+          elementType: "geometry.stroke",
+          stylers: [{ color: "#212a37" }],
+        },
+        {
+          featureType: "road",
+          elementType: "labels.text.fill",
+          stylers: [{ color: "#9ca5b3" }],
+        },
+        {
+          featureType: "road.highway",
+          elementType: "geometry",
+          stylers: [{ color: "#746855" }],
+        },
+        {
+          featureType: "road.highway",
+          elementType: "geometry.stroke",
+          stylers: [{ color: "#1f2835" }],
+        },
+        {
+          featureType: "road.highway",
+          elementType: "labels.text.fill",
+          stylers: [{ color: "#f3d19c" }],
+        },
+        {
+          featureType: "transit",
+          elementType: "geometry",
+          stylers: [{ color: "#2f3948" }],
+        },
+        {
+          featureType: "transit.station",
+          elementType: "labels.text.fill",
+          stylers: [{ color: "#d59563" }],
+        },
+        {
+          featureType: "water",
+          elementType: "geometry",
+          stylers: [{ color: "#17263c" }],
+        },
+        {
+          featureType: "water",
+          elementType: "labels.text.fill",
+          stylers: [{ color: "#515c6d" }],
+        },
+        {
+          featureType: "water",
+          elementType: "labels.text.stroke",
+          stylers: [{ color: "#17263c" }],
+        },
+      ];
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+
+            map.value = new google.maps.Map(mapDiv.value!, {
+              center: userLocation,
+              zoom: 12,
+              minZoom: 4, // Limite inferior de zoom
+              // @ts-ignore
+              styles: darkModeStyles,
+            });
+            addCurrentLocationMarker(userLocation);
+          },
+          (error) => {
+            // Se a localização não for aceita, inicie o mapa com a localização padrão
+            const defaultLocation = { lat: -14.235, lng: -51.9253 };
+            map.value = new google.maps.Map(mapDiv.value!, {
+              center: defaultLocation,
+              zoom: 3,
+              minZoom: 4, // Limite inferior de zoom
+              // @ts-ignore
+              styles: darkModeStyles,
+            });
+            // Não chama addMarker se a geolocalização falhar
+          }
+        );
+      } else {
+        const defaultLocation = { lat: 2.8266, lng: -60.6623 };
+        map.value = new google.maps.Map(mapDiv.value!, {
+          center: defaultLocation,
+          zoom: 10,
+          minZoom: 4,
+          // @ts-ignore
+          styles: darkModeStyles,
+        });
+      }
     }
 
     const initializeMap = () => {
@@ -320,7 +395,7 @@ export default {
       let estilo = null;
 
       if (isDarkTheme.value) {
-        estilo = darkModeStyles;
+        estilo = updateDarkMode;
       }
 
       if (navigator.geolocation) {
@@ -465,7 +540,7 @@ export default {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
 
 
-      
+
     }
 
     const plotPointOnMap = (userData: any) => {
@@ -803,14 +878,8 @@ export default {
     };
 
     // Observando o valor de `isDarkTheme`
-    // watch(isDarkTheme, (newValue) => {
-    //   console.log("Tema atual:", newValue ? "Escuro" : "Claro");
-      
-    // });
-
-        // Observando o valor de `isDarkTheme`
     watch(isPanelOpen, (newValue) => {
-      console.log('chegou',newValue)
+      console.log('chegou', newValue)
     });
 
     return {
@@ -830,6 +899,7 @@ export default {
       themeClass,
       darkMode,
       updateDarkMode,
+      initializeMapDark,
 
       snackbar,
       snackbarColor,
