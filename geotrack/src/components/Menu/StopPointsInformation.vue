@@ -17,14 +17,19 @@
                                             <p>{{ featureAddress }}</p>
                                         </div>
                                         <p class="date-row">
-                                            Entrada: {{
+                                            {{
                                                 formatDate(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.startDate)
+                                            }}, {{
+                                                formatTime(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.startDate)
+                                            }} - {{
+                                                formatTime(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.endDate)
                                             }}
                                         </p>
-                                        <p class="date-row">
-                                            Saída: {{
-                                                formatDate(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.endDate)
-                                            }}
+                                        <p class="stop-duration">
+                                            Tempo parado: {{
+                                                getStopDuration(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.startDate,
+                                                    stopPoints[index].geoJsonDTO.features[featureIndex].geometry.endDate) }}
+                                            minutos
                                         </p>
                                     </div>
                                 </div>
@@ -109,9 +114,24 @@ const showNextAddress = (index: number) => {
 const formatDate = (date: string) => {
     const parsedDate = new Date(date);
     const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+        day: '2-digit', month: '2-digit', year: 'numeric'
     };
     return parsedDate.toLocaleDateString('pt-BR', options);
+};
+
+const formatTime = (date: string) => {
+    const parsedDate = new Date(date);
+    const options: Intl.DateTimeFormatOptions = {
+        hour: '2-digit', minute: '2-digit'
+    };
+    return parsedDate.toLocaleTimeString('pt-BR', options);
+};
+
+const getStopDuration = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffInMinutes = Math.floor((end.getTime() - start.getTime()) / 60000); // Converte a diferença para minutos
+    return diffInMinutes;
 };
 
 watch(
@@ -227,7 +247,13 @@ ul {
 
 .date-row {
     font-size: 14px;
-    color: #555;
-    margin: 0 0 0 30px;
+    color: #777;
+    margin-left: 30px;
+}
+
+.stop-duration {
+    font-size: 14px;
+    color: #777;
+    margin-left: 30px;
 }
 </style>

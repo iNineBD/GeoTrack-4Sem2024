@@ -62,9 +62,9 @@
     </v-card-actions>
   </v-card>
 
-    <!-- Loading progress circular -->
-  <v-col v-if="loadingPage"  id="loadingStopPoints" class="d-flex justify-center mt-4">
-      <v-progress-circular color="primary" indeterminate></v-progress-circular>
+  <!-- Loading progress circular -->
+  <v-col v-if="loadingPage" id="loadingStopPoints" class="d-flex justify-center mt-4">
+    <v-progress-circular color="primary" indeterminate></v-progress-circular>
   </v-col>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
@@ -181,7 +181,7 @@ export default {
       const cachedDetails = localStorage.getItem('cachedCircleDetails');
       const cachedCircle = JSON.parse(cachedDetails);
 
-      
+
       const selectedArea = this.geoAreas.find(
         (area) => area.id === this.selectedGeoArea.id
       );
@@ -218,19 +218,19 @@ export default {
         return;
       }
 
-            if(this.selectedGeoArea){
-                selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+      if (this.selectedGeoArea) {
+        selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
 
-                if (!selectedArea) {
-                    console.log("Área geográfica não encontrada");
-                    return;
-                }
-            }else{
-                selectedArea = cachedCircle;
-                selectedArea.latitude = selectedArea.center.latitude;
-                selectedArea.longitude = selectedArea.center.longitude;
-                console.log('passooou ', selectedArea)
-            }
+        if (!selectedArea) {
+          console.log("Área geográfica não encontrada");
+          return;
+        }
+      } else {
+        selectedArea = cachedCircle;
+        selectedArea.latitude = selectedArea.center.latitude;
+        selectedArea.longitude = selectedArea.center.longitude;
+        console.log('passooou ', selectedArea)
+      }
 
       const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
 
@@ -282,6 +282,8 @@ export default {
             coords: coord, // Definindo corretamente um array para coordenadas
           };
 
+          console.log("DADOS DA CONSULTA AQUI!!!", dados)
+
           // Dados enviados para plotar o círculo escolhido
           this.$emit("consult", dataCircleAndUser);
           this.$emit("stopPointsReceived", dados);
@@ -289,7 +291,7 @@ export default {
           const errorData = await response.json();
 
           console.log("Erro 404: ", errorData.message);
-          
+
           this.showSnackbar('Dados não localizados para este usuário');
           this.$emit("noPointsFound", errorData.message);
         }
