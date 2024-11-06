@@ -370,6 +370,8 @@ export default {
             coords: coord, // Definindo corretamente um array para coordenadas
           };
 
+          console.log("DADOS DA CONSULTA AQUI!!!", dados)
+
           // Dados enviados para plotar o círculo escolhido
           this.$emit("consult", dataCircleAndUser);
           this.$emit("stopPointsReceived", dados);

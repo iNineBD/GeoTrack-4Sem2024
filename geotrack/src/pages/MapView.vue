@@ -504,12 +504,15 @@ export default {
               });
             }
           });
+          return {success: true, data: geoJsonResponses}
         }
+        console.log("tetstte: ", geoJsonResponses)
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           if (error.response.status === 404) {
             console.log("Erro 404: ", error.response.data.message);
             showSnackbar(error.response.data.message, "error");
+            return {success: false, data: [geoJsonResponses]}
           } else {
             console.error(
               "Erro ao buscar os dados GeoJSON:",
