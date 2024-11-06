@@ -147,7 +147,7 @@ export default {
         // Mapeando a resposta da API para o formato correto
         this.users = data.listUsers.map((user) => ({
           name: user.userName.toUpperCase(), // Nome do usuário
-          deviceId: user.idDevice, // ID do dispositivo associado
+          deviceId: user.idDevice, // ID do dispositivo 
         }));
 
         console.log("Successfully fetched users:", this.users);

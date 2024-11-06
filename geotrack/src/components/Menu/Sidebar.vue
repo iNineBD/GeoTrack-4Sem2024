@@ -61,6 +61,7 @@
       <!-- Botão para GeographicAreasFilter -->
       <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"
         title="Filtro de Áreas Geográficas" color="primary"></v-btn>
+        <v-btn  key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída"></v-btn>
     </v-speed-dial>
   </div>
 </template>
@@ -190,6 +191,10 @@ const goToFilterGeographicAreas = () => {
   }
 };
 
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  router.push({ name: "Login" });
+}
 const handlePanelChange = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
@@ -209,6 +214,8 @@ const handleGeographicAreasFilterClick = () => {
 
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
 .floating-panel {
   position: fixed;
   top: 10px;
@@ -218,5 +225,13 @@ const handleGeographicAreasFilterClick = () => {
   align-items: flex-start;
   max-width: calc(100% - 40px);
   gap: 10px;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+}
+
+.logout-icon {
+  color: #000B62 !important;
 }
 </style>
