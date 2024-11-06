@@ -20,6 +20,9 @@
               <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @removeCircle="handleRemoveCircle"
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
                 @stopPointsReceived="handleStopPointsReceived"  @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"/>
+                <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints" />
+              <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation"
+                :geoStopPoints="geoStopPoints" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -117,6 +120,8 @@ const geoStopPoints = ref<any[]>([]);
 
 const handleFilterData = async (data: FilterData) => {
   const result = await props.onConsult(data);
+
+  console.log("testesssss: ", result)
 
   if (result.success) {
     showStopPointsInformation.value = true;

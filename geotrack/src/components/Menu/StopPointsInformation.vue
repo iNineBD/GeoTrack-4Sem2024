@@ -13,7 +13,7 @@
                                 <div class="address-row">
                                     <div class="address-content">
                                         <div class="location-details">
-                                            <v-icon color="primary" class="location-icon" small>mdi-map-marker</v-icon>
+                                            <v-icon color="secondary" class="location-icon" small>mdi-map-marker</v-icon>
                                             <p>{{ featureAddress }}</p>
                                         </div>
                                         <p class="date-row">
