@@ -70,7 +70,7 @@ onMounted(() => {
   width: 250px;
   padding-bottom: 30px;
   margin: auto;
-  margin-top: 10px; /* Ajuste este valor conforme necessário */
+  margin-top: 06px; /* Ajuste este valor conforme necessário */
 }
 .metric-card {
   width: 100%;
@@ -78,7 +78,7 @@ onMounted(() => {
   padding: 10px;
 }
 .metric-text {
-  font-size: 11px;
+  font-size: 13px;
   color: "primary";
   font-weight: bold;
   text-align: center;
