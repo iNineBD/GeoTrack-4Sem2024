@@ -502,12 +502,8 @@ export default {
                   });
                 }
               });
-              // Não chama addMarker se a geolocalização falhar
-              showSnackbar('Falha ao obter a localização.Usando localização padrão.', 'warning');
             }
           });
-          // Não chama addMarker se geolocalização não estiver disponível
-          showSnackbar('Geolocalização não suportada pelo navegador.', 'error');
         }
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
@@ -648,116 +644,6 @@ export default {
           }
         }
       );
-    };
-
-    const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
-      if (map.value) {
-        new google.maps.Marker({
-          position,
-          map: map.value,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: "#4285F4",
-            fillOpacity: 1,
-            strokeWeight: 2,
-            strokeColor: "#ffffff",
-          },
-          title: "Sua Localização Atual",
-        });
-      }
-    };
-
-    const centerMapOnMarker = (position: google.maps.LatLngLiteral) => {
-      if (map.value) {
-        map.value.panTo(position);
-        map.value.setZoom(15);
-      }
-    };
-
-    const fetchGeoJsonData = async (filterData: FilterData) => {
-      console.log("Filter data recebido:", filterData);
-      try {
-        const requestData = { ...filterData }; // Formato dos dados que você espera no backend
-
-        console.log("dados recebidos:", requestData);
-
-        const response = await axios.post(
-          "http://localhost:8080/stoppoint/find",
-          requestData
-        );
-
-        // Resposta esperada: uma matriz de objetos
-        const geoJsonResponses = response.data;
-        console.log("geoJsonResponses:", geoJsonResponses);
-
-        geoJsonResponses.forEach((item: any) => {
-          const { user, device, geoJsonDTO } = item;
-
-          if (geoJsonDTO.features && geoJsonDTO.features.length > 0) {
-            geoJsonDTO.features.forEach((feature: GeoJsonFeature) => {
-              const coords = feature.geometry.coordinates;
-              if (coords && coords.length >= 2) {
-                localStorage.setItem('cachedLoading', JSON.stringify({ result: false }));
-                const position = { lat: coords[1], lng: coords[0] }; // Coordenadas: lat e lng
-
-                // Gera as iniciais do usuário
-                const initials = user
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((name: string) => name[0])
-                  .join("");
-
-                const marker = new google.maps.Marker({
-                  position,
-                  map: map.value,
-                  label: {
-                    text: initials,
-                    color: "white",
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                  },
-                  icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 15,
-                    fillColor: "#000B62",
-                    fillOpacity: 1,
-                    strokeWeight: 2,
-                    strokeColor: "#ffffff",
-                  },
-                });
-
-                const infoWindow = new google.maps.InfoWindow({
-                  content: `<div>
-                          <strong>Usuário:</strong> ${user}<br>
-                          <strong>Dispositivo:</strong> ${device}<br>
-                          <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
-                         </div>`,
-                });
-
-                google.maps.event.addListener(marker, "click", () => {
-                  infoWindow.open(map.value!, marker);
-                });
-
-                google.maps.event.addListener(map.value, "click", () => {
-                  infoWindow.close();
-                });
-
-                centerMapOnMarker(position);
-              }
-            });
-          } else {
-            showSnackbar('Nenhum dado GeoJSON disponível para o usuário', 'warning');
-            console.warn("Nenhum dado GeoJSON disponível para o usuário:", user);
-          }
-        });
-
-        // Retorna sucesso se dados válidos foram encontrados
-        return { success: true, data: geoJsonResponses };
-      } catch (error) {
-        showSnackbar('Nenhuma localização encontrada para este período', 'error');
-        return { success: false, data: [] }; // Retorna falha em caso de erro
-      }
     };
 
     const enableCircleDrawing = () => {
