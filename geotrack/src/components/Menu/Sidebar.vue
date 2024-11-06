@@ -61,6 +61,7 @@
       <!-- Botão para GeographicAreasFilter -->
       <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"
         title="Filtro de Áreas Geográficas" color="primary"></v-btn>
+        <v-btn  key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída"></v-btn>
     </v-speed-dial>
   </div>
 </template>
