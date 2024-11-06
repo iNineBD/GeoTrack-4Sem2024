@@ -1,43 +1,98 @@
 <template>
   <div class="floating-panel">
-    <v-container width="400px" class="panel-container" style="padding: 0px;">
-      <v-expansion-panels v-model="panel" rounded="xl" elevation="4">
+    <v-container width="400px" class="panel-container" style="padding: 0px">
+      <v-expansion-panels v-model="panel" rounded="xl" elevation="4" color="primary">
         <v-expansion-panel>
           <template v-slot:title>
             <v-row class="panel-header" justify="center" align="center">
               <v-img :src="logo" height="30" class="icon" />
             </v-row>
           </template>
-          <v-expansion-panel-text style="padding: 0px;">
-            <v-container width="400px" class="filter-container" style="padding: 0px;">
+          <v-expansion-panel-text style="padding: 0px" >
+            <v-container
+              width="400px"
+              class="filter-container"
+              style="padding: 0px"
+            >
               <v-divider :thickness="2" />
-              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"/>
-              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsReceived"/>
+              <!-- Exibe o filtro correto com base na rota -->
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"/>
+              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @removeCircle="handleRemoveCircle"
+                @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
+                @stopPointsReceived="handleStopPointsReceived"  @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"/>
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
 
-    <v-speed-dial v-model="dial" location="bottom center" transition="scale-transition" class="speed-dial">
+    <v-speed-dial
+      v-model="dial"
+      location="bottom center"
+      transition="scale-transition"
+      class="speed-dial"
+    >
       <template v-slot:activator="{ props: activatorProps }">
-        <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4"></v-btn>
+        <v-btn
+          v-bind="activatorProps"
+          icon="mdi-menu"
+          large
+          elevation="4"
+          color="primary"
+        ></v-btn>
       </template>
 
-      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker" title="Filtro de Pontos de Parada"></v-btn>
-      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search" title="Filtro de Áreas Geográficas"></v-btn>
-      <v-btn  key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída"></v-btn>
+      <!-- Botão para StopPointsFilter -->
+
+      <v-btn
+        key="map-marker"
+        @click="logo === '/src/assets/LogoWhite.svg' ? initializeMapDark() : initializeMap()"
+        icon="mdi-home"
+        title="Home"
+        color="primary"
+      ></v-btn>
+
+      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"
+        title="Filtro de Pontos de Parada" color="primary"></v-btn>
+
+      <!-- Botão para GeographicAreasFilter -->
+      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"
+        title="Filtro de Áreas Geográficas" color="primary"></v-btn>
     </v-speed-dial>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
-//@ts-ignore
-import MapView, { FilterData } from "@/pages/MapView.vue";
+import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
+import { eventBus } from '@/utils/EventBus'; // Verifique se está importado corretamente
+
+const panel = ref([]);
+const dial = ref(false);
+const route = useRoute();
+const router = useRouter();
+const emit = defineEmits(["initializeMap", "removeCircle","initializeMapDark"]);
+const logo = ref("/src/assets/Logo.svg");
+
+
+onMounted(() => {
+  eventBus.on("changeLogo", updateLogo);
+});
+
+onUnmounted(() => {
+  eventBus.off("changeLogo", updateLogo);
+});
+
+const toggleDial = () => {
+  dial.value = !dial.value;
+};
+
+const updateLogo = () => {
+  logo.value = logo.value === "/src/assets/Logo.svg" ? "/src/assets/LogoWhite.svg" : "/src/assets/Logo.svg";
+};
 
 // Definindo as props
 const props = defineProps<{
@@ -55,6 +110,10 @@ const handleDrawCircle = () => {
   props.onDrawCircle();
 };
 
+const handleRemoveCircle = () => {
+  emit('removeCircle');
+};
+
 const handleGeographicAreaConsult = (data: FilterData) => {
   console.log("Dados recebidos do GeographicAreasFilter:", data);
   props.onGeographicAreaConsult(data);
@@ -65,29 +124,39 @@ const handleStopPointsReceived = (stopPoints: any) => {
   props.onStopPointsReceived(stopPoints);
 };
 
-const logo = "/src/assets/Logo.svg";
-const panel = ref([]);
-const dial = ref(false);
+const initializeMap = () => {
+  console.log('Aquiiiiiiiiiiiii')
+  emit("initializeMap");
+};
 
-const route = useRoute();
-const router = useRouter();
-
-const toggleDial = () => {
-  dial.value = !dial.value;
+const initializeMapDark = () => {
+  console.log('Aquiiiiiiiiiiiii novo')
+  emit("initializeMapDark");
 };
 
 const goToFilterStopPoints = () => {
   router.push("/stoppointsfilter");
   //@ts-ignore
-  panel.value = 0; // Define o primeiro painel como aberto
+  panel.value = [0];
   toggleDial();
+
+  if(logo.value === "/src/assets/Logo.svg"){
+    emit("initializeMap");
+  }else{
+    emit("initializeMapDark");
+  }
 };
 
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
-  //@ts-ignore
-  panel.value = 0; // Define o primeiro painel como aberto
+    //@ts-ignore
+  panel.value = [0];
   toggleDial();
+  if(logo.value === "/src/assets/Logo.svg"){
+    emit("initializeMap");
+  }else{
+    emit("initializeMapDark");
+  }
 };
 
 const handleLogout = () => {
@@ -96,6 +165,7 @@ const handleLogout = () => {
 };
 
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
