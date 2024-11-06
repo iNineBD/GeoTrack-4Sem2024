@@ -69,8 +69,9 @@
 </template>
 
 <script>
-import { load } from "ol/Image";
-import { fa, tr } from "vuetify/locale";
+import { load } from 'ol/Image';
+import { fa } from 'vuetify/locale';
+import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import { eventBus } from '@/utils/EventBus';
 
 export default {
@@ -102,12 +103,13 @@ export default {
     selectedQuickFilter: null,
     dateInputDisabled: false,
 
-
     snackbar: false,
     snackbarColor: "success",
     snackbarMessage: "",
 
   }),
+
+  emits: ['consult'],
 
   mounted() {
     this.fetchUsers();
@@ -184,6 +186,13 @@ export default {
 
       console.log("Dados enviados:", requestData);
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
+
+      // Simulação do retorno dos postos de parada
+      setTimeout(() => {
+        this.showStopPointsInformation = true;  // Exibe o novo componente
+        this.loadingPage = false;
+      }, 2000); // Simulando o tempo de resposta
+
     },
 
     clearFields() {

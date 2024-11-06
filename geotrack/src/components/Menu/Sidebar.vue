@@ -5,7 +5,7 @@
         <v-expansion-panel>
           <template v-slot:title>
             <v-row class="panel-header" justify="center" align="center">
-              <v-img :src="logo" height="30" class="icon" />
+              <v-img :src="logo" height="35" class="icon" />
             </v-row>
           </template>
           <v-expansion-panel-text style="padding: 0px" >
@@ -20,6 +20,9 @@
               <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @removeCircle="handleRemoveCircle"
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
                 @stopPointsReceived="handleStopPointsReceived"  @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"/>
+                <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints" />
+              <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation"
+                :geoStopPoints="geoStopPoints" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -66,6 +69,8 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
+import StopPointsInformation from '../Menu/StopPointsInformation.vue';
+import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
 import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 import { eventBus } from '@/utils/EventBus'; // Verifique se está importado corretamente
@@ -96,14 +101,37 @@ const updateLogo = () => {
 
 // Definindo as props
 const props = defineProps<{
-  onConsult: (data: FilterData) => void;
+  onConsult: (data: FilterData) => any;
   onDrawCircle: () => void;
-  onGeographicAreaConsult: (data: FilterData) => void;
+  onGeographicAreaConsult: (data: FilterData) => any;
   onStopPointsReceived: (stopPoints: any) => void;
 }>();
 
-const handleFilterData = (data: FilterData) => {
-  props.onConsult(data);
+interface StopPoint {
+  device: string;
+  user: string;
+  geoJsonDTO: any;
+}
+
+const showStopPointsInformation = ref(false);
+const stopPoints = ref<StopPoint[]>([]);
+const showGeographicStopPointsInformation = ref(false);
+const geoStopPoints = ref<any[]>([]);
+
+const handleFilterData = async (data: FilterData) => {
+  const result = await props.onConsult(data);
+
+  console.log("testesssss: ", result)
+
+  if (result.success) {
+    showStopPointsInformation.value = true;
+    stopPoints.value = result.data;
+    console.log("Aqui está os pontos salvos: ", stopPoints.value)
+  } else {
+    showStopPointsInformation.value = false;
+    stopPoints.value = [];
+    console.log("Aqui está a lista vazia: ", stopPoints.value)
+  }
 };
 
 const handleDrawCircle = () => {
@@ -121,6 +149,9 @@ const handleGeographicAreaConsult = (data: FilterData) => {
 
 const handleStopPointsReceived = (stopPoints: any) => {
   console.log("Pontos de parada recebidos do GeographicAreasFilter:", stopPoints);
+  console.log("RESULT:", stopPoints)
+  geoStopPoints.value = stopPoints;
+  showGeographicStopPointsInformation.value = true;
   props.onStopPointsReceived(stopPoints);
 };
 
@@ -162,6 +193,20 @@ const goToFilterGeographicAreas = () => {
 const handleLogout = () => {
   localStorage.removeItem("token");
   router.push({ name: "Login" });
+}
+const handlePanelChange = () => {
+  showStopPointsInformation.value = false;
+  showGeographicStopPointsInformation.value = false;
+};
+
+const handleStopPointsFilterClick = () => {
+  goToFilterStopPoints();
+  handlePanelChange();
+};
+
+const handleGeographicAreasFilterClick = () => {
+  goToFilterGeographicAreas();
+  handlePanelChange();
 };
 
 </script>
