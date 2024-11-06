@@ -93,10 +93,15 @@ export default {
           email: email.value,
           password: password.value,
         });
+
         snackbarMessage.value = 'Usuário cadastrado com sucesso!';
         snackbarColor.value = 'success';
         snackbar.value = true;
-        router.push('/');
+        setTimeout(() => {
+          router.push('/');
+        }, 3000);
+        
+
       } catch (error) {
         snackbarMessage.value = error.response?.data?.message || 'Erro ao cadastrar usuário';
         snackbarColor.value = 'error';
