@@ -7,7 +7,7 @@
                     <span class="device-name"><strong>{{ geoStopPoints.device.toUpperCase() }}</strong></span>
                 </div>
                 <ul class="stop-points-list">
-                    <li v-for="(coord, coordIndex) in geoStopPoints.coords" :key="coordIndex">
+                    <li v-for="(coord, coordIndex) in geoStopPoints.coords" :key="coordIndex" @click="navigateToStopPoint(coord)">
                         <div class="address-row">
                             <div class="address-content">
                                 <div class="location-details">
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, watch, ref } from 'vue';
+import { defineProps, watch, ref, defineEmits } from 'vue';
 import axios from 'axios';
 
 const props = defineProps<{
@@ -47,6 +47,10 @@ const props = defineProps<{
             endDate: string;
         }>;
     }
+}>();
+
+const emit = defineEmits<{
+    (e: 'navigate-to-stop-point', coordinates: [number, number]): void;
 }>();
 
 const addresses = ref<string[][]>([]);
@@ -103,6 +107,11 @@ const calculateStopDuration = (startDate: string, endDate: string) => {
     const durationMinutes = Math.floor((end.getTime() - start.getTime()) / (1000 * 60));
 
     return `${durationMinutes} minuto${durationMinutes !== 1 ? 's' : ''}`;
+};
+
+const navigateToStopPoint = (coord: { latitude: number; longitude: number }) => {
+    console.log("ESTOU AQUII!!", coord.latitude, coord.longitude)
+    emit('navigate-to-stop-point', [coord.latitude, coord.longitude]);
 };
 
 watch(

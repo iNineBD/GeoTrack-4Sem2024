@@ -14,7 +14,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-        }}</v-icon>
+      }}</v-icon>
     </template>
   </v-switch>
 
@@ -144,8 +144,57 @@ export default {
       if (mapDiv.value) {
         initializeDrawingManager();
         initializeMap();
+
+        eventBus.on("navigateToLocation", (coordinates: [number, number]) => {
+          navigateToLocation(coordinates);
+        });
+
+        eventBus.on("navigateGeoToLocation", (coords: [number, number]) => {
+          navigateGeoToLocation(coords);
+        });
       }
     });
+
+    const navigateToLocation = (coordinates: [number, number]) => {
+      if (map.value) {
+        const [latitude, longitude] = coordinates;
+        const newPosition = new google.maps.LatLng(longitude, latitude);
+
+        map.value.panTo(newPosition);
+        let currentZoom = map.value.getZoom();
+        const targetZoom = 16;
+
+        const zoomIn = setInterval(() => {
+          if (currentZoom < targetZoom) {
+            currentZoom += 1;
+            map.value.setZoom(currentZoom);
+          } else {
+            clearInterval(zoomIn);  // Finaliza a animação de zoom
+          }
+        }, 20);
+      }
+    };
+
+    const navigateGeoToLocation = (coords: [number, number]) => {
+      console.log("CHEGOUU AQUI", coords)
+      if (map.value) {
+        const [latitude, longitude] = coords;
+        const newPosition = new google.maps.LatLng(latitude, longitude);
+
+        map.value.panTo(newPosition);
+        let currentZoom = map.value.getZoom();
+        const targetZoom = 16;
+
+        const zoomIn = setInterval(() => {
+          if (currentZoom < targetZoom) {
+            currentZoom += 1;
+            map.value.setZoom(currentZoom);
+          } else {
+            clearInterval(zoomIn);  // Finaliza a animação de zoom
+          }
+        }, 20);
+      }
+    };
 
     const updateDarkMode = () => {
       darkMode();
@@ -504,7 +553,7 @@ export default {
               });
             }
           });
-          return {success: true, data: geoJsonResponses}
+          return { success: true, data: geoJsonResponses }
         }
         console.log("tetstte: ", geoJsonResponses)
       } catch (error) {
@@ -512,7 +561,7 @@ export default {
           if (error.response.status === 404) {
             console.log("Erro 404: ", error.response.data.message);
             showSnackbar(error.response.data.message, "error");
-            return {success: false, data: [geoJsonResponses]}
+            return { success: false, data: [geoJsonResponses] }
           } else {
             console.error(
               "Erro ao buscar os dados GeoJSON:",
@@ -541,10 +590,7 @@ export default {
 
     function toggleTheme(): void {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
-
-
-
-    }
+    };
 
     const plotPointOnMap = (userData: any) => {
       const position = {

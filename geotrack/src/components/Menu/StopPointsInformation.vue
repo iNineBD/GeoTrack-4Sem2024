@@ -9,7 +9,7 @@
                             <span class="device-name"><strong>{{ stopPoints[index].device }}</strong></span>
                         </div>
                         <ul class="stop-points-list">
-                            <li v-for="(featureAddress, featureIndex) in displayedAddresses[index]" :key="featureIndex">
+                            <li v-for="(featureAddress, featureIndex) in displayedAddresses[index]" :key="featureIndex" @click="goToLocation(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.coordinates)">
                                 <div class="address-row">
                                     <div class="address-content">
                                         <div class="location-details">
@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, watch } from 'vue';
+import { defineProps, ref, watch, defineEmits } from 'vue';
 import axios from 'axios';
 
 const props = defineProps<{
@@ -73,6 +73,10 @@ const props = defineProps<{
             }>;
         };
     }>;
+}>();
+
+const emit = defineEmits<{
+    (event: 'go-to-location', coordinates: [number, number]): void;
 }>();
 
 const addresses = ref<string[][]>([]);
@@ -132,6 +136,10 @@ const getStopDuration = (startDate: string, endDate: string) => {
     const end = new Date(endDate);
     const diffInMinutes = Math.floor((end.getTime() - start.getTime()) / 60000); // Converte a diferença para minutos
     return diffInMinutes;
+};
+
+const goToLocation = (coordinates: [number, number]) => {
+    emit('go-to-location', coordinates);
 };
 
 watch(

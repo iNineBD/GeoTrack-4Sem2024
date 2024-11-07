@@ -127,6 +127,7 @@ export default {
     stopIsLoading() {
       this.loading = false;
     },
+
     change(){
       this.update = true
     },
