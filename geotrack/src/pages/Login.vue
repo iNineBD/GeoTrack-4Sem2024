@@ -1,14 +1,22 @@
 <template>
   <v-container fluid class="login-container pa-0">
-    <v-row no-gutters style="height: 100%">
-      <v-col class="blue-section" cols="12">
+    <v-row class="row">
+      <v-col class="blue-section custom-col" cols="6">
         <v-card class="login-card" elevation="2">
           <div class="logo-container">
-            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-2">
+            <img
+              :src="logoGeoTrack"
+              alt="GeoTrack Logo"
+              class="main-logo mb-2"
+            />
           </div>
-          <v-card-title class="text-h5 font-weight-bold text-center">Entre na sua conta</v-card-title>
+          <v-card-title class="text-h5 font-weight-bold text-center"
+            >Entre na sua conta</v-card-title
+          >
           <v-card-text>
-            <p class="subtitle-1 mb-4 text-body-2 text-center">Preencha os campos abaixo</p>
+            <p class="subtitle-1 mb-4 text-body-2 text-center">
+              Preencha os campos abaixo
+            </p>
             <v-form @submit.prevent="handleLogin">
               <v-text-field
                 v-model="email"
@@ -17,9 +25,9 @@
                 class="login-input mb-2"
                 variant="outlined"
                 density="comfortable"
-                style="width: 300px;"
+                style="width: 300px"
               ></v-text-field>
-              
+
               <v-text-field
                 v-model="password"
                 label="Digite sua senha"
@@ -30,12 +38,7 @@
                 density="comfortable"
               ></v-text-field>
 
-              <v-btn 
-                type="submit" 
-                block 
-                class="login-btn"
-                size="large"
-              >
+              <v-btn type="submit" block class="login-btn" size="large">
                 Entrar
               </v-btn>
 
@@ -46,68 +49,59 @@
           </v-card-text>
 
           <div class="partner-logos mt-6">
-            <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo">
-            <img :src="logoInine" alt="INine Logo" class="partner-logo">
+            <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo" />
+            <img :src="logoInine" alt="INine Logo" class="partner-logo" />
           </div>
         </v-card>
       </v-col>
-    </v-row>
 
-    <v-snackbar
-      v-model="snackbar" :color="snackbarColor" timeout="3000" top class="text-center">
+      <v-col class="yellow-section custom-col" cols="6"> </v-col>
+    </v-row>
+    <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
       {{ snackbarMessage }}
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="white"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Fechar
-        </v-btn>
-      </template>
     </v-snackbar>
   </v-container>
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
-import logoGeoTrack from '../assets/GeoTrack-logo.png';
-import logoIto1 from '../assets/ito1-logo.png';
-import logoInine from '../assets/inine-logo.png';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
+import logoGeoTrack from "../assets/GeoTrack-logo.png";
+import logoIto1 from "../assets/ito1-logo.png";
+import logoInine from "../assets/inine-logo.png";
 
 export default {
-  name: 'Login',
+  name: "Login",
   setup() {
-    const email = ref('');
-    const password = ref('');
+    const email = ref("");
+    const password = ref("");
     const router = useRouter();
 
     const snackbar = ref(false);
-    const snackbarMessage = ref('');
-    const snackbarColor = ref('');
+    const snackbarMessage = ref("");
+    const snackbarColor = ref("");
 
     const handleLogin = async () => {
       try {
-        const response = await axios.post('http://localhost:8080/auth/login', {
+        const response = await axios.post("http://localhost:8080/auth/login", {
           email: email.value,
           password: password.value,
         });
-        
+
         console.info("Login bem-sucedido:", response.data);
-        localStorage.setItem('token', response.data.token);
-        
+        localStorage.setItem("token", response.data.token);
+
         snackbarMessage.value = "Login bem-sucedido!";
         snackbarColor.value = "success";
         snackbar.value = true;
 
-        router.push('/stoppointsfilter'); 
+        router.push("/stoppointsfilter");
       } catch (error) {
         console.error("Erro no login:", error.response?.data || error.message);
 
-        snackbarMessage.value = error.response?.data?.message || 'Erro desconhecido no login';
+        snackbarMessage.value =
+          error.response?.data?.message || "Erro desconhecido no login";
         snackbarColor.value = "error";
         snackbar.value = true;
       }
@@ -129,26 +123,49 @@ export default {
 </script>
 
 <style scoped>
+
+.custom-col {
+  flex: 1 1 auto;
+  max-width: 100%; /* Ajusta para a largura completa disponível */
+}
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 100%;
+  margin: 0;
+  flex-direction: row;
+}
 .login-container {
   height: 100vh;
-  background-color: white;
+  background-color: #ffffff;
+  flex-direction: column;
 }
 
 .blue-section {
-  background-image: url('../assets/image-sjc.png');
-  background-size: cover;
-  background-position: center;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
-  height: 100vh; 
+  margin: 10px;
+  border-radius: 20px;
+}
+
+.yellow-section {
+  background-image:  url("../assets/universe.png");
+  background-position: center;
+  background-size: cover;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  border-radius: 20px;
 }
 
 .login-card {
   background: white !important;
-  width: min(90vw, 450px); 
-  padding: 2vw; 
+  width: min(90vw, 450px);
+  padding: 2vw;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -200,7 +217,7 @@ export default {
 }
 
 .login-btn {
-  background-color: #2B81C4 !important;
+  background-color: #2b81c4 !important;
   color: white;
   height: 48px;
   font-weight: bold;
