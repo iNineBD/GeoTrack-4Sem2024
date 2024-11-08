@@ -176,7 +176,6 @@ export default {
     };
 
     const navigateGeoToLocation = (coords: [number, number]) => {
-      console.log("CHEGOUU AQUI", coords)
       if (map.value) {
         const [latitude, longitude] = coords;
         const newPosition = new google.maps.LatLng(latitude, longitude);

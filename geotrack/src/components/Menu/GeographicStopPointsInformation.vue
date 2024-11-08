@@ -1,32 +1,39 @@
 <template>
-    <v-card class="stop-points-card" width="400px" height="250px" rounded="xl" elevation="4">
-        <v-col class="scrollable-container">
+    <v-card class="stop-points-card" width="400px" height="300px" rounded="xl" elevation="4">
+        <v-col class="scrollable-container" cols="12">
             <template v-if="geoStopPoints && Object.keys(geoStopPoints).length > 0">
-                <div class="header-row">
-                    <h5 class="user-name"><strong>{{ getUserInitials(geoStopPoints.userName) }}</strong></h5>
-                    <span class="device-name"><strong>{{ geoStopPoints.device.toUpperCase() }}</strong></span>
-                </div>
-                <ul class="stop-points-list">
-                    <li v-for="(coord, coordIndex) in geoStopPoints.coords" :key="coordIndex" @click="navigateToStopPoint(coord)">
-                        <div class="address-row">
-                            <div class="address-content">
-                                <div class="location-details">
-                                    <v-icon color="secondary" class="location-icon" small>mdi-map-marker</v-icon>
-                                    <p>{{ displayedAddresses[coordIndex] }}</p>
-                                </div>
-                                <p class="date-row">
+                <v-sheet color="primary_light" class="header-row pa-2 mb-2" rounded>
+                    <v-row align="center" justify="space-between">
+                        <span class="user-name" style="font-weight: bold;">{{ getUserInitials(geoStopPoints.userName) }}</span>
+                        <span class="device-name" style="font-weight: bold;">{{ geoStopPoints.device.toUpperCase() }}</span>
+                    </v-row>
+                </v-sheet>
+                <v-list dense>
+                    <v-list-item v-for="(coord, coordIndex) in geoStopPoints.coords" :key="coordIndex" @click="navigateToStopPoint(coord)" class="address-row pa-2 mb-2" rounded>
+                        <v-row no-gutters align="center">
+                            <v-col cols="auto">
+                                <v-icon color="secondary" class="mr-2">mdi-map-marker</v-icon>
+                            </v-col>
+                            <v-col>
+                                <v-list-item-title class="text-wrap">
+                                    {{ displayedAddresses[coordIndex] }}
+                                </v-list-item-title>
+                                <v-list-item-subtitle class="text-wrap">
                                     {{ formatDateRange(coord.startDate, coord.endDate) }}
-                                </p>
-                                <p class="date-row">
+                                </v-list-item-subtitle>
+                                <v-list-item-subtitle class="text-wrap">
                                     Tempo parado: {{ calculateStopDuration(coord.startDate, coord.endDate) }}
-                                </p>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
+                                </v-list-item-subtitle>
+                            </v-col>
+                        </v-row>
+                    </v-list-item>
+                </v-list>
             </template>
             <template v-else>
-                <p style="text-align: center;">Nenhum ponto de parada encontrado.</p>
+                <v-row justify="center" align="center">
+                    <v-icon color="grey">mdi-alert</v-icon>
+                    <span>Nenhum ponto de parada encontrado.</span>
+                </v-row>
             </template>
         </v-col>
     </v-card>
@@ -127,13 +134,7 @@ watch(
     border-radius: 0;
     position: fixed;
     margin-top: 15px;
-}
-
-.scrollable-container {
-    padding: 10px;
-    background-color: white;
     overflow-y: auto;
-    max-height: 250px;
 }
 
 .header-row {
@@ -207,5 +208,10 @@ ul {
     font-size: 14px;
     color: #777;
     margin-left: 30px;
+}
+
+.text-wrap {
+    white-space: normal;
+    word-wrap: break-word;
 }
 </style>

@@ -34,12 +34,11 @@
       </template>
 
       <!-- Botão para Home -->
-      <v-btn key="map-marker" @click="logo === '/src/assets/LogoWhite.svg' ? initializeMapDark() : initializeMap()"
-        icon="mdi-home" title="Home" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleHomeClick" icon="mdi-home" title="Home" color="primary"></v-btn>
 
       <!-- Botão para StopPointsFilter -->
-      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker" title="Filtro de Pontos de Parada"
-        color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker"
+        title="Filtro de Pontos de Parada" color="primary"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
       <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search"
@@ -70,6 +69,7 @@ const logo = ref("/src/assets/Logo.svg");
 
 onMounted(() => {
   eventBus.on("changeLogo", updateLogo);
+  eventBus.on("clearStopPointsInformation", clearStopPointsInformation);
 });
 
 onUnmounted(() => {
@@ -102,6 +102,12 @@ const showStopPointsInformation = ref(false);
 const stopPoints = ref<StopPoint[]>([]);
 const showGeographicStopPointsInformation = ref(false);
 const geoStopPoints = ref<any[]>([]);
+
+const clearStopPointsInformation = () => {
+  showStopPointsInformation.value = false;
+  showGeographicStopPointsInformation.value = false;
+};
+
 
 const handleFilterData = async (data: FilterData) => {
   const result = await props.onConsult(data);
@@ -141,12 +147,10 @@ const handleStopPointsReceived = (stopPoints: any) => {
 };
 
 const initializeMap = () => {
-  console.log('Aquiiiiiiiiiiiii')
   emit("initializeMap");
 };
 
 const initializeMapDark = () => {
-  console.log('Aquiiiiiiiiiiiii novo')
   emit("initializeMapDark");
 };
 
@@ -194,6 +198,18 @@ const handleGeographicAreasFilterClick = () => {
   goToFilterGeographicAreas();
   handlePanelChange();
 };
+
+const handleHomeClick = () => {
+  handlePanelChange();
+  clearStopPointsInformation();
+  eventBus.emit("clearFields");
+
+  if (logo.value === '/src/assets/LogoWhite.svg') {
+    initializeMapDark();
+  } else {
+    initializeMap();
+  }
+}
 
 // navigateToLocation é para ir até os pontos do filtro de usuários
 const navigateToLocation = (coordinates: [number, number]) => {
