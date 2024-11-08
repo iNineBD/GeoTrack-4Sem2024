@@ -2,7 +2,7 @@
   <v-container fluid class="login-container pa-0">
     <v-row class="row">
       <v-col class="blue-section custom-col" cols="6">
-        <v-card class="login-card" elevation="2">
+        <v-card class="login-card" >
           <div class="logo-container">
             <img
               :src="logoGeoTrack"
@@ -54,8 +54,6 @@
           </div>
         </v-card>
       </v-col>
-
-      <v-col class="yellow-section custom-col" cols="6"> </v-col>
     </v-row>
     <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
       {{ snackbarMessage }}
@@ -126,19 +124,15 @@ export default {
 
 .custom-col {
   flex: 1 1 auto;
-  max-width: 100%; /* Ajusta para a largura completa disponível */
+  max-width: 100%;
 }
 
-.row {
-  display: flex;
-  flex-wrap: nowrap;
-  height: 100%;
-  margin: 0;
-  flex-direction: row;
-}
 .login-container {
   height: 100vh;
-  background-color: #ffffff;
+  background-image: url('../assets/terra1.png');
+  background-position: center;
+  background-size: cover;
+  display: flex;
   flex-direction: column;
 }
 
@@ -151,25 +145,27 @@ export default {
 }
 
 .yellow-section {
-  background-image:  url("../assets/universe.png");
+
+  background-image: url('../assets/terra.gif');
   background-position: center;
-  background-size: cover;
-  background-color: #ffffff;
+  
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 10px;
+ 
   border-radius: 20px;
+  background-color: #ffffff;
 }
 
 .login-card {
   background: white !important;
   width: min(90vw, 450px);
   padding: 2vw;
-  border-radius: 8px;
+  border-radius: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: 0;
 }
 
 .logo-container {

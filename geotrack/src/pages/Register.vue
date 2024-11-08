@@ -133,7 +133,7 @@ export default {
 }
 
 .blue-section {
-  background-image: url('../assets/image-sjc.png');
+  background-image: url('../assets/terra1.png');
   background-size: cover;
   background-position: center;
   display: flex;
@@ -188,7 +188,7 @@ export default {
   background: white !important;
   width: min(90vw, 450px); 
   padding: 2vw; 
-  border-radius: 8px;
+  border-radius: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
