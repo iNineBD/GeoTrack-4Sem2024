@@ -1,9 +1,10 @@
 <template>
-  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; " color="primary">
+  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; "
+    color="primary">
     <v-col style="padding: 20px 20px 0 20px;">
       <!-- Users selection -->
       <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
-        prepend-icon="mdi-filter-variant" chips clearable multiple color="primary">
+        prepend-icon="mdi-filter-variant" chips clearable multiple color="secondary">
         <template v-slot:selection="{ attrs, item, select, selected }">
           <v-chip v-bind="attrs" :model-value="selected" closable @click="select" @click:close="remove(item)">
           </v-chip>
@@ -11,30 +12,15 @@
       </v-combobox>
 
       <!-- Date selection -->
-      <v-date-input
-        v-model="date"
-        label="Selecione o período"
-        multiple="range"
-        color="secondary"
-        :max="today"
-        :locale="locale"
-        :format="customDateFormat"
-        placeholder="dd/MM/yyyy"
-        :readonly="dateInputDisabled"
-      ></v-date-input>
+      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="secondary" :max="today"
+        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
+        :readonly="dateInputDisabled"></v-date-input>
 
       <!-- Quick date filters using chips -->
       <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
-        <v-chip
-          v-for="(filter, index) in quickFilters"
-          :key="filter.label"
-          @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
-          :active="selectedQuickFilter === index"
-          filter
-          variant="flat"
-          size="small"
-        >
+        <v-chip v-for="(filter, index) in quickFilters" :key="filter.label" @click="setQuickFilter(filter.range, index)"
+          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
+          filter variant="flat" size="small">
           {{ filter.label }}
         </v-chip>
       </v-col>
@@ -43,8 +29,8 @@
     <v-card-actions class="d-flex" style="padding: 20px 20px 10px 20px">
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary" size="large"
-            variant="flat" block rounded="xl" @click="handleConsult">
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary"
+            size="large" variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
@@ -106,7 +92,6 @@ export default {
     snackbar: false,
     snackbarColor: "success",
     snackbarMessage: "",
-
   }),
 
   emits: ['consult'],
@@ -115,6 +100,7 @@ export default {
     this.fetchUsers();
     eventBus.on('stopIsLoading', this.stopIsLoading);
     eventBus.on("changeLogo", this.change);
+    eventBus.on("clearFields", this.clearFields);
   },
 
   computed: {
@@ -127,7 +113,8 @@ export default {
     stopIsLoading() {
       this.loading = false;
     },
-    change(){
+
+    change() {
       this.update = true
     },
 
@@ -166,7 +153,7 @@ export default {
 
       const qtddias = Math.round(
         (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
-          (1000 * 60 * 60 * 24)
+        (1000 * 60 * 60 * 24)
       );
 
       if (qtddias > 31) {
@@ -201,11 +188,11 @@ export default {
       this.devices = [];
       this.selectedQuickFilter = null;
 
-      console.log("Hora de limpar: ", this.update)
-      if(this.update){
+      if (this.update) {
         this.$emit("initializeMapDark");
-      }else{
+      } else {
         this.$emit("initializeMap");
+        eventBus.emit("clearStopPointsInformation");
       }
     },
 

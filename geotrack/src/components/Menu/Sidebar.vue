@@ -8,60 +8,44 @@
               <v-img :src="logo" height="35" class="icon" />
             </v-row>
           </template>
-          <v-expansion-panel-text style="padding: 0px" >
-            <v-container
-              width="400px"
-              class="filter-container"
-              style="padding: 0px"
-            >
+          <v-expansion-panel-text style="padding: 0px">
+            <v-container width="400px" class="filter-container" style="padding: 0px">
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
-              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData" @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"/>
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"
+                @initializeMap="initializeMap" @initializeMapDark="initializeMapDark" />
               <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @removeCircle="handleRemoveCircle"
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
-                @stopPointsReceived="handleStopPointsReceived"  @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"/>
-                <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints" />
-              <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation"
-                :geoStopPoints="geoStopPoints" />
+                @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
+                @initializeMapDark="initializeMapDark" />
+              <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints"
+                @go-to-location="navigateToLocation" />
+              <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
+                @navigate-to-stop-point="navigateGeoToLocation" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
 
-    <v-speed-dial
-      v-model="dial"
-      location="bottom center"
-      transition="scale-transition"
-      class="speed-dial"
-    >
+    <v-speed-dial v-model="dial" location="bottom center" transition="scale-transition" class="speed-dial">
       <template v-slot:activator="{ props: activatorProps }">
-        <v-btn
-          v-bind="activatorProps"
-          icon="mdi-menu"
-          large
-          elevation="4"
-          color="primary"
-        ></v-btn>
+        <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4" color="primary"></v-btn>
       </template>
 
+      <!-- Botão para Home -->
+      <v-btn key="map-marker" @click="handleHomeClick" icon="mdi-home" title="Home" color="primary"></v-btn>
+
       <!-- Botão para StopPointsFilter -->
-
-      <v-btn
-        key="map-marker"
-        @click="logo === '/src/assets/LogoWhite.svg' ? initializeMapDark() : initializeMap()"
-        icon="mdi-home"
-        title="Home"
-        color="primary"
-      ></v-btn>
-
-      <v-btn key="map-marker" @click="goToFilterStopPoints" icon="mdi-map-marker"
+      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker"
         title="Filtro de Pontos de Parada" color="primary"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
-      <v-btn key="map-marker" @click="goToFilterGeographicAreas" icon="mdi-map-search"
+      <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search"
         title="Filtro de Áreas Geográficas" color="primary"></v-btn>
-        <v-btn  key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída"></v-btn>
+
+      <!-- Botão para Sair -->
+      <v-btn key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída"></v-btn>
     </v-speed-dial>
   </div>
 </template>
@@ -80,12 +64,12 @@ const panel = ref([]);
 const dial = ref(false);
 const route = useRoute();
 const router = useRouter();
-const emit = defineEmits(["initializeMap", "removeCircle","initializeMapDark"]);
+const emit = defineEmits(["initializeMap", "removeCircle", "initializeMapDark"]);
 const logo = ref("/src/assets/Logo.svg");
-
 
 onMounted(() => {
   eventBus.on("changeLogo", updateLogo);
+  eventBus.on("clearStopPointsInformation", clearStopPointsInformation);
 });
 
 onUnmounted(() => {
@@ -118,6 +102,12 @@ const showStopPointsInformation = ref(false);
 const stopPoints = ref<StopPoint[]>([]);
 const showGeographicStopPointsInformation = ref(false);
 const geoStopPoints = ref<any[]>([]);
+
+const clearStopPointsInformation = () => {
+  showStopPointsInformation.value = false;
+  showGeographicStopPointsInformation.value = false;
+};
+
 
 const handleFilterData = async (data: FilterData) => {
   const result = await props.onConsult(data);
@@ -157,12 +147,10 @@ const handleStopPointsReceived = (stopPoints: any) => {
 };
 
 const initializeMap = () => {
-  console.log('Aquiiiiiiiiiiiii')
   emit("initializeMap");
 };
 
 const initializeMapDark = () => {
-  console.log('Aquiiiiiiiiiiiii novo')
   emit("initializeMapDark");
 };
 
@@ -172,21 +160,21 @@ const goToFilterStopPoints = () => {
   panel.value = [0];
   toggleDial();
 
-  if(logo.value === "/src/assets/Logo.svg"){
+  if (logo.value === "/src/assets/Logo.svg") {
     emit("initializeMap");
-  }else{
+  } else {
     emit("initializeMapDark");
   }
 };
 
 const goToFilterGeographicAreas = () => {
   router.push("/geographicareasfilter");
-    //@ts-ignore
+  //@ts-ignore
   panel.value = [0];
   toggleDial();
-  if(logo.value === "/src/assets/Logo.svg"){
+  if (logo.value === "/src/assets/Logo.svg") {
     emit("initializeMap");
-  }else{
+  } else {
     emit("initializeMapDark");
   }
 };
@@ -195,6 +183,7 @@ const handleLogout = () => {
   localStorage.removeItem("token");
   router.push({ name: "Login" });
 }
+
 const handlePanelChange = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
@@ -208,6 +197,29 @@ const handleStopPointsFilterClick = () => {
 const handleGeographicAreasFilterClick = () => {
   goToFilterGeographicAreas();
   handlePanelChange();
+};
+
+const handleHomeClick = () => {
+  handlePanelChange();
+  clearStopPointsInformation();
+  eventBus.emit("clearFields");
+
+  if (logo.value === '/src/assets/LogoWhite.svg') {
+    initializeMapDark();
+  } else {
+    initializeMap();
+  }
+}
+
+// navigateToLocation é para ir até os pontos do filtro de usuários
+const navigateToLocation = (coordinates: [number, number]) => {
+  eventBus.emit("navigateToLocation", coordinates);
+};
+
+// navigateGeoToLocation é para ir até os pontos do filtro de áreas geográficas
+const navigateGeoToLocation = (coord: [number, number]) => {
+  console.log("COORDS AQUII", coord)
+  eventBus.emit("navigateGeoToLocation", coord);
 };
 
 </script>

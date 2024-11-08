@@ -1,40 +1,21 @@
 <template>
-  <v-card
-    class="mx-auto"
-    width="100%"
-    style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; height: 350px;"
-    color="primary"
-  >
+  <v-card class="mx-auto" width="100%"
+    style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; height: 350px;" color="primary">
     <v-col style="padding: 20px 20px 0 20px">
       <!-- Card das áreas geográficas -->
       <v-card-actions class="d-flex justify-space-between">
         <v-row class="d-flex align-center no-gutters">
           <v-col cols="100%" style="padding: 0px">
             <!-- Combobox de áreas geográficas -->
-            <v-combobox
-              :disabled="disabledTexts"
-              label="Áreas geográficas"
-              color="primary"
-              v-model="selectedGeoArea"
-              :items="geoAreas"
-              item-value="id"
-              item-title="name"
-              clearable
-              :multiple="false"
-              @update:model-value="handleGeoAreaChange"
-              prepend-icon="mdi-map-search"
-            >
+            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="secondary" v-model="selectedGeoArea"
+              :items="geoAreas" item-value="id" item-title="name" clearable :multiple="false"
+              @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
             </v-combobox>
           </v-col>
 
           <v-col cols="auto" style="padding: 0px 0px 20px 10px">
             <div class="icon-container">
-              <v-btn
-                icon
-                @click="drawCircle"
-                class="no-shadow rounded"
-                :disabled="disableDrawButton"
-              >
+              <v-btn icon @click="drawCircle" class="no-shadow rounded" :disabled="disableDrawButton">
                 <v-icon>mdi-circle-outline</v-icon>
                 <v-icon class="plus-icon">mdi-plus</v-icon>
               </v-btn>
@@ -44,65 +25,37 @@
       </v-card-actions>
 
       <!-- Users combobox -->
-      <v-combobox
-        v-model="selectedUser"
-        label="Usuário"
-        :items="users"
-        item-title="name"
-        item-value="deviceId"
-        prepend-icon="mdi-filter-variant"
-        clearable
-        :multiple="false"
-        color="primary"
-      >
+      <v-combobox v-model="selectedUser" label="Usuário" :items="users" item-title="name" item-value="deviceId"
+        prepend-icon="mdi-filter-variant" clearable :multiple="false" color="secondary">
       </v-combobox>
 
       <!-- Date selection -->
-      <v-date-input
-        v-model="date"
-        label="Selecione o período"
-        multiple="range"
-        color="secondary"
-        :max="today"
-        :locale="locale"
-        :format="customDateFormat"
-        placeholder="dd/MM/yyyy"
-        :readonly="dateInputDisabled"
-      ></v-date-input>
+      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="secondary" :max="today"
+        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :readonly="dateInputDisabled">
+      </v-date-input>
 
       <!-- Quick date filters using chips -->
       <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
-        <v-chip
-          style="margin: 0px 2px !important"
-          size="small"
-          v-for="(filter, index) in quickFilters"
-          :key="filter.label"
-          @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
-          :active="selectedQuickFilter === index"
-          filter
-          class="ma-2"
-          variant="flat"
-        >
+        <v-chip style="margin: 0px 2px !important" size="small" v-for="(filter, index) in quickFilters"
+          :key="filter.label" @click="setQuickFilter(filter.range, index)"
+          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
+          filter class="ma-2" variant="flat">
           {{ filter.label }}
         </v-chip>
       </v-col>
     </v-col>
 
-    <v-card-actions
-      class="d-flex justify-space-between"
-      style="padding: 20px 20px 0 20px"
-    >
+    <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="xl" @click="handleConsult">
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary"
+            size="large" variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="xl" @click="clearFields">
+          <v-btn class="text-none" color="primary_light" size="large" variant="flat" block rounded="xl"
+            @click="clearFields">
             Limpar
           </v-btn>
         </v-col>
@@ -111,17 +64,14 @@
   </v-card>
 
   <!-- Loading progress circular -->
-  <v-col
-    v-if="loadingPage"
-    id="loadingStopPoints"
-    class="d-flex justify-center mt-4"
-  >
-    <v-progress-circular color="primary" indeterminate></v-progress-circular>
+  <v-col v-if="loadingPage" id="loadingStopPoints" class="d-flex justify-center mt-4">
+    <v-progress-circular color="primary" indeterminate>
+    </v-progress-circular>
   </v-col>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
-   </v-snackbar>
+  </v-snackbar>
 </template>
 
 <script>
@@ -173,6 +123,7 @@ export default {
     eventBus.on('stopIsLoading', this.stopIsLoading);
     eventBus.on('reloadGeoArea', this.reloadGeoArea);
     eventBus.on("changeLogo", this.change);
+    eventBus.on("clearFields", this.clearFields);
   },
 
   computed: {
@@ -201,7 +152,7 @@ export default {
     clearSelectedGeoArea() {
       this.selectedGeoArea = null;
     },
-    change(){
+    change() {
       this.update = true
     },
 
@@ -320,7 +271,7 @@ export default {
 
       const qtddias = Math.round(
         (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
-          (1000 * 60 * 60 * 24)
+        (1000 * 60 * 60 * 24)
       );
 
       if (qtddias > 31) {
@@ -400,11 +351,11 @@ export default {
       this.radius = null;
       this.circleDrawn = false;
 
-      console.log("tasxza>: ", this.update)
-      if(this.update){
+      if (this.update) {
         this.$emit("initializeMapDark");
-      }else{
+      } else {
         this.$emit("initializeMap");
+        eventBus.emit("clearStopPointsInformation");
       }
     },
 
