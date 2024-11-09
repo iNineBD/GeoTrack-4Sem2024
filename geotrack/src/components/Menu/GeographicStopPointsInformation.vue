@@ -25,12 +25,12 @@
                             <v-list-item-title>
                                 {{ displayedAddresses[coordIndex] }}
                             </v-list-item-title>
-                            <v-list-item-subtitle>
+                            <!-- <v-list-item-subtitle>
                                 {{ formatDateRange(coord.startDate, coord.endDate) }}
                             </v-list-item-subtitle>
                             <v-list-item-subtitle>
                                 Tempo parado: {{ calculateStopDuration(coord.startDate, coord.endDate) }}
-                            </v-list-item-subtitle>
+                            </v-list-item-subtitle> -->
                         </v-col>
                     </v-row>
                     <v-divider v-if="coordIndex < geoStopPoints.coords.length"></v-divider>
