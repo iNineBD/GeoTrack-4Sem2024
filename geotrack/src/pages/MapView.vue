@@ -50,18 +50,18 @@
 
       <v-card-actions>
         <v-row justify="center">
-          <v-btn variant="flat" color="secondary_light" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
+          <v-btn variant="flat" color="#008000" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
             Salvar
           </v-btn>
           <v-btn variant="flat" color="primary_light" @click="removeCircle" style="margin: 0px 10px 15px 10px"
-            rounded="xl">
+            rounded="xl" >
             Remover
           </v-btn>
           <v-btn variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
             rounded="xl">
             Editar
           </v-btn>
-          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="red" @click="deleteCircle"
+          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="#FF0000" @click="deleteCircle"
             style="margin: 0px 10px 15px 10px" rounded="xl">
             Deletar
           </v-btn>
