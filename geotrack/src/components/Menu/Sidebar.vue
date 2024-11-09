@@ -45,7 +45,7 @@
         title="Filtro de Áreas Geográficas" color="primary"></v-btn>
 
       <!-- Botão para Sair -->
-      <v-btn key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída" color="primary"></v-btn>
+      <v-btn key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída" color="#F44336"></v-btn>
     </v-speed-dial>
   </div>
 </template>
