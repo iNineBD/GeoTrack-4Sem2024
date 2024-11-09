@@ -1,17 +1,22 @@
 <template>
     <v-card class="stop-points-card" width="400px" height="300px" rounded="xl" elevation="4" color="primary">
         <template v-if="geoStopPoints && Object.keys(geoStopPoints).length > 0">
-            <v-list class="stop-points-list bg-primary">
+            <v-list class="scrollable-container bg-primary">
+                <v-list-item>
                 <v-sheet class="pa-2 mb-2" color="primary_light" elevation="0" rounded>
                     <v-row align="center" justify="space-between" style="padding: 5px 12px;">
                         <span style="font-weight: bold; font-size: 16px;">
                             {{ getUserInitials(geoStopPoints.userName) }}
                         </span>
-                        <span>{{ geoStopPoints.device.toUpperCase() }}</span>
+                        <span outlined>
+                        	{{ geoStopPoints.device.toUpperCase() }}
+                        </span>
                     </v-row>
                 </v-sheet>
-                <v-list-item v-for="(coord, coordIndex) in geoStopPoints.coords" :key="coordIndex"
-                    @click="navigateToStopPoint(coord)" class="pa-2 mb-2">
+                <v-list-item v-for="(coord, coordIndex) in geoStopPoints.coords" 
+                    :key="coordIndex"
+                    @click="navigateToStopPoint(coord)" 
+                    style="padding: 0;" color="primary">
                     <v-row align="start" no-gutters class="px-2 py-1">
                         <v-col cols="1">
                             <v-icon color="secondary" class="mr-1 mt-1">mdi-map-marker</v-icon>
@@ -30,7 +35,8 @@
                     </v-row>
                     <v-divider v-if="coordIndex < geoStopPoints.coords.length"></v-divider>
                 </v-list-item>
-            </v-list>
+            </v-list-item>
+        </v-list>
         </template>
         <template v-else>
             <v-row justify="center" align="center">
@@ -132,35 +138,33 @@ watch(
 
 <style scoped>
 .stop-points-card {
-    padding: 12px;
     box-shadow: none;
     border-radius: 0;
     position: fixed;
     margin-top: 15px;
-    overflow-x: hidden;
 }
 
-.stop-points-list {
-    max-height: 300px;
+.scrollable-container {
+    max-height: 300px; /* Ajuste a altura conforme necessário */
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-.stop-points-list::-webkit-scrollbar {
+.scrollable-container::-webkit-scrollbar {
     width: 10px;
 }
 
-.stop-points-list::-webkit-scrollbar-track {
+.scrollable-container::-webkit-scrollbar-track {
     background: #f0f0f5;
     border-radius: 5px;
 }
 
-.stop-points-list::-webkit-scrollbar-thumb {
+.scrollable-container::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, #c7c9ff, #7a7de9);
     border-radius: 10px;
 }
 
-.stop-points-list::-webkit-scrollbar-thumb:hover {
+.scrollable-container::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #6b6fe1, #4f51d3);
 }
 
