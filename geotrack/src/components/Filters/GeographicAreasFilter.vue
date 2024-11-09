@@ -391,7 +391,7 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 16px;
-  color: black;
+  color: terceary;
 }
 
 .title-text {

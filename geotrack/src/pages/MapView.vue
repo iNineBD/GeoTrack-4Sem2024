@@ -31,7 +31,7 @@
 
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px">
-    <v-card rounded="xl">
+    <v-card rounded="xl" color="primary">
       <v-card-title class="text-center" style="padding: 10px 15px 0px 15px">
         <span class="headline">Detalhes da zona selecionada</span>
       </v-card-title>
@@ -50,7 +50,7 @@
 
       <v-card-actions>
         <v-row justify="center">
-          <v-btn variant="flat" color="primary" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
+          <v-btn variant="flat" color="secondary_light" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
             Salvar
           </v-btn>
           <v-btn variant="flat" color="primary_light" @click="removeCircle" style="margin: 0px 10px 15px 10px"

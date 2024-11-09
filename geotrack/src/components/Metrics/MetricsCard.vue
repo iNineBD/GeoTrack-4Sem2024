@@ -1,11 +1,11 @@
 <template>
   <div class="metrics-container">
-    <v-card class="metric-card" rounded="xl" elevation="4" outlined>
+    <v-card class="metric-card" rounded="xl" elevation="4" color="primary" outlined>
       <div class="metric-text">
         USUÁRIOS MONITORADOS: {{ metrics?.qtdMonitored }}
       </div>
     </v-card>
-    <v-card class="metric-card" rounded="xl" elevation="4" outlined>
+    <v-card class="metric-card" rounded="xl" elevation="4" color="primary" outlined>
       <div class="metric-text">
         USUÁRIOS REGISTRADOS: {{ metrics?.qtdAdmins }}
       </div>
@@ -16,6 +16,7 @@
       rounded="xl"
       elevation="4"
       outlined
+      color="primary"
     >
       <div class="metric-text">
         ÁREAS GEOGRÁFICAS: {{ metrics?.qtdSessions }}
@@ -71,6 +72,7 @@ onMounted(() => {
   padding-bottom: 30px;
   margin: auto;
   margin-top: 06px; /* Ajuste este valor conforme necessário */
+  color: primary;
 }
 .metric-card {
   width: 100%;

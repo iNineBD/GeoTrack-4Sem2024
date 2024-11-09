@@ -15,14 +15,18 @@ export default createVuetify({
           primary: '#f2f3f5',
           primary_light: '#b8beff',
           secondary: '#1A237E',
+          secondary_light: "#43A047",
+          terceary: "black"
         },
       },
       dark: {
         dark: true,
         colors: {
-          primary: '#242f3e', // botao consultar
-          primary_light: '#b8beff', //botoes filtro rapidos e limpar
-          secondary: '#6A5ACD', // nao sabemos ainda
+          primary: '#21374d', 
+          primary_light: '#b8beff', 
+          secondary: '#6A5ACD', 
+          secondary_light: "#1B5E20",
+          terceary: "white",
         },
       },
     },
