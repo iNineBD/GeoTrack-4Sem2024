@@ -133,7 +133,7 @@ export default {
 }
 
 .blue-section {
-  background-image: url('../assets/terra1.png');
+  background-image: url('../assets/terra.png');
   background-size: cover;
   background-position: center;
   display: flex;
@@ -186,7 +186,7 @@ export default {
 
 .register-card {
   background: white !important;
-  width: min(90vw, 450px); 
+  width: min(90vw, 420px); 
   padding: 2vw; 
   border-radius: 30px;
   display: flex;

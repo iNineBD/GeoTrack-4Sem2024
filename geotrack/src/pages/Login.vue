@@ -129,7 +129,7 @@ export default {
 
 .login-container {
   height: 100vh;
-  background-image: url('../assets/terra1.png');
+  background-image: url('../assets/terra2.png');
   background-position: center;
   background-size: cover;
   display: flex;
@@ -159,13 +159,12 @@ export default {
 
 .login-card {
   background: white !important;
-  width: min(90vw, 450px);
+  width: min(90vw, 420px);
   padding: 2vw;
   border-radius: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0;
 }
 
 .logo-container {
