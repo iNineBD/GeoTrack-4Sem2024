@@ -333,11 +333,14 @@ export default {
           console.log("Erro 404: ", errorData.message);
 
           this.showSnackbar("Dados não localizados para este usuário", "error");
-          this.$emit("noPointsFound", errorData.message);
           this.loading = false;
+          this.$emit("noPointsFound", errorData.message);
         }
       } catch (error) {
         console.log("Erro ao buscar pontos de parada:", error);
+        this.showSnackbar("Dados não localizados para este usuário", "error");
+        this.loading = false;
+        this.$emit("noPointsFound", errorData.message);
       }
     },
 
