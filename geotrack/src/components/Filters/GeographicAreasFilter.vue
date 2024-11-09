@@ -82,7 +82,7 @@ export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
     loading: false,
-    update: false,
+    logo: "/src/assets/Logo.svg",
     date: null,
     users: [], // Lista de usuários
     selectedUser: null,
@@ -122,7 +122,7 @@ export default {
     eventBus.on('clearSelectedGeoArea', this.clearSelectedGeoArea);
     eventBus.on('stopIsLoading', this.stopIsLoading);
     eventBus.on('reloadGeoArea', this.reloadGeoArea);
-    eventBus.on("changeLogo", this.change);
+    eventBus.on("novoLogo", this.change)
     eventBus.on("clearFields", this.clearFields);
   },
 
@@ -152,8 +152,8 @@ export default {
     clearSelectedGeoArea() {
       this.selectedGeoArea = null;
     },
-    change() {
-      this.update = true
+    change(newLogo) {
+      this.logo = newLogo;
     },
 
     stopIsLoading() {
@@ -351,8 +351,11 @@ export default {
       this.radius = null;
       this.circleDrawn = false;
 
-      if (this.update) {
+      console.log("logo novo: ", this.logo)
+
+      if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");
+        eventBus.emit("clearStopPointsInformation");
       } else {
         this.$emit("initializeMap");
         eventBus.emit("clearStopPointsInformation");
