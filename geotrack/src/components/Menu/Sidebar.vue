@@ -69,12 +69,20 @@ const logo = ref("/src/assets/Logo.svg");
 
 onMounted(() => {
   eventBus.on("changeLogo", updateLogo);
+  eventBus.on("novoLogo", change);
   eventBus.on("clearStopPointsInformation", clearStopPointsInformation);
 });
 
 onUnmounted(() => {
+  eventBus.off("novoLogo", change);
   eventBus.off("changeLogo", updateLogo);
 });
+
+// Método que será chamado quando o evento "novoLogo" for emitido
+const change = (newLogo: string) => {
+  logo.value = newLogo; // Atualizando o valor do logo com o valor recebido
+  console.log("logo enviado: ", logo.value);
+};
 
 const toggleDial = () => {
   dial.value = !dial.value;
@@ -82,6 +90,7 @@ const toggleDial = () => {
 
 const updateLogo = () => {
   logo.value = logo.value === "/src/assets/Logo.svg" ? "/src/assets/LogoWhite.svg" : "/src/assets/Logo.svg";
+  eventBus.emit("novoLogo",logo.value)
 };
 
 // Definindo as props
@@ -204,7 +213,7 @@ const handleHomeClick = () => {
   clearStopPointsInformation();
   eventBus.emit("clearFields");
 
-  if (logo.value === '/src/assets/LogoWhite.svg') {
+  if (logo.value == '/src/assets/LogoWhite.svg') {
     initializeMapDark();
   } else {
     initializeMap();

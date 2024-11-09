@@ -55,6 +55,7 @@
 </template>
 
 <script>
+import { ref, onMounted, onUnmounted } from "vue";
 import { load } from 'ol/Image';
 import { fa } from 'vuetify/locale';
 import StopPointsInformation from '../Menu/StopPointsInformation.vue';
@@ -64,7 +65,7 @@ export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
     loading: false,
-    update: false,
+    logo: "/src/assets/Logo.svg",
     date: null,
     users: [], // Lista de usuários
     selectedUsers: [], // Armazena múltiplos usuários selecionados
@@ -99,7 +100,7 @@ export default {
   mounted() {
     this.fetchUsers();
     eventBus.on('stopIsLoading', this.stopIsLoading);
-    eventBus.on("changeLogo", this.change);
+    eventBus.on("novoLogo", this.change)
     eventBus.on("clearFields", this.clearFields);
   },
 
@@ -110,12 +111,12 @@ export default {
   },
 
   methods: {
-    stopIsLoading() {
-      this.loading = false;
+    change(newLogo) {
+      this.logo = newLogo;
     },
 
-    change() {
-      this.update = true
+    stopIsLoading() {
+      this.loading = false;
     },
 
     showSnackbar(message, color = "success") {
@@ -179,7 +180,6 @@ export default {
         this.showStopPointsInformation = true;  // Exibe o novo componente
         this.loadingPage = false;
       }, 2000); // Simulando o tempo de resposta
-
     },
 
     clearFields() {
@@ -188,8 +188,11 @@ export default {
       this.devices = [];
       this.selectedQuickFilter = null;
 
-      if (this.update) {
+      console.log("logo novo: ", this.logo)
+
+      if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");
+        eventBus.emit("clearStopPointsInformation");
       } else {
         this.$emit("initializeMap");
         eventBus.emit("clearStopPointsInformation");
@@ -219,7 +222,9 @@ export default {
       this.snackbarColor = "error";
       this.snackbar = true;
     },
+
   },
+  
 
   watch: {
     selectedUsers(newValue) {
@@ -230,6 +235,7 @@ export default {
     },
   },
 };
+
 </script>
 
 <style scoped></style>
