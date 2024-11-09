@@ -129,7 +129,7 @@ export default {
 
 .login-container {
   height: 100vh;
-  background-image: url('../assets/terra2.png');
+  background-image: url('../assets/terra.png');
   background-position: center;
   background-size: cover;
   display: flex;
@@ -145,8 +145,6 @@ export default {
 }
 
 .yellow-section {
-
-  background-image: url('../assets/terra.gif');
   background-position: center;
   
   display: flex;
@@ -154,7 +152,6 @@ export default {
   align-items: center;
  
   border-radius: 20px;
-  background-color: #ffffff;
 }
 
 .login-card {
