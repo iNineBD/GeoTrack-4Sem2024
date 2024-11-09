@@ -1,41 +1,43 @@
 <template>
-    <v-card class="stop-points-card" width="400px" height="300px" rounded="xl" elevation="4">
-        <v-col class="scrollable-container" cols="12">
-            <template v-if="geoStopPoints && Object.keys(geoStopPoints).length > 0">
-                <v-sheet color="primary_light" class="header-row pa-2 mb-2" rounded>
-                    <v-row align="center" justify="space-between">
-                        <span class="user-name" style="font-weight: bold;">{{ getUserInitials(geoStopPoints.userName) }}</span>
-                        <span class="device-name" style="font-weight: bold;">{{ geoStopPoints.device.toUpperCase() }}</span>
+    <v-card class="stop-points-card" width="400px" height="300px" rounded="xl" elevation="4" color="primary">
+        <template v-if="geoStopPoints && Object.keys(geoStopPoints).length > 0">
+            <v-list class="stop-points-list bg-primary">
+                <v-sheet class="pa-2 mb-2" color="primary_light" elevation="0" rounded>
+                    <v-row align="center" justify="space-between" style="padding: 5px 12px;">
+                        <span style="font-weight: bold; font-size: 16px;">
+                            {{ getUserInitials(geoStopPoints.userName) }}
+                        </span>
+                        <span>{{ geoStopPoints.device.toUpperCase() }}</span>
                     </v-row>
                 </v-sheet>
-                <v-list dense>
-                    <v-list-item v-for="(coord, coordIndex) in geoStopPoints.coords" :key="coordIndex" @click="navigateToStopPoint(coord)" class="address-row pa-2 mb-2" rounded>
-                        <v-row no-gutters align="center">
-                            <v-col cols="auto">
-                                <v-icon color="secondary" class="mr-2">mdi-map-marker</v-icon>
-                            </v-col>
-                            <v-col>
-                                <v-list-item-title class="text-wrap">
-                                    {{ displayedAddresses[coordIndex] }}
-                                </v-list-item-title>
-                                <v-list-item-subtitle class="text-wrap">
-                                    {{ formatDateRange(coord.startDate, coord.endDate) }}
-                                </v-list-item-subtitle>
-                                <v-list-item-subtitle class="text-wrap">
-                                    Tempo parado: {{ calculateStopDuration(coord.startDate, coord.endDate) }}
-                                </v-list-item-subtitle>
-                            </v-col>
-                        </v-row>
-                    </v-list-item>
-                </v-list>
-            </template>
-            <template v-else>
-                <v-row justify="center" align="center">
-                    <v-icon color="grey">mdi-alert</v-icon>
-                    <span>Nenhum ponto de parada encontrado.</span>
-                </v-row>
-            </template>
-        </v-col>
+                <v-list-item v-for="(coord, coordIndex) in geoStopPoints.coords" :key="coordIndex"
+                    @click="navigateToStopPoint(coord)" class="pa-2 mb-2">
+                    <v-row align="start" no-gutters class="px-2 py-1">
+                        <v-col cols="1">
+                            <v-icon color="secondary" class="mr-1 mt-1">mdi-map-marker</v-icon>
+                        </v-col>
+                        <v-col cols="11">
+                            <v-list-item-title>
+                                {{ displayedAddresses[coordIndex] }}
+                            </v-list-item-title>
+                            <v-list-item-subtitle>
+                                {{ formatDateRange(coord.startDate, coord.endDate) }}
+                            </v-list-item-subtitle>
+                            <v-list-item-subtitle>
+                                Tempo parado: {{ calculateStopDuration(coord.startDate, coord.endDate) }}
+                            </v-list-item-subtitle>
+                        </v-col>
+                    </v-row>
+                    <v-divider v-if="coordIndex < geoStopPoints.coords.length"></v-divider>
+                </v-list-item>
+            </v-list>
+        </template>
+        <template v-else>
+            <v-row justify="center" align="center">
+                <v-icon color="grey">mdi-alert</v-icon>
+                <span>Nenhum ponto de parada encontrado.</span>
+            </v-row>
+        </template>
     </v-card>
 </template>
 
@@ -130,88 +132,40 @@ watch(
 
 <style scoped>
 .stop-points-card {
+    padding: 12px;
     box-shadow: none;
     border-radius: 0;
     position: fixed;
     margin-top: 15px;
-    overflow-y: auto;
-}
-
-.header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #d5d9ff;
-    padding: 8px 10px;
-    border-radius: 8px;
-    margin-bottom: 4px;
-}
-
-.user-name,
-.device-name {
-    font-size: 15px;
-    color: #333;
-}
-
-ul {
-    list-style-type: none;
-    padding-left: 0;
+    overflow-x: hidden;
 }
 
 .stop-points-list {
-    list-style-type: none;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.scrollable-container::-webkit-scrollbar {
-    width: 8px;
+.stop-points-list::-webkit-scrollbar {
+    width: 10px;
 }
 
-.scrollable-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 8px;
+.stop-points-list::-webkit-scrollbar-track {
+    background: #f0f0f5;
+    border-radius: 5px;
 }
 
-.scrollable-container::-webkit-scrollbar-thumb {
-    background-color: #d5d9ff;
-    border-radius: 8px;
+.stop-points-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #c7c9ff, #7a7de9);
+    border-radius: 10px;
 }
 
-.scrollable-container::-webkit-scrollbar-thumb:hover {
-    background-color: #979edb;
+.stop-points-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #6b6fe1, #4f51d3);
 }
 
-.address-row {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    background-color: #d5d9ff2d;
-    padding: 8px;
-    border-radius: 8px;
-    margin-bottom: 5px;
-}
-
-.address-row:hover {
-    background-color: #bec4f852;
-    cursor: pointer;
-}
-
-.location-details {
-    display: flex;
-    align-items: center;
-}
-
-.location-icon {
-    margin-right: 5px;
-}
-
-.date-row {
-    font-size: 14px;
-    color: #777;
-    margin-left: 30px;
-}
-
-.text-wrap {
-    white-space: normal;
+.v-list-item-title {
     word-wrap: break-word;
+    white-space: normal;
 }
 </style>

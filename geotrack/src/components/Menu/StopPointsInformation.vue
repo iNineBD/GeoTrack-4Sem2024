@@ -1,8 +1,8 @@
 <template>
-    <v-card class="stop-points-card" width="400px" height="300px" rounded="xl" elevation="4">
+    <v-card class="stop-points-card" width="400px" height="300px" rounded="xl" elevation="4" color="primary">
         <template v-if="stopPoints && stopPoints.length > 0">
-            <v-list>
-                <v-list-item v-for="(address, index) in addresses" :key="index" class="mb-4">
+            <v-list class="stop-points-list bg-primary">
+                <v-list-item v-for="(address, index) in addresses" :key="index" class="mb-1">
                     <v-sheet class="pa-2 mb-2" color="primary_light" elevation="0" rounded>
                         <v-row align="center" justify="space-between" style="padding: 5px 12px;">
                             <span style="font-weight: bold; font-size: 16px;">
@@ -13,20 +13,20 @@
                             </span>
                         </v-row>
                     </v-sheet>
-                    <v-list style="padding: 0;">
+                    <v-list style="padding: 0;" class="bg-primary">
                         <v-list-item v-for="(featureAddress, featureIndex) in displayedAddresses[index]"
                             :key="featureIndex"
                             @click="goToLocation(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.coordinates)"
-                            style="padding: 0;">
+                            style="padding: 0;" color="primary">
                             <v-row align="start" no-gutters class="px-2 py-1" style="padding: 0;">
-                                <v-col cols="auto">
-                                    <v-icon color="secondary" class="mr-2">mdi-map-marker</v-icon>
+                                <v-col cols="1">
+                                    <v-icon color="secondary" class="mt-1">mdi-map-marker</v-icon>
                                 </v-col>
-                                <v-col>
-                                    <v-list-item-title class="text-wrap">
+                                <v-col cols="11">
+                                    <v-list-item-title>
                                         {{ featureAddress }}
                                     </v-list-item-title>
-                                    <v-list-item-subtitle class="text-wrap">
+                                    <v-list-item-subtitle>
                                         {{ "Data: " }}{{
                                             formatDate(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.startDate)
                                         }},
@@ -37,13 +37,14 @@
                                             formatTime(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.endDate)
                                         }}
                                     </v-list-item-subtitle>
-                                    <v-list-item-subtitle class="text-wrap">
+                                    <v-list-item-subtitle>
                                         Tempo parado: {{ " " }}{{
                                             getStopDuration(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.startDate,
                                                 stopPoints[index].geoJsonDTO.features[featureIndex].geometry.endDate) }} minutos
                                     </v-list-item-subtitle>
                                 </v-col>
                             </v-row>
+                            <v-divider v-if="featureIndex < displayedAddresses[index].length"></v-divider>
                         </v-list-item>
                     </v-list>
 
@@ -52,7 +53,6 @@
                         + {{ remainingPoints(index) }} ponto<span v-if="remainingPoints(index) > 1">s</span> de
                         parada
                     </v-btn>
-                    <v-divider v-if="index < addresses.length - 1"></v-divider>
                 </v-list-item>
             </v-list>
         </template>
@@ -178,24 +178,34 @@ watch(
     border-radius: 0;
     position: fixed;
     margin-top: 15px;
+}
+
+.stop-points-list {
+    max-height: 300px;
     overflow-y: auto;
 }
 
-.scrollable-container::-webkit-scrollbar {
-    width: 8px;
+.stop-points-list::-webkit-scrollbar {
+    width: 10px;
 }
 
-.scrollable-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 8px;
+.stop-points-list::-webkit-scrollbar-track {
+    background: #f0f0f5;
+    border-radius: 5px;
 }
 
-.scrollable-container::-webkit-scrollbar-thumb {
-    background-color: #d5d9ff;
-    border-radius: 8px;
+.stop-points-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #c7c9ff, #7a7de9);
+    border-radius: 10px;
 }
 
-.scrollable-container::-webkit-scrollbar-thumb:hover {
-    background-color: #979edb;
+.stop-points-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #6b6fe1, #4f51d3);
+    border-radius: 10px;
+}
+
+.v-list-item-title {
+    word-wrap: break-word;
+    white-space: normal;
 }
 </style>
