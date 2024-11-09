@@ -76,6 +76,7 @@
 
 <script>
 import { eventBus } from '@/utils/EventBus';
+import axios from 'axios';
 
 
 export default {
@@ -167,38 +168,38 @@ export default {
 
     async fetchUsers() {
       try {
-        const response = await fetch(
-          "http://localhost:8080/filters/users?page=0&qtdPage=1000"
-        );
-        const data = await response.json();
+      const response = await axios.get(
+        "http://localhost:8080/filters/users?page=0&qtdPage=1000"
+      );
+      const data = response.data;
 
-        // Mapeando a resposta da API para o formato correto
-        this.users = data.listUsers.map((user) => ({
-          name: user.userName.toUpperCase(), // Nome do usuário
-          deviceId: user.idDevice, // ID do dispositivo associado
-          device: user.deviceName,
-        }));
+      // Mapeando a resposta da API para o formato correto
+      this.users = data.listUsers.map((user) => ({
+        name: user.userName.toUpperCase(), // Nome do usuário
+        deviceId: user.idDevice, // ID do dispositivo associado
+        device: user.deviceName,
+      }));
 
-        console.log("Sucesso ao buscar usuários: ", this.users);
+      console.log("Sucesso ao buscar usuários: ", this.users);
       } catch (error) {
-        console.log("Erro ao buscar usuários: ", error);
+      console.log("Erro ao buscar usuários: ", error);
       }
     },
 
     async fetchGeoAreas() {
       try {
-        const response = await fetch("http://localhost:8080/zone");
-        const data = await response.json();
-        this.geoAreas = data.map((area) => ({
-          id: area.id,
-          name: area.name,
-          latitude: area.center.latitude,
-          longitude: area.center.longitude,
-          radius: area.radius,
-        }));
-        console.log("Áreas geográficas carregadas:", data);
+      const response = await axios.get("http://localhost:8080/zone");
+      const data = response.data;
+      this.geoAreas = data.map((area) => ({
+        id: area.id,
+        name: area.name,
+        latitude: area.center.latitude,
+        longitude: area.center.longitude,
+        radius: area.radius,
+      }));
+      console.log("Áreas geográficas carregadas:", data);
       } catch (error) {
-        console.log("Erro ao buscar áreas geográficas:", error);
+      console.log("Erro ao buscar áreas geográficas:", error);
       }
     },
 
@@ -298,9 +299,9 @@ export default {
       console.log("URL: ", url);
 
       try {
-        const response = await fetch(url);
-        if (response.ok) {
-          const data = await response.json();
+        const response = await axios.get(url);
+        if (response.status === 200) {
+          const data = await response.data;
 
           console.log("Pontos de parada recebidos:", data.stopPoints);
 

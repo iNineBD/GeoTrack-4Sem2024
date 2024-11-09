@@ -66,8 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, watch, defineEmits } from 'vue';
-import axios from 'axios';
+import { defineEmits, defineProps, ref, watch } from 'vue';
 
 const props = defineProps<{
     stopPoints: Array<{
@@ -102,10 +101,11 @@ const getFormattedAddress = async (lat: number, lng: number) => {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lng},${lat}&key=${apiKey}&language=BR&region`;
 
     try {
-        const response = await axios.get(url);
-        console.log("ENDEREÇO:", response)
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("ENDEREÇO:", data);
 
-        const formattedAddress = response.data.results.length > 0 ? response.data.results[0].formatted_address : 'Endereço não encontrado';
+        const formattedAddress = data.results.length > 0 ? data.results[0].formatted_address : 'Endereço não encontrado';
 
         return formattedAddress;
     } catch (error) {

@@ -55,11 +55,8 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from "vue";
-import { load } from 'ol/Image';
-import { fa } from 'vuetify/locale';
-import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import { eventBus } from '@/utils/EventBus';
+import axios from 'axios';
 
 export default {
   data: () => ({
@@ -127,20 +124,20 @@ export default {
 
     async fetchUsers() {
       try {
-        const response = await fetch(
-          "http://localhost:8080/filters/users?page=0&qtdPage=1000"
-        );
-        const data = await response.json();
+      const response = await axios.get(
+        "http://localhost:8080/filters/users?page=0&qtdPage=1000",
+      );
+      const data = response.data;
 
-        // Mapeando a resposta da API para o formato correto
-        this.users = data.listUsers.map((user) => ({
-          name: user.userName.toUpperCase(), // Nome do usuário
-          deviceId: user.idDevice, // ID do dispositivo 
-        }));
+      // Mapeando a resposta da API para o formato correto
+      this.users = data.listUsers.map((user) => ({
+        name: user.userName.toUpperCase(), // Nome do usuário
+        deviceId: user.idDevice, // ID do dispositivo 
+      }));
 
-        console.log("Successfully fetched users:", this.users);
+      console.log("Successfully fetched users:", this.users);
       } catch (error) {
-        console.log("Error fetching users:", error);
+      console.log("Error fetching users:", error);
       }
     },
 
