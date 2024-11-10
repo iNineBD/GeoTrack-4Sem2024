@@ -77,11 +77,11 @@
 
 
 <script lang="ts">
-import { onMounted, ref, watch } from "vue";
-import axios from "axios";
-import { id } from "vuetify/locale";
-import { eventBus } from "@/utils/EventBus"; // Importando o EventBus
 import vuetify from "@/plugins/vuetify";
+import { eventBus } from "@/utils/EventBus"; // Importando o EventBus
+import axios from "axios";
+import { onMounted, ref, watch } from "vue";
+import { id } from "vuetify/locale";
 
 interface GeoJsonFeature {
   geometry: {
@@ -845,6 +845,7 @@ export default {
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
         showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
+      showSnackbar(`Erro ao salvar a zona: ${error.response.data.message}`, "error");
       }
     };
 
