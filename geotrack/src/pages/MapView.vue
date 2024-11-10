@@ -842,10 +842,18 @@ export default {
         dialog.value = false;
 
         eventBus.emit("reloadGeoArea");
+
+        console.log("está no modo dark ? ",isDarkTheme)
+
+        if(isDarkTheme.value){
+          initializeMapDark()
+        }else{
+          initializeMap()
+        }
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
         showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
-      showSnackbar(`Erro ao salvar a zona: ${error.response.data.message}`, "error");
+        showSnackbar(`Erro ao salvar a zona: ${error.response.data.message}`, "error");
       }
     };
 
@@ -873,6 +881,12 @@ export default {
         dialog.value = false;
         removeCircle();
         eventBus.emit("reloadGeoArea");
+
+        if(isDarkTheme.value){
+          initializeMapDark()
+        }else{
+          initializeMap()
+        }
       } catch (error) {
         console.log("Erro ao deletar os dados:", error);
         showSnackbar("Erro ao deletar a zona. Tente novamente.", "error");
