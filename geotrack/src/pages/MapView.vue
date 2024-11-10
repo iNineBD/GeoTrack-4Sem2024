@@ -843,8 +843,9 @@ export default {
 
         eventBus.emit("reloadGeoArea");
 
-        localStorage.removeItem("circleDetailsCached")
+        circleDetails.value.name = "Zona 1"
 
+        localStorage.removeItem("circleDetailsCached")
         if(isDarkTheme.value){
           initializeMapDark()
         }else{
@@ -883,6 +884,7 @@ export default {
         removeCircle();
         eventBus.emit("reloadGeoArea");
         localStorage.removeItem("circleDetailsCached")
+        circleDetails.value.name = "Zona 1"
 
         if(isDarkTheme.value){
           initializeMapDark()
