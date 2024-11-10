@@ -676,11 +676,12 @@ export default {
           if (circleDetails.value.name === "") {
             circleDetails.value.name = "Zona 1";
             circleDetails.value.type = "CIRCLE";
+          } else {
+            circleDetails.value.id = `${id}`;
           }
-          circleDetails.value.id = `${id}`;
           circleDetails.value.center = `${center.lat}, ${center.lng}`;
           circleDetails.value.radius = `${radius}`;
-
+          
           circleForConsult();
 
           // Evento para abrir o modal quando o círculo for clicado
@@ -857,6 +858,8 @@ export default {
         showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
         showSnackbar(`Erro ao salvar a zona: ${error.response.data.message}`, "error");
       }
+
+      window.location.reload();
     };
 
     const deleteCircle = async () => {
