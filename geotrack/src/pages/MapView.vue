@@ -843,7 +843,7 @@ export default {
 
         eventBus.emit("reloadGeoArea");
 
-        console.log("está no modo dark ? ",isDarkTheme)
+        localStorage.removeItem("circleDetailsCached")
 
         if(isDarkTheme.value){
           initializeMapDark()
@@ -852,6 +852,7 @@ export default {
         }
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
+        localStorage.removeItem("circleDetailsCached")
         showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
         showSnackbar(`Erro ao salvar a zona: ${error.response.data.message}`, "error");
       }
@@ -905,8 +906,8 @@ export default {
       if (circleInstance) {
         circleInstance.setMap(null);
         circleInstance = null;
-        localStorage.removeItem("cachedCircleDetails");
       }
+      localStorage.removeItem("circleDetailsCached")
       eventBus.emit("clearSelectedGeoArea");
     };
 
