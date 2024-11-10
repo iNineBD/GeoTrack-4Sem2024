@@ -882,6 +882,7 @@ export default {
         dialog.value = false;
         removeCircle();
         eventBus.emit("reloadGeoArea");
+        localStorage.removeItem("circleDetailsCached")
 
         if(isDarkTheme.value){
           initializeMapDark()
