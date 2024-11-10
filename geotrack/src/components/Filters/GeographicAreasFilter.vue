@@ -1,12 +1,13 @@
 <template>
-  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0; margin-bottom: 25px">
+  <v-card class="mx-auto" width="100%"
+    style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; height: 350px;" color="primary">
     <v-col style="padding: 20px 20px 0 20px">
       <!-- Card das áreas geográficas -->
       <v-card-actions class="d-flex justify-space-between">
         <v-row class="d-flex align-center no-gutters">
           <v-col cols="100%" style="padding: 0px">
             <!-- Combobox de áreas geográficas -->
-            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="primary" v-model="selectedGeoArea"
+            <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="secondary" v-model="selectedGeoArea"
               :items="geoAreas" item-value="id" item-title="name" clearable :multiple="false"
               @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
             </v-combobox>
@@ -25,16 +26,16 @@
 
       <!-- Users combobox -->
       <v-combobox v-model="selectedUser" label="Usuário" :items="users" item-title="name" item-value="deviceId"
-        prepend-icon="mdi-filter-variant" clearable :multiple="false" color="primary">
+        prepend-icon="mdi-filter-variant" clearable :multiple="false" color="secondary">
       </v-combobox>
 
       <!-- Date selection -->
-      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="primary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
-        :readonly="dateInputDisabled"></v-date-input>
+      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="secondary" :max="today"
+        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :readonly="dateInputDisabled">
+      </v-date-input>
 
       <!-- Quick date filters using chips -->
-      <v-col style="padding: 0px; display: flex; justify-content: space-evenly;">
+      <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
         <v-chip style="margin: 0px 2px !important" size="small" v-for="(filter, index) in quickFilters"
           :key="filter.label" @click="setQuickFilter(filter.range, index)"
           :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
@@ -45,16 +46,16 @@
     </v-col>
 
     <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
-      <v-row class="d-flex" no-gutters style="justify-content: space-around;">
+      <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :disabled="ButtonDisabled || loading" :loading="loading" class="text-none" color="primary" size="large"
-            variant="flat" block rounded="xl" @click="handleConsult">
+          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary"
+            size="large" variant="flat" block rounded="xl" @click="handleConsult">
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn :disabled="loading" :loading="loading" class="text-none" color="primary_light" size="large"
-            variant="flat" block rounded="xl" @click="clearFields">
+          <v-btn class="text-none" color="primary_light" size="large" variant="flat" block rounded="xl"
+            @click="clearFields">
             Limpar
           </v-btn>
         </v-col>
@@ -62,31 +63,27 @@
     </v-card-actions>
   </v-card>
 
-    <!-- Loading progress circular -->
-  <v-col v-if="loadingPage"  id="loadingStopPoints" class="d-flex justify-center mt-4">
-      <v-progress-circular color="primary" indeterminate></v-progress-circular>
+  <!-- Loading progress circular -->
+  <v-col v-if="loadingPage" id="loadingStopPoints" class="d-flex justify-center mt-4">
+    <v-progress-circular color="primary" indeterminate>
+    </v-progress-circular>
   </v-col>
 
-  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" top>
-    <span style="font-weight: bold; font-size: 15px; color: white;">
-      {{ snackbarMessage }}
-    </span>
-    <template v-slot:actions>
-      <v-btn color="white" variant="text" style="font-weight: bold; text-transform: uppercase; color: white;"
-        @click="snackbar = false">
-        Close
-      </v-btn>
-    </template>
+  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
+    {{ snackbarMessage }}
   </v-snackbar>
-
 </template>
 
 <script>
+import { eventBus } from '@/utils/EventBus';
+import axios from 'axios';
+
+
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
-    loadingPage: false,
     loading: false,
+    logo: "/src/assets/Logo.svg",
     date: null,
     users: [], // Lista de usuários
     selectedUser: null,
@@ -115,14 +112,19 @@ export default {
     longitude: null,
     radius: null,
     circleDrawn: false,
-    snackbar: false, // Controla a exibição do snackbar
-    snackbarMessage: '', // Mensagem exibida no snackbar
-    snackbarColor: 'success', // Cor do snackbar
+    snackbar: false,
+    snackbarColor: "success",
+    snackbarMessage: "",
   }),
 
   mounted() {
     this.fetchUsers();
     this.fetchGeoAreas();
+    eventBus.on('clearSelectedGeoArea', this.clearSelectedGeoArea);
+    eventBus.on('stopIsLoading', this.stopIsLoading);
+    eventBus.on('reloadGeoArea', this.reloadGeoArea);
+    eventBus.on("novoLogo", this.change)
+    eventBus.on("clearFields", this.clearFields);
   },
 
   computed: {
@@ -131,57 +133,86 @@ export default {
     },
 
     ButtonDisabled() {
-      const cachedDetails = localStorage.getItem('cachedCircleDetails');
+      const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
+
+
+      console.log('teste: ', cachedCircle)
 
       return !this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle);
     },
   },
 
   methods: {
+    showSnackbar(message, color = "success") {
+      this.snackbarMessage = message; // Define a mensagem
+      this.snackbarColor = color; // Define a cor
+      this.snackbar = true; // Torna o snackbar visível
+    },
+
+    clearSelectedGeoArea() {
+      this.selectedGeoArea = null;
+    },
+    change(newLogo) {
+      this.logo = newLogo;
+    },
+
+    stopIsLoading() {
+      this.loading = false;
+    },
+
+    async reloadGeoArea() {
+      this.selectedGeoArea = null;
+      this.fetchGeoAreas();
+    },
+
     async fetchUsers() {
       try {
-        const response = await fetch(
-          "http://localhost:8080/filters/users?page=0&qtdPage=1000"
-        );
-        const data = await response.json();
+      const response = await axios.get(
+        "http://localhost:8080/filters/users?page=0&qtdPage=1000"
+      );
+      const data = response.data;
 
-        // Mapeando a resposta da API para o formato correto
-        this.users = data.listUsers.map((user) => ({
-          name: user.userName.toUpperCase(), // Nome do usuário
-          deviceId: user.idDevice, // ID do dispositivo associado
-          device: user.deviceName,
-        }));
+      // Mapeando a resposta da API para o formato correto
+      this.users = data.listUsers.map((user) => ({
+        name: user.userName.toUpperCase(), // Nome do usuário
+        deviceId: user.idDevice, // ID do dispositivo associado
+        device: user.deviceName,
+      }));
 
-        console.log("Sucesso ao buscar usuários: ", this.users);
+      console.log("Sucesso ao buscar usuários: ", this.users);
       } catch (error) {
-        console.log("Erro ao buscar usuários: ", error);
+      console.log("Erro ao buscar usuários: ", error);
       }
     },
 
     async fetchGeoAreas() {
       try {
-        const response = await fetch("http://localhost:8080/zone");
-        const data = await response.json();
-        this.geoAreas = data.map((area) => ({
-          id: area.id,
-          name: area.name,
-          latitude: area.center.latitude,
-          longitude: area.center.longitude,
-          radius: area.radius,
-        }));
-        console.log("Áreas geográficas carregadas:", data);
+      const response = await axios.get("http://localhost:8080/zone");
+      const data = response.data;
+      this.geoAreas = data.map((area) => ({
+        id: area.id,
+        name: area.name,
+        latitude: area.center.latitude,
+        longitude: area.center.longitude,
+        radius: area.radius,
+      }));
+      console.log("Áreas geográficas carregadas:", data);
       } catch (error) {
-        console.log("Erro ao buscar áreas geográficas:", error);
+      console.log("Erro ao buscar áreas geográficas:", error);
       }
     },
 
     async handleGeoAreaChange() {
+      if (!this.selectedGeoArea) {
+        console.log("Área geográfica não selecionada ou foi limpa");
+        this.$emit("removeCircle");
+        return; // Interrompe a execução da função
+      }
 
       const cachedDetails = localStorage.getItem('cachedCircleDetails');
       const cachedCircle = JSON.parse(cachedDetails);
 
-      
       const selectedArea = this.geoAreas.find(
         (area) => area.id === this.selectedGeoArea.id
       );
@@ -209,37 +240,46 @@ export default {
     },
 
     async handleConsult() {
+      this.loading = true;
       const cachedDetails = localStorage.getItem('cachedCircleDetails');
       const cachedCircle = JSON.parse(cachedDetails);
-      let selectedArea = null
+      let selectedArea = null;
 
-      if (!this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle)) {
+      if (
+        !this.selectedUser ||
+        !this.date ||
+        (!this.selectedGeoArea && !cachedCircle)
+      ) {
         console.log("Dados incompletos para a consulta");
+        this.loading = false;
         return;
       }
 
-            if(this.selectedGeoArea){
-                selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+      if (this.selectedGeoArea) {
 
-                if (!selectedArea) {
-                    console.log("Área geográfica não encontrada");
-                    return;
-                }
-            }else{
-                selectedArea = cachedCircle;
-                selectedArea.latitude = selectedArea.center.latitude;
-                selectedArea.longitude = selectedArea.center.longitude;
-                console.log('passooou ', selectedArea)
-            }
+        selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+        if (!selectedArea) {
+          console.log("Área geográfica não encontrada");
+          this.loading = false;
+          return;
+        }
+      } else {
+        selectedArea = cachedCircle;
+        selectedArea.latitude = selectedArea.center.latitude;
+        selectedArea.longitude = selectedArea.center.longitude;
+        console.log('passooou ', selectedArea)
+      }
 
-      const qtddias = Math.round((new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) / (1000 * 60 * 60 * 24));
+      const qtddias = Math.round(
+        (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
+        (1000 * 60 * 60 * 24)
+      );
 
       if (qtddias > 31) {
-        this.showSnackbar("Mais que 31 dias selecionados");
+        this.showSnackbar("Mais que 31 dias selecionados", "error");
+        this.loading = false;
         return;
       }
-
-      this.loadingPage = true
 
       const requestData = {
         deviceId: this.selectedUser.deviceId,
@@ -259,9 +299,9 @@ export default {
       console.log("URL: ", url);
 
       try {
-        const response = await fetch(url);
-        if (response.ok) {
-          const data = await response.json();
+        const response = await axios.get(url);
+        if (response.status === 200) {
+          const data = await response.data;
 
           console.log("Pontos de parada recebidos:", data.stopPoints);
 
@@ -282,6 +322,8 @@ export default {
             coords: coord, // Definindo corretamente um array para coordenadas
           };
 
+          console.log("DADOS DA CONSULTA AQUI!!!", dados)
+
           // Dados enviados para plotar o círculo escolhido
           this.$emit("consult", dataCircleAndUser);
           this.$emit("stopPointsReceived", dados);
@@ -289,24 +331,39 @@ export default {
           const errorData = await response.json();
 
           console.log("Erro 404: ", errorData.message);
-          
-          this.showSnackbar('Dados não localizados para este usuário');
+
+          this.showSnackbar("Dados não localizados para este usuário", "error");
+          this.loading = false;
           this.$emit("noPointsFound", errorData.message);
         }
       } catch (error) {
         console.log("Erro ao buscar pontos de parada:", error);
+        this.showSnackbar("Dados não localizados para este usuário", "error");
+        this.loading = false;
+        this.$emit("noPointsFound", errorData.message);
       }
     },
 
     clearFields() {
-      window.location.reload();
-    },
+      this.date = null;
+      this.selectedUser = null;
+      this.devices = [];
+      this.selectedQuickFilter = null;
+      this.selectedGeoArea = null;
+      this.latitude = null;
+      this.longitude = null;
+      this.radius = null;
+      this.circleDrawn = false;
 
-    // Método para exibir o snackbar
-    showSnackbar(message, color = 'success') {
-      this.snackbarMessage = message;
-      this.snackbarColor = 'error';
-      this.snackbar = true;
+      console.log("logo novo: ", this.logo)
+
+      if (this.logo == "/src/assets/LogoWhite.svg") {
+        this.$emit("initializeMapDark");
+        eventBus.emit("clearStopPointsInformation");
+      } else {
+        this.$emit("initializeMap");
+        eventBus.emit("clearStopPointsInformation");
+      }
     },
 
     drawCircle() {
@@ -324,17 +381,6 @@ export default {
       }
     },
   },
-
-  watch: {
-    loading(val) {
-      if (!val) return;
-      setTimeout(() => (this.loading = false), 1000);
-    },
-    loadingPage(val) {
-      if (!val) return;
-      setTimeout(() => (this.loadingPage = false), 550);
-    },
-  },
 };
 </script>
 
@@ -349,7 +395,7 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 16px;
-  color: black;
+  color: terceary;
 }
 
 .title-text {
