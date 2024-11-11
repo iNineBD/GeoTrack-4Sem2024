@@ -62,10 +62,9 @@
 <script lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
 import logoGeoTrack from '../assets/GeoTrack-logo.png';
-import logoIto1 from '../assets/ito1-logo.png';
 import logoInine from '../assets/inine-logo.png';
+import logoIto1 from '../assets/ito1-logo.png';
 
 export default {
   name: 'Register',
@@ -88,11 +87,21 @@ export default {
       }
 
       try {
-        await axios.post('http://localhost:8080/auth/register', {
-          name: name.value,
-          email: email.value,
-          password: password.value,
+        const response = await fetch('http://localhost:8080/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: name.value,
+            email: email.value,
+            password: password.value,
+          }),
         });
+
+        if (!response.ok) {
+          throw new Error('Erro ao cadastrar usuário');
+        }
 
         snackbarMessage.value = 'Usuário cadastrado com sucesso!';
         snackbarColor.value = 'success';

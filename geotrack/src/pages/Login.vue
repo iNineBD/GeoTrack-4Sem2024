@@ -64,10 +64,9 @@
 <script lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import logoGeoTrack from "../assets/GeoTrack-logo.png";
-import logoIto1 from "../assets/ito1-logo.png";
 import logoInine from "../assets/inine-logo.png";
+import logoIto1 from "../assets/ito1-logo.png";
 
 export default {
   name: "Login",
@@ -82,26 +81,36 @@ export default {
 
     const handleLogin = async () => {
       try {
-        const response = await axios.post("http://localhost:8080/auth/login", {
-          email: email.value,
-          password: password.value,
-        });
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+        email: email.value,
+        password: password.value,
+        }),
+      });
 
-        console.info("Login bem-sucedido:", response.data);
-        localStorage.setItem("token", response.data.token);
+      if (!response.ok) {
+        throw new Error("Erro no login");
+      }
 
-        snackbarMessage.value = "Login bem-sucedido!";
-        snackbarColor.value = "success";
-        snackbar.value = true;
+      const data = await response.json();
+      console.info("Login bem-sucedido:", data);
+      localStorage.setItem("token", data.token);
 
-        router.push("/stoppointsfilter");
+      snackbarMessage.value = "Login bem-sucedido!";
+      snackbarColor.value = "success";
+      snackbar.value = true;
+
+      router.push("/stoppointsfilter");
       } catch (error) {
-        console.error("Erro no login:", error.response?.data || error.message);
+      console.error("Erro no login:", error.message);
 
-        snackbarMessage.value =
-          error.response?.data?.message || "Erro desconhecido no login";
-        snackbarColor.value = "error";
-        snackbar.value = true;
+      snackbarMessage.value = error.message || "Erro desconhecido no login";
+      snackbarColor.value = "error";
+      snackbar.value = true;
       }
     };
 
