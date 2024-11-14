@@ -43,12 +43,7 @@
       </v-row>
     </v-card-actions>
   </v-card>
-
-  <!-- Loading progress circular -->
-  <v-col v-if="loadingPage" class="d-flex justify-center mt-4">
-    <v-progress-circular color="primary" indeterminate></v-progress-circular>
-  </v-col>
-
+  
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
@@ -171,12 +166,6 @@ export default {
 
       console.log("Dados enviados:", requestData);
       this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
-
-      // Simulação do retorno dos postos de parada
-      setTimeout(() => {
-        this.showStopPointsInformation = true;  // Exibe o novo componente
-        this.loadingPage = false;
-      }, 2000); // Simulando o tempo de resposta
     },
 
     clearFields() {

@@ -18,6 +18,7 @@
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
                 @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
+              <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived" v-if="route.path === '/georoutesfilter'"/>
               <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints"
                 @go-to-location="navigateToLocation" />
               <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
@@ -37,12 +38,13 @@
       <v-btn key="map-marker" @click="handleHomeClick" icon="mdi-home" title="Home" color="primary"></v-btn>
 
       <!-- Botão para StopPointsFilter -->
-      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker"
-        title="Filtro de Pontos de Parada" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker" title="Filtro de Pontos de Parada" color="primary"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
-      <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search"
-        title="Filtro de Áreas Geográficas" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search" title="Filtro de Áreas Geográficas" color="primary"></v-btn>
+
+      <!-- Botão para GeoRoutesFilter -->
+      <v-btn key="map-marker" @click="handleGeoRoutesFilterClick" icon="mdi-map-marker-distance" title="Filtro de Rotas" color="primary"></v-btn>
 
       <!-- Botão para Sair -->
       <v-btn key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída" color="#F44336"></v-btn>
@@ -54,6 +56,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
+import GeoRoutesFilter from "../Filters/GeoRoutesFilter.vue";
 import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
 import { FilterData } from "@/pages/MapView.vue";
@@ -99,6 +102,7 @@ const props = defineProps<{
   onDrawCircle: () => void;
   onGeographicAreaConsult: (data: FilterData) => any;
   onStopPointsReceived: (stopPoints: any) => void;
+  onRoutesReceived: (routes: any) => void;
 }>();
 
 interface StopPoint {
@@ -155,6 +159,11 @@ const handleStopPointsReceived = (stopPoints: any) => {
   props.onStopPointsReceived(stopPoints);
 };
 
+const handleRoutesReceived = (routes: any) => {
+  console.log("Rotas recebidas no sidebar", routes);
+  props.onRoutesReceived(routes);
+};
+
 const initializeMap = () => {
   emit("initializeMap");
 };
@@ -188,6 +197,19 @@ const goToFilterGeographicAreas = () => {
   }
 };
 
+const goToFilterGeoRoutes = () => {
+  router.push("/georoutesfilter");
+  //@ts-ignore
+  panel.value = [0];
+  toggleDial();
+  if (logo.value === "/src/assets/Logo.svg") {
+    emit("initializeMap");
+  } else {
+    emit("initializeMapDark");
+  }
+};
+
+
 const handleLogout = () => {
   localStorage.removeItem("token");
   router.push({ name: "Login" });
@@ -207,6 +229,12 @@ const handleGeographicAreasFilterClick = () => {
   goToFilterGeographicAreas();
   handlePanelChange();
 };
+
+const handleGeoRoutesFilterClick = () => {
+  goToFilterGeoRoutes();
+  handlePanelChange();
+};
+
 
 const handleHomeClick = () => {
   handlePanelChange();

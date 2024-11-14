@@ -36,6 +36,18 @@ const routes = [
     }
   },
   {
+    path: '/georoutesfilter',
+    name: 'GeoRoutesFilter',
+    component: MapView,
+    beforeEnter: (to, from, next) => {
+      if (isTokenExpired()) {
+        next({ name: 'Login' });
+      } else {
+        next();
+      }
+    }
+  },
+  {
     path: '/register',
     name: 'Register',
     component: Register,
