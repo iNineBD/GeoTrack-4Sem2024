@@ -1,7 +1,8 @@
 <template>
   <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
     @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap"
-    @initializeMap="initializeMap" @removeCircle="removeCircle" @initializeMapDark="initializeMapDark" />
+    @initializeMap="initializeMap" @removeCircle="removeCircle" @initializeMapDark="initializeMapDark"
+    @routesReceived="handleRoutesReceived" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
   <v-switch v-model="isDarkTheme" hide-details inset style="
       position: fixed;
@@ -23,9 +24,6 @@
       style="position: fixed; top: 12px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;">
     </v-btn>
 
-    <MetricsCard v-if="isPanelOpen"
-      style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
-    </MetricsCard>
   </div>
 
 
@@ -54,7 +52,7 @@
             Salvar
           </v-btn>
           <v-btn variant="flat" color="primary_light" @click="removeCircle" style="margin: 0px 10px 15px 10px"
-            rounded="xl" >
+            rounded="xl">
             Remover
           </v-btn>
           <v-btn variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
@@ -80,6 +78,7 @@
 import vuetify from "@/plugins/vuetify";
 import { eventBus } from "@/utils/EventBus"; // Importando o EventBus
 import axios from "axios";
+import { Color } from "ol/color";
 import { onMounted, ref, watch } from "vue";
 import { id } from "vuetify/locale";
 
@@ -506,10 +505,10 @@ export default {
       }
     };
 
-    const centerMapOnMarker = (position: google.maps.LatLngLiteral) => {
+    const centerMapOnMarker = (position: google.maps.LatLngLiteral, zoom: number) => {
       if (map.value) {
         map.value.panTo(position);
-        map.value.setZoom(15);
+        map.value.setZoom(zoom);
       }
     };
 
@@ -587,8 +586,97 @@ export default {
       eventBus.emit("stopIsLoading");
     };
 
+    const handleRoutesReceived = (routes: any) => {
+      clearMarkers();
+
+      routes.routes.forEach((route: any) => {
+        const routePath = [];
+
+        route.coordinates.forEach((coord: any, index: number) => {
+          const position = { latitude: coord.latitude, longitude: coord.longitude };
+          routePath.push(position);
+
+          let color = "#000B62";
+          let scale = 5;
+
+          if (index === 0) {
+            color = "green";
+            scale = 10;
+          }
+
+          if (index === route.coordinates.length - 1) {
+            color = "red";
+            scale = 10;
+          }
+
+          plotPointRouteOnMap({
+            device: `Data: ${coord.date}`,
+            coords: position,
+          }, color, scale);
+        });
+
+        // Converte os pontos da rota para o formato Google Maps
+        const googleRoutePath = routePath.map(point => ({
+          lat: point.latitude,
+          lng: point.longitude,
+        }));
+
+        // Desenha a linha da rota no mapa
+        const routeLine = new google.maps.Polyline({
+          path: googleRoutePath,
+          geodesic: true,
+          strokeColor: '#000B62',
+          strokeOpacity: 1.0,
+          strokeWeight: 2,
+        });
+        routeLine.setMap(map.value);
+      });
+
+      eventBus.emit("stopIsLoading");
+    };
+
     function toggleTheme(): void {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
+    };
+
+    const plotPointRouteOnMap = (userData: any, color: string, scale: number) => {
+      const position = {
+        lat: userData.coords.latitude,
+        lng: userData.coords.longitude,
+      }; // Coordenadas
+
+      const marker = new google.maps.Marker({
+        position,
+        map: map.value,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: scale,
+          fillColor: color,
+          fillOpacity: 1,
+          strokeWeight: 2,
+          strokeColor: "#ffffff",
+        },
+      });
+
+      // Adiciona o marcador no array global para controle
+      markers.push(marker);
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `<div style="color: black;">
+              <strong>Dispositivo:</strong> ${userData.device}<br>
+              <strong>Coordenadas:</strong> ${position.lat}, ${position.lng}
+            </div>`,
+      });
+
+      google.maps.event.addListener(marker, "click", () => {
+        infoWindow.open(map.value!, marker);
+      });
+
+      google.maps.event.addListener(map.value, "click", () => {
+        infoWindow.close();
+      });
+
+      centerMapOnMarker(position, 22);
     };
 
     const plotPointOnMap = (userData: any) => {
@@ -642,7 +730,7 @@ export default {
         infoWindow.close();
       });
 
-      centerMapOnMarker(position);
+      centerMapOnMarker(position, 15);
     };
 
     const initializeDrawingManager = () => {
@@ -681,7 +769,7 @@ export default {
           }
           circleDetails.value.center = `${center.lat}, ${center.lng}`;
           circleDetails.value.radius = `${radius}`;
-          
+
           circleForConsult();
 
           // Evento para abrir o modal quando o círculo for clicado
@@ -787,8 +875,8 @@ export default {
         radius: parseFloat(circleDetails.value.radius)
       };
 
-        // Armazenando os dados no localStorage
-        localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
+      // Armazenando os dados no localStorage
+      localStorage.setItem('cachedCircleDetails', JSON.stringify(payload));
 
     };
 
@@ -847,9 +935,9 @@ export default {
         circleDetails.value.name = "Zona 1"
 
         localStorage.removeItem("circleDetailsCached")
-        if(isDarkTheme.value){
+        if (isDarkTheme.value) {
           initializeMapDark()
-        }else{
+        } else {
           initializeMap()
         }
       } catch (error) {
@@ -889,9 +977,9 @@ export default {
         localStorage.removeItem("circleDetailsCached")
         circleDetails.value.name = "Zona 1"
 
-        if(isDarkTheme.value){
+        if (isDarkTheme.value) {
           initializeMapDark()
-        }else{
+        } else {
           initializeMap()
         }
       } catch (error) {
@@ -997,6 +1085,7 @@ export default {
       drawCircleOnMap,
       handleGeographicAreaConsult,
       handleStopPointsOnMap,
+      handleRoutesReceived,
 
       isPanelOpen,
       togglePanel,

@@ -63,12 +63,6 @@
     </v-card-actions>
   </v-card>
 
-  <!-- Loading progress circular -->
-  <v-col v-if="loadingPage" id="loadingStopPoints" class="d-flex justify-center mt-4">
-    <v-progress-circular color="primary" indeterminate>
-    </v-progress-circular>
-  </v-col>
-
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
