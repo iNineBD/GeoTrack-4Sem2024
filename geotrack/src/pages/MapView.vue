@@ -15,7 +15,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-      }}</v-icon>
+        }}</v-icon>
     </template>
   </v-switch>
 
@@ -941,8 +941,9 @@ export default {
         }
 
         setTimeout(() => {
-      window.location.reload();
-      }, 500); // 2000 ms = 2 segundos
+          window.location.reload();
+        }, 500); // 2000 ms = 2 segundos
+
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
         localStorage.removeItem("circleDetailsCached")
@@ -984,8 +985,8 @@ export default {
           initializeMap()
         }
         setTimeout(() => {
-      window.location.reload();
-      }, 500); // 2000 ms = 2 segundos
+          window.location.reload();
+        }, 500); // 2000 ms = 2 segundos
       } catch (error) {
         console.log("Erro ao deletar os dados:", error);
         showSnackbar("Erro ao deletar a zona. Tente novamente.", "error");
