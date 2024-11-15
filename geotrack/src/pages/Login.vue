@@ -80,6 +80,7 @@ export default {
     const snackbarColor = ref("");
 
     const handleLogin = async () => {
+      localStorage.removeItem("token");
       try {
       const response = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
@@ -93,7 +94,10 @@ export default {
       });
 
       if (!response.ok) {
-        throw new Error("Erro no login");
+        const errorData = await response.json();
+        snackbarMessage.value = errorData.message;
+        snackbarColor.value = 'error';
+        snackbar.value = true;
       }
 
       const data = await response.json();
@@ -106,11 +110,7 @@ export default {
 
       router.push("/stoppointsfilter");
       } catch (error) {
-      console.error("Erro no login:", error.message);
-
-      snackbarMessage.value = error.message || "Erro desconhecido no login";
-      snackbarColor.value = "error";
-      snackbar.value = true;
+      console.error("Erro no login:", error);
       }
     };
 
@@ -155,11 +155,11 @@ export default {
 
 .yellow-section {
   background-position: center;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
- 
+
   border-radius: 20px;
 }
 
