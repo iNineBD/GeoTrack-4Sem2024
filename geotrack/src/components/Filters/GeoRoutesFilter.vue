@@ -1,18 +1,18 @@
 <template>
     <v-card class="mx-auto" width="100%"
       style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; padding-bottom: 20px;" color="primary">
-      <v-col style="padding: 20px 20px 0 20px"> 
-  
+      <v-col style="padding: 20px 20px 0 20px">
+
         <!-- Users combobox -->
         <v-combobox v-model="selectedUser" label="Usuário" :items="users" item-title="name" item-value="deviceId"
           prepend-icon="mdi-filter-variant" clearable :multiple="false" color="secondary">
         </v-combobox>
-  
+
         <!-- Date selection -->
         <v-date-input v-model="date" label="Selecione o período" multiple="range" color="secondary" :max="today"
           :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :readonly="dateInputDisabled">
         </v-date-input>
-  
+
         <!-- Quick date filters using chips -->
         <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
           <v-chip style="margin: 0px 2px !important" size="small" v-for="(filter, index) in quickFilters"
@@ -23,7 +23,7 @@
           </v-chip>
         </v-col>
       </v-col>
-  
+
       <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
         <v-row class="d-flex" no-gutters style="justify-content: space-around">
           <v-col cols="7">
@@ -41,17 +41,17 @@
         </v-row>
       </v-card-actions>
     </v-card>
-  
+
     <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
       {{ snackbarMessage }}
     </v-snackbar>
   </template>
-  
+
   <script>
   import { eventBus } from '@/utils/EventBus';
   import axios from 'axios';
-  
-  
+
+
   export default {
     data: () => ({
       today: new Date().toISOString().substr(0, 10),
@@ -85,7 +85,7 @@
       snackbarColor: "success",
       snackbarMessage: "",
     }),
-  
+
     mounted() {
       this.fetchUsers();
       eventBus.on('stopIsLoading', this.stopIsLoading);
@@ -93,42 +93,42 @@
       eventBus.on("novoLogo", this.change)
       eventBus.on("clearFields", this.clearFields);
     },
-  
+
     computed: {
       ButtonDisabled() {
         return !this.selectedUser || !this.date;
       },
     },
-  
+
     methods: {
       showSnackbar(message, color = "success") {
         this.snackbarMessage = message; // Define a mensagem
         this.snackbarColor = color; // Define a cor
         this.snackbar = true; // Torna o snackbar visível
       },
-  
+
       change(newLogo) {
         this.logo = newLogo;
       },
-  
+
       stopIsLoading() {
         this.loading = false;
       },
-  
+
       async fetchUsers() {
         try {
         const response = await axios.get(
           "http://localhost:8080/filters/users?page=0&qtdPage=1000"
         );
         const data = response.data;
-  
+
         // Mapeando a resposta da API para o formato correto
         this.users = data.listUsers.map((user) => ({
           name: user.userName.toUpperCase(), // Nome do usuário
           deviceId: user.idDevice, // ID do dispositivo associado
           device: user.deviceName,
         }));
-  
+
         console.log("Sucesso ao buscar usuários: ", this.users);
         } catch (error) {
         console.log("Erro ao buscar usuários: ", error);
@@ -137,7 +137,7 @@
 
       async handleConsult() {
         this.loading = true;
-  
+
         if (
           !this.selectedUser ||
           !this.date
@@ -145,21 +145,21 @@
           this.loading = false;
           return;
         }
-  
+
         if (this.selectedUser) {
         }
-  
+
         const qtddias = Math.round(
           (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
           (1000 * 60 * 60 * 24)
         );
-  
+
         if (qtddias > 31) {
           this.showSnackbar("Mais que 31 dias selecionados", "error");
           this.loading = false;
           return;
         }
-  
+
         const requestData = {
           deviceId: this.selectedUser.deviceId,
           startDate: new Date(this.date[0]).toLocaleDateString("en-CA"),
@@ -167,18 +167,18 @@
             "en-CA"
           ),
         };
-  
+
         console.log("Dados enviados: ", requestData);
-  
+
         const url = `http://localhost:8080/routes?deviceId=${requestData.deviceId}&&dateStart=${requestData.startDate}&dateEnd=${requestData.finalDate}`
-  
+
         try {
           const response = await axios.get(url);
           if (response.status === 200) {
             const data = await response.data;
-  
+
             console.log("Rotas recebidas:", data.routes);
-  
+
             const dados = {
                 routes: data.routes.map(route => ({
                     startDate: route.date_start,
@@ -190,18 +190,15 @@
                     }))
                 }))
             };
-  
+
             this.$emit("routesReceived", dados);
-          } else if (response.status === 404) {
-            this.showSnackbar("Dados não localizados para este usuário", "error");
-            this.loading = false;
-          }
-        } catch (error) {
-          this.showSnackbar("Dados não localizados para este usuário", "error");
+          } } catch (error) {
+          console.log(error)
+          this.showSnackbar(error.response.data.message, "error");
           this.loading = false;
         }
       },
-  
+
       clearFields() {
         this.date = null;
         this.selectedUser = null;
@@ -209,7 +206,7 @@
         this.selectedQuickFilter = null;
         this.latitude = null;
         this.longitude = null;
-  
+
         if (this.logo == "/src/assets/LogoWhite.svg") {
           this.$emit("initializeMapDark");
           eventBus.emit("clearStopPointsInformation");
@@ -233,12 +230,12 @@
     },
   };
   </script>
-  
+
   <style scoped>
   .icon-container {
     position: relative;
   }
-  
+
   .plus-icon {
     position: absolute;
     top: 50%;
@@ -247,18 +244,17 @@
     font-size: 16px;
     color: terceary;
   }
-  
+
   .title-text {
     font-weight: bold;
     font-size: 16px;
   }
-  
+
   .no-shadow {
     box-shadow: none !important;
   }
-  
+
   .rounded {
     border-radius: 0 !important;
   }
   </style>
-  

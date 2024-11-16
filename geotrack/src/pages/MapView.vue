@@ -24,6 +24,10 @@
       style="position: fixed; top: 12px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;">
     </v-btn>
 
+    <MetricsCard v-if="isPanelOpen"
+      style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
+    </MetricsCard>
+
   </div>
 
 
