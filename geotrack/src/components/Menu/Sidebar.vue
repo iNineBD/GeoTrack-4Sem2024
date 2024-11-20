@@ -20,7 +20,9 @@
                 @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
 
-              <StopPointInZoneFilter v-if="route.path === '/StopPointInZoneFilter'" @initializeMap="initializeMap"
+              <StopPointInZoneFilter v-if="route.path === '/StopPointInZoneFilter'" @removeCircle="handleRemoveCircle"
+                @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
+                @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
 
               <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived"
