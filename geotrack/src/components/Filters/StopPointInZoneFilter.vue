@@ -1,33 +1,38 @@
 <template>
-    <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; "
-        color="primary">
-        <v-col style="padding: 20px 20px 0 20px;">
-            <!-- Users selection -->
-            <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
-                prepend-icon="mdi-filter-variant" chips clearable multiple color="secondary">
-                <template v-slot:selection="{ attrs, item, select, selected }">
-                    <v-chip v-bind="attrs" :model-value="selected" closable @click="select" @click:close="remove(item)">
-                    </v-chip>
-                </template>
-            </v-combobox>
+    <v-card class="mx-auto" width="100%"
+        style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; height: 350px;" color="primary">
+        <v-col style="padding: 20px 20px 0 20px">
+            <!-- Card das áreas geográficas -->
+            <v-card-actions class="d-flex justify-space-between">
+                <v-row class="d-flex align-center no-gutters">
+                    <v-col cols="100%" style="padding: 0px">
+                        <!-- Combobox de áreas geográficas -->
+                        <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="secondary"
+                            v-model="selectedGeoArea" :items="geoAreas" item-value="id" item-title="name" clearable
+                            :multiple="false" @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
+                        </v-combobox>
+                    </v-col>
+
+                </v-row>
+            </v-card-actions>
 
             <!-- Date selection -->
             <v-date-input v-model="date" label="Selecione o período" multiple="range" color="secondary" :max="today"
-                :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
-                :readonly="dateInputDisabled"></v-date-input>
+                :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :readonly="dateInputDisabled">
+            </v-date-input>
 
             <!-- Quick date filters using chips -->
             <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
-                <v-chip v-for="(filter, index) in quickFilters" :key="filter.label"
-                    @click="setQuickFilter(filter.range, index)"
+                <v-chip style="margin: 0px 2px !important" size="small" v-for="(filter, index) in quickFilters"
+                    :key="filter.label" @click="setQuickFilter(filter.range, index)"
                     :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
-                    :active="selectedQuickFilter === index" filter variant="flat" size="small">
+                    :active="selectedQuickFilter === index" filter class="ma-2" variant="flat">
                     {{ filter.label }}
                 </v-chip>
             </v-col>
         </v-col>
 
-        <v-card-actions class="d-flex" style="padding: 20px 20px 10px 20px">
+        <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
             <v-row class="d-flex" no-gutters style="justify-content: space-around">
                 <v-col cols="7">
                     <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary"
@@ -54,15 +59,13 @@
 import { eventBus } from '@/utils/EventBus';
 import axios from 'axios';
 
+
 export default {
     data: () => ({
         today: new Date().toISOString().substr(0, 10),
         loading: false,
         logo: "/src/assets/Logo.svg",
         date: null,
-        users: [], // Lista de usuários
-        selectedUsers: [], // Armazena múltiplos usuários selecionados
-        devices: [],
         locale: "pt",
         customDateFormat: "dd/MM/yyyy",
         quickFilters: [
@@ -82,28 +85,52 @@ export default {
         ],
         selectedQuickFilter: null,
         dateInputDisabled: false,
-
+        geoAreas: [],
+        selectedGeoArea: null,
+        latitude: null,
+        longitude: null,
+        radius: null,
+        circleDrawn: false,
         snackbar: false,
         snackbarColor: "success",
         snackbarMessage: "",
     }),
 
-    emits: ['consult'],
-
     mounted() {
-        this.fetchUsers();
+        this.fetchGeoAreas();
+        eventBus.on('clearSelectedGeoArea', this.clearSelectedGeoArea);
         eventBus.on('stopIsLoading', this.stopIsLoading);
+        eventBus.on('reloadGeoArea', this.reloadGeoArea);
         eventBus.on("novoLogo", this.change)
         eventBus.on("clearFields", this.clearFields);
     },
 
     computed: {
+        disableDrawButton() {
+            return this.selectedGeoArea !== null;
+        },
+
         ButtonDisabled() {
-            return this.selectedUsers.length === 0 || !this.date;
+            const cachedDetails = localStorage.getItem("cachedCircleDetails");
+            const cachedCircle = JSON.parse(cachedDetails);
+
+
+            console.log('teste: ', cachedCircle)
+
+            return !this.date || (!this.selectedGeoArea && !cachedCircle);
         },
     },
 
     methods: {
+        showSnackbar(message, color = "success") {
+            this.snackbarMessage = message; // Define a mensagem
+            this.snackbarColor = color; // Define a cor
+            this.snackbar = true; // Torna o snackbar visível
+        },
+
+        clearSelectedGeoArea() {
+            this.selectedGeoArea = null;
+        },
         change(newLogo) {
             this.logo = newLogo;
         },
@@ -112,38 +139,92 @@ export default {
             this.loading = false;
         },
 
-        showSnackbar(message, color = "success") {
-            this.snackbarMessage = message; // Define a mensagem
-            this.snackbarColor = color; // Define a cor
-            this.snackbar = true; // Torna o snackbar visível
+        async reloadGeoArea() {
+            this.selectedGeoArea = null;
+            this.fetchGeoAreas();
         },
 
-        async fetchUsers() {
+        async fetchGeoAreas() {
             try {
-                const response = await axios.get(
-                    "http://localhost:8080/filters/users?page=0&qtdPage=1000",
-                );
+                const response = await axios.get("http://localhost:8080/zone");
                 const data = response.data;
-
-                // Mapeando a resposta da API para o formato correto
-                this.users = data.listUsers.map((user) => ({
-                    name: user.userName.toUpperCase(), // Nome do usuário
-                    deviceId: user.idDevice, // ID do dispositivo 
+                this.geoAreas = data.map((area) => ({
+                    id: area.id,
+                    name: area.name,
+                    latitude: area.center.latitude,
+                    longitude: area.center.longitude,
+                    radius: area.radius,
                 }));
-
-                console.log("Successfully fetched users:", this.users);
+                console.log("Áreas geográficas carregadas:", data);
             } catch (error) {
-                console.log("Error fetching users:", error);
+                console.log("Erro ao buscar áreas geográficas:", error);
             }
         },
 
+        async handleGeoAreaChange() {
+            if (!this.selectedGeoArea) {
+                console.log("Área geográfica não selecionada ou foi limpa");
+                this.$emit("removeCircle");
+                return; // Interrompe a execução da função
+            }
+
+            const cachedDetails = localStorage.getItem('cachedCircleDetails');
+            const cachedCircle = JSON.parse(cachedDetails);
+
+            const selectedArea = this.geoAreas.find(
+                (area) => area.id === this.selectedGeoArea.id
+            );
+
+            if (!selectedArea) {
+                console.log("Área geográfica não encontrada");
+                return;
+            }
+
+            const requestData = {
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
+            };
+
+            const dataCircle = {
+                id: selectedArea.id,
+                name: selectedArea.name,
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
+            };
+
+            this.$emit("consult", dataCircle);
+        },
+
         async handleConsult() {
-            if (this.selectedUsers.length === 0 || !this.date) return;
-
             this.loading = true;
+            const cachedDetails = localStorage.getItem('cachedCircleDetails');
+            const cachedCircle = JSON.parse(cachedDetails);
+            let selectedArea = null;
+            if (
+                !this.date ||
+                (!this.selectedGeoArea && !cachedCircle)
+            ) {
+                console.log("Dados incompletos para a consulta");
+                this.loading = false;
+                return;
+            }
 
-            // Extraindo os IDs dos dispositivos dos usuários selecionados
-            const deviceIds = this.selectedUsers.map((user) => user.deviceId);
+            if (this.selectedGeoArea) {
+
+                selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+                if (!selectedArea) {
+                    console.log("Área geográfica não encontrada");
+                    this.loading = false;
+                    return;
+                }
+            } else {
+                selectedArea = cachedCircle;
+                selectedArea.latitude = selectedArea.center.latitude;
+                selectedArea.longitude = selectedArea.center.longitude;
+                console.log('passooou ', selectedArea)
+            }
 
             const qtddias = Math.round(
                 (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
@@ -156,24 +237,75 @@ export default {
                 return;
             }
 
-            // Preparando os dados da requisição com todos os devices como um array e as datas uma única vez
             const requestData = {
-                devices: deviceIds, // Array de IDs dos dispositivos
-                startDate: new Date(this.date[0]).toLocaleDateString("en-CA"), // Data de início
+                startDate: new Date(this.date[0]).toLocaleDateString("en-CA"),
                 finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString(
                     "en-CA"
-                ), // Data de fim
+                ),
+                latitude: selectedArea.latitude,
+                longitude: selectedArea.longitude,
+                radius: selectedArea.radius,
             };
 
-            console.log("Dados enviados:", requestData);
-            this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
+            console.log("Dados enviados: ", requestData);
+
+            const url = `http://localhost:8080/stoppointsession/pointsInSession?deviceId=${requestData.deviceId}&startDate=${requestData.startDate}&endDate=${requestData.finalDate}&latitude=${requestData.latitude}&longitude=${requestData.longitude}&radius=${requestData.radius}`;
+
+            console.log("URL: ", url);
+
+            try {
+                const response = await axios.get(url);
+                if (response.status === 200) {
+                    const data = await response.data;
+
+                    console.log("Pontos de parada recebidos:", data.stopPoints);
+
+                    const dataCircle = {
+                        id: selectedArea.id,
+                        name: selectedArea.name,
+                        latitude: selectedArea.latitude,
+                        longitude: selectedArea.longitude,
+                        radius: selectedArea.radius,
+                    };
+
+                    const coord = data.stopPoints;
+
+                    const dados = {
+                        device: this.selected.device,
+                        coords: coord, // Definindo corretamente um array para coordenadas
+                    };
+
+                    console.log("DADOS DA CONSULTA AQUI!!!", dados)
+
+                    // Dados enviados para plotar o círculo escolhido
+                    this.$emit("consult", dataCircle);
+                    this.$emit("stopPointsReceived", dados);
+                } else if (response.status === 404) {
+                    const errorData = await response.json();
+
+                    console.log("Erro 404: ", errorData.message);
+
+                    this.showSnackbar("Dados não localizados para este usuário", "error");
+                    this.loading = false;
+                    this.$emit("noPointsFound", errorData.message);
+                }
+            } catch (error) {
+                console.log("Erro ao buscar pontos de parada:", error);
+                this.showSnackbar("Dados não localizados para este usuário", "error");
+                this.loading = false;
+                this.$emit("noPointsFound", errorData.message);
+            }
         },
 
         clearFields() {
             this.date = null;
-            this.selectedUsers = [];
             this.devices = [];
             this.selectedQuickFilter = null;
+            this.selectedGeoArea = null;
+            this.latitude = null;
+            this.longitude = null;
+            this.radius = null;
+            this.circleDrawn = false;
 
             console.log("logo novo: ", this.logo)
 
@@ -186,6 +318,9 @@ export default {
             }
         },
 
+        drawCircle() {
+            this.$emit("drawCircle");
+        },
         setQuickFilter(range, index) {
             if (this.selectedQuickFilter === index) {
                 this.selectedQuickFilter = null;
@@ -197,32 +332,34 @@ export default {
                 this.dateInputDisabled = true;
             }
         },
-
-        remove(item) {
-            this.selectedUsers = this.selectedUsers.filter(
-                (user) => user.id !== item.id
-            );
-        },
-        // Método para exibir o snackbar
-        showSnackbar(message, color = "success") {
-            this.snackbarMessage = message;
-            this.snackbarColor = "error";
-            this.snackbar = true;
-        },
-
-    },
-
-
-    watch: {
-        selectedUsers(newValue) {
-            if (newValue.length > 5) {
-                this.selectedUsers = newValue.slice(0, 5);
-            }
-            console.log('users selecionados:', this.selectedUsers);
-        },
     },
 };
-
 </script>
 
-<style scoped></style>
+<style scoped>
+.icon-container {
+    position: relative;
+}
+
+.plus-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    color: terceary;
+}
+
+.title-text {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.no-shadow {
+    box-shadow: none !important;
+}
+
+.rounded {
+    border-radius: 0 !important;
+}
+</style>

@@ -57,7 +57,7 @@
       <v-btn key="map-marker" @click="handleGeoRoutesFilterClick" icon="mdi-map-marker-distance" title="Filtro de Rotas"
         color="primary"></v-btn>
       <!-- Botão para stopPointInZone -->
-      <v-btn key="map-marker" @click="StopPointInZoneFilter" icon="" title="Filtro de pontos de parada em zona"
+      <v-btn key="map-marker" @click="handleStopPointInZoneFilter" icon="" title="Filtro de pontos de parada em zona"
         color="primary"></v-btn>
 
       <!-- Botão para Sair -->
