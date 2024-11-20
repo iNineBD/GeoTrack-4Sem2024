@@ -14,13 +14,21 @@
               <!-- Exibe o filtro correto com base na rota -->
               <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"
                 @initializeMap="initializeMap" @initializeMapDark="initializeMapDark" />
+
               <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @removeCircle="handleRemoveCircle"
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
                 @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
-              <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived" v-if="route.path === '/georoutesfilter'"/>
+
+              <StopPointInZoneFilter v-if="route.path === '/StopPointInZoneFilter'" @initializeMap="initializeMap"
+                @initializeMapDark="initializeMapDark" />
+
+              <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived"
+                v-if="route.path === '/georoutesfilter'" />
+
               <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints"
                 @go-to-location="navigateToLocation" />
+
               <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
                 @navigate-to-stop-point="navigateGeoToLocation" />
             </v-container>
@@ -38,13 +46,19 @@
       <v-btn key="map-marker" @click="handleHomeClick" icon="mdi-home" title="Home" color="primary"></v-btn>
 
       <!-- Botão para StopPointsFilter -->
-      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker" title="Filtro de Pontos de Parada" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker"
+        title="Filtro de Pontos de Parada" color="primary"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
-      <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search" title="Filtro de Áreas Geográficas" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search"
+        title="Filtro de Áreas Geográficas" color="primary"></v-btn>
 
       <!-- Botão para GeoRoutesFilter -->
-      <v-btn key="map-marker" @click="handleGeoRoutesFilterClick" icon="mdi-map-marker-distance" title="Filtro de Rotas" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleGeoRoutesFilterClick" icon="mdi-map-marker-distance" title="Filtro de Rotas"
+        color="primary"></v-btn>
+      <!-- Botão para stopPointInZone -->
+      <v-btn key="map-marker" @click="StopPointInZoneFilter" icon="" title="Filtro de pontos de parada em zona"
+        color="primary"></v-btn>
 
       <!-- Botão para Sair -->
       <v-btn key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída" color="#F44336"></v-btn>
@@ -59,6 +73,7 @@ import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
 import GeoRoutesFilter from "../Filters/GeoRoutesFilter.vue";
 import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
+import StopPointInZoneFilter from '../Filters/StopPointInZoneFilter.vue'
 import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 import { eventBus } from '@/utils/EventBus'; // Verifique se está importado corretamente
@@ -93,7 +108,7 @@ const toggleDial = () => {
 
 const updateLogo = () => {
   logo.value = logo.value === "/src/assets/Logo.svg" ? "/src/assets/LogoWhite.svg" : "/src/assets/Logo.svg";
-  eventBus.emit("novoLogo",logo.value)
+  eventBus.emit("novoLogo", logo.value)
 };
 
 // Definindo as props
@@ -209,6 +224,18 @@ const goToFilterGeoRoutes = () => {
   }
 };
 
+const goToStopPointsZone = () => {
+  router.push("/StopPointInZoneFilter");
+  //@ts-ignore
+  panel.value = [0];
+  toggleDial();
+  if (logo.value === "/src/assets/Logo.svg") {
+    emit("initializeMap");
+  } else {
+    emit("initializeMapDark");
+  }
+};
+
 
 const handleLogout = () => {
   localStorage.removeItem("token");
@@ -232,6 +259,11 @@ const handleGeographicAreasFilterClick = () => {
 
 const handleGeoRoutesFilterClick = () => {
   goToFilterGeoRoutes();
+  handlePanelChange();
+};
+
+const handleStopPointInZoneFilter = () => {
+  goToStopPointsZone();
   handlePanelChange();
 };
 

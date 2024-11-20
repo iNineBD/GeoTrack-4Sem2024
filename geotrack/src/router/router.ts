@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Vue from 'vue';
-import Router from 'vue-router';
 import Login from '../pages/Login.vue'; 
 import MapView from '../pages/MapView.vue';
 import Register from '../pages/Register.vue';
@@ -48,6 +46,18 @@ const routes = [
     }
   },
   {
+    path: '/StopPointInZoneFilter',
+    name: 'StopPointInZoneFilter',
+    component: MapView,
+    beforeEnter: (to, from, next) => {
+      if (isTokenExpired()) {
+        next({ name: 'Login' });
+      } else {
+        next();
+      }
+    }
+  },
+  {
     path: '/register',
     name: 'Register',
     component: Register,
@@ -68,8 +78,6 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
   const requiresAuth = to.name !== 'Login';
-
-  console.log('testando: ', to.name == 'Register');
 
   if (to.name === 'Register' && from.name !== 'Register') {
     // Só redireciona se a navegação não veio de 'Register'

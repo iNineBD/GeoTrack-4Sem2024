@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; "
+  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px;"
     color="primary">
     <v-col style="padding: 20px 20px 0 20px;">
       <!-- Users selection -->
@@ -43,7 +43,7 @@
       </v-row>
     </v-card-actions>
   </v-card>
-  
+
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
@@ -87,12 +87,12 @@ export default {
     snackbarMessage: "",
   }),
 
-  emits: ['consult'],
+  emits: ['consult', 'initializeMap', 'initializeMapDark'],
 
   mounted() {
     this.fetchUsers();
     eventBus.on('stopIsLoading', this.stopIsLoading);
-    eventBus.on("novoLogo", this.change)
+    eventBus.on("novoLogo", this.change);
     eventBus.on("clearFields", this.clearFields);
   },
 
@@ -119,20 +119,18 @@ export default {
 
     async fetchUsers() {
       try {
-      const response = await axios.get(
-        "http://localhost:8080/filters/users?page=0&qtdPage=1000",
-      );
-      const data = response.data;
+        const response = await axios.get("http://localhost:8080/filters/users?page=0&qtdPage=1000");
+        const data = response.data;
 
-      // Mapeando a resposta da API para o formato correto
-      this.users = data.listUsers.map((user) => ({
-        name: user.userName.toUpperCase(), // Nome do usuário
-        deviceId: user.idDevice, // ID do dispositivo 
-      }));
+        // Mapeando a resposta da API para o formato correto
+        this.users = data.listUsers.map((user) => ({
+          name: user.userName.toUpperCase(), // Nome do usuário
+          deviceId: user.idDevice, // ID do dispositivo 
+        }));
 
-      console.log("Successfully fetched users:", this.users);
+        console.log("Successfully fetched users:", this.users);
       } catch (error) {
-      console.log("Error fetching users:", error);
+        console.log("Error fetching users:", error);
       }
     },
 
@@ -159,9 +157,7 @@ export default {
       const requestData = {
         devices: deviceIds, // Array de IDs dos dispositivos
         startDate: new Date(this.date[0]).toLocaleDateString("en-CA"), // Data de início
-        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString(
-          "en-CA"
-        ), // Data de fim
+        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString("en-CA"), // Data de fim
       };
 
       console.log("Dados enviados:", requestData);
@@ -174,7 +170,7 @@ export default {
       this.devices = [];
       this.selectedQuickFilter = null;
 
-      console.log("logo novo: ", this.logo)
+      console.log("logo novo: ", this.logo);
 
       if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");
@@ -202,15 +198,7 @@ export default {
         (user) => user.id !== item.id
       );
     },
-    // Método para exibir o snackbar
-    showSnackbar(message, color = "success") {
-      this.snackbarMessage = message;
-      this.snackbarColor = "error";
-      this.snackbar = true;
-    },
-
   },
-  
 
   watch: {
     selectedUsers(newValue) {
@@ -221,7 +209,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <style scoped></style>
