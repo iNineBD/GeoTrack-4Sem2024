@@ -33,10 +33,10 @@
               :type="passwordVisible ? 'text' : 'password'"
               label="Digite sua senha"
               required
-              class="login-input mb-4"
+              class="login-input mb-10"
               variant="outlined"
               density="comfortable"
-              append-icon="mdi-eye"
+              :append-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="togglePasswordVisibility"
               style="width: 300px"
               ></v-text-field>
