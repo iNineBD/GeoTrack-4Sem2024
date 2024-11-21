@@ -18,11 +18,13 @@
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
                 @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
-              <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived" v-if="route.path === '/georoutesfilter'"/>
+              <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived"
+                v-if="route.path === '/georoutesfilter'" />
               <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints"
                 @go-to-location="navigateToLocation" />
               <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
                 @navigate-to-stop-point="navigateGeoToLocation" />
+              <GeoRoutesInformation v-if="showGeoRoutesInformation" :geoRoutes="geoRoutes" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -38,13 +40,16 @@
       <v-btn key="map-marker" @click="handleHomeClick" icon="mdi-home" title="Home" color="primary"></v-btn>
 
       <!-- Botão para StopPointsFilter -->
-      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker" title="Filtro de Pontos de Parada" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker"
+        title="Filtro de Pontos de Parada" color="primary"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
-      <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search" title="Filtro de Áreas Geográficas" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search"
+        title="Filtro de Áreas Geográficas" color="primary"></v-btn>
 
       <!-- Botão para GeoRoutesFilter -->
-      <v-btn key="map-marker" @click="handleGeoRoutesFilterClick" icon="mdi-map-marker-distance" title="Filtro de Rotas" color="primary"></v-btn>
+      <v-btn key="map-marker" @click="handleGeoRoutesFilterClick" icon="mdi-map-marker-distance" title="Filtro de Rotas"
+        color="primary"></v-btn>
 
       <!-- Botão para Sair -->
       <v-btn key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída" color="#F44336"></v-btn>
@@ -57,6 +62,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
 import GeoRoutesFilter from "../Filters/GeoRoutesFilter.vue";
+import GeoRoutesInformation from "./GeoRoutesInformation.vue";
 import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
 import { FilterData } from "@/pages/MapView.vue";
@@ -74,11 +80,13 @@ onMounted(() => {
   eventBus.on("changeLogo", updateLogo);
   eventBus.on("novoLogo", change);
   eventBus.on("clearStopPointsInformation", clearStopPointsInformation);
+  eventBus.on('showRouteOnMap', handleRouteFromSidebar);
 });
 
 onUnmounted(() => {
   eventBus.off("novoLogo", change);
   eventBus.off("changeLogo", updateLogo);
+  eventBus.off('showRouteOnMap', handleRouteFromSidebar);
 });
 
 // Método que será chamado quando o evento "novoLogo" for emitido
@@ -93,7 +101,7 @@ const toggleDial = () => {
 
 const updateLogo = () => {
   logo.value = logo.value === "/src/assets/Logo.svg" ? "/src/assets/LogoWhite.svg" : "/src/assets/Logo.svg";
-  eventBus.emit("novoLogo",logo.value)
+  eventBus.emit("novoLogo", logo.value)
 };
 
 // Definindo as props
@@ -115,12 +123,14 @@ const showStopPointsInformation = ref(false);
 const stopPoints = ref<StopPoint[]>([]);
 const showGeographicStopPointsInformation = ref(false);
 const geoStopPoints = ref<any[]>([]);
+const showGeoRoutesInformation = ref(false);
+const geoRoutes = ref<any[]>([]);
 
 const clearStopPointsInformation = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
+  showGeoRoutesInformation.value = false;
 };
-
 
 const handleFilterData = async (data: FilterData) => {
   const result = await props.onConsult(data);
@@ -161,6 +171,8 @@ const handleStopPointsReceived = (stopPoints: any) => {
 
 const handleRoutesReceived = (routes: any) => {
   console.log("Rotas recebidas no sidebar", routes);
+  geoRoutes.value = routes;
+  showGeoRoutesInformation.value = true;
   props.onRoutesReceived(routes);
 };
 
@@ -209,7 +221,6 @@ const goToFilterGeoRoutes = () => {
   }
 };
 
-
 const handleLogout = () => {
   localStorage.removeItem("token");
   router.push({ name: "Login" });
@@ -218,6 +229,7 @@ const handleLogout = () => {
 const handlePanelChange = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
+  showGeoRoutesInformation.value = false;
 };
 
 const handleStopPointsFilterClick = () => {
@@ -234,7 +246,6 @@ const handleGeoRoutesFilterClick = () => {
   goToFilterGeoRoutes();
   handlePanelChange();
 };
-
 
 const handleHomeClick = () => {
   handlePanelChange();
@@ -257,6 +268,11 @@ const navigateToLocation = (coordinates: [number, number]) => {
 const navigateGeoToLocation = (coord: [number, number]) => {
   console.log("COORDS AQUII", coord)
   eventBus.emit("navigateGeoToLocation", coord);
+};
+
+const handleRouteFromSidebar = (route: any) => {
+  console.log('Rota recebida no Sidebar:', route);
+  eventBus.emit("selectedRoute", route);
 };
 
 </script>

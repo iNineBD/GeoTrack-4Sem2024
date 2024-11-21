@@ -138,6 +138,8 @@ export default {
     let circleInstance: google.maps.Circle | null = null;
     // @ts-ignore
     const circles = ref<{ circle: google.maps.Circle; details: any }[]>([]);
+    // @ts-ignore
+    let routeLines: google.maps.Polyline[] = [];
 
     onMounted(() => {
       if (mapDiv.value) {
@@ -152,7 +154,15 @@ export default {
           navigateGeoToLocation(coords);
         });
       }
+
+      eventBus.on("selectedRoute", handleSelectedRoute);
     });
+
+    const handleSelectedRoute = (route: any) => {
+      console.log("Rota recebida no MapView:", route);
+      clearMarkers();
+      handleRoutesReceived({ routes: [route] });
+    };
 
     const navigateToLocation = (coordinates: [number, number]) => {
       if (map.value) {
@@ -587,7 +597,14 @@ export default {
     };
 
     const handleRoutesReceived = (routes: any) => {
+
       clearMarkers();
+
+      // Remove as rotas (linhas) existentes
+      routeLines.forEach(line => {
+        line.setMap(null);
+      });
+      routeLines = [];  // Limpa a lista de linhas
 
       routes.routes.forEach((route: any) => {
         const routePath = [];
@@ -630,6 +647,7 @@ export default {
           strokeWeight: 2,
         });
         routeLine.setMap(map.value);
+        routeLines.push(routeLine);
       });
 
       eventBus.emit("stopIsLoading");
