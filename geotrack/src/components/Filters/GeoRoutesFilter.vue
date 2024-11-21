@@ -190,7 +190,6 @@ export default {
             userName: this.selectedUser.name,
             device: this.selectedUser.device,
           });
-
         } else if (response.status === 404) {
           this.showSnackbar("Dados não localizados para este usuário", "error");
           this.loading = false;
