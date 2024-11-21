@@ -16,8 +16,18 @@
               <v-text-field v-model="email" label="Email" required class="register-input mb-2" variant="outlined"
                 density="comfortable"></v-text-field>
 
-              <v-text-field v-model="password" label="Senha" type="password" required class="register-input mb-4"
-                variant="outlined" density="comfortable"></v-text-field>
+              <v-text-field
+              v-model="password"
+              :type="passwordVisible ? 'text' : 'password'"
+              label="Digite sua senha"
+              required
+              class="login-input mb-10"
+              variant="outlined"
+              density="comfortable"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="togglePasswordVisibility"
+              style="width: 300px"
+              ></v-text-field>
 
               <v-btn type="submit" block class="register-btn" size="large">Cadastrar</v-btn>
             </v-form>
@@ -54,6 +64,10 @@ export default {
     const email = ref('');
     const password = ref('');
     const router = useRouter();
+    const passwordVisible = ref(false);
+    const togglePasswordVisibility = () => {
+      passwordVisible.value = !passwordVisible.value;
+    };
 
     const snackbar = ref(false);
     const snackbarMessage = ref('');
@@ -80,19 +94,17 @@ export default {
           }),
         });
 
-        if (response.ok) {
-          snackbarMessage.value = 'Usuário cadastrado com sucesso!';
-          snackbarColor.value = 'success';
-          snackbar.value = true;
-          setTimeout(() => {
-            router.push('/');
-          }, 3000);
-        }else{
-          const errorData = await response.json();
-          snackbarMessage.value = errorData.message;
-          snackbarColor.value = 'error';
-          snackbar.value = true;
+        if (!response.ok) {
+          throw new Error('Erro ao cadastrar usuário');
         }
+
+        snackbarMessage.value = 'Usuário cadastrado com sucesso!';
+        snackbarColor.value = 'success';
+        snackbar.value = true;
+        setTimeout(() => {
+          router.push('/');
+        }, 3000);
+
 
       } catch (error) {
         console.log("erro: ", error.mensagem)
@@ -103,6 +115,8 @@ export default {
       name,
       email,
       password,
+      passwordVisible,
+      togglePasswordVisibility,
       handleRegister,
       logoGeoTrack,
       logoIto1,
