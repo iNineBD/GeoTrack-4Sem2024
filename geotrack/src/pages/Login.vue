@@ -29,13 +29,16 @@
               ></v-text-field>
 
               <v-text-field
-                v-model="password"
-                label="Digite sua senha"
-                type="password"
-                required
-                class="login-input mb-4"
-                variant="outlined"
-                density="comfortable"
+              v-model="password"
+              :type="passwordVisible ? 'text' : 'password'"
+              label="Digite sua senha"
+              required
+              class="login-input mb-4"
+              variant="outlined"
+              density="comfortable"
+              append-icon="mdi-eye"
+              @click:append="togglePasswordVisibility"
+              style="width: 300px"
               ></v-text-field>
 
               <v-btn type="submit" block class="login-btn" size="large">
@@ -74,6 +77,10 @@ export default {
     const email = ref("");
     const password = ref("");
     const router = useRouter();
+    const passwordVisible = ref(false);
+    const togglePasswordVisibility = () => {
+      passwordVisible.value = !passwordVisible.value;
+    };
 
     const snackbar = ref(false);
     const snackbarMessage = ref("");
@@ -117,6 +124,8 @@ export default {
     return {
       email,
       password,
+      passwordVisible,
+      togglePasswordVisibility,
       handleLogin,
       logoGeoTrack,
       logoIto1,
@@ -155,11 +164,11 @@ export default {
 
 .yellow-section {
   background-position: center;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
- 
+
   border-radius: 20px;
 }
 
