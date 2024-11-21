@@ -36,8 +36,8 @@
               class="login-input mb-10"
               variant="outlined"
               density="comfortable"
-              :append-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append="togglePasswordVisibility"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="togglePasswordVisibility"
               style="width: 300px"
               ></v-text-field>
 
