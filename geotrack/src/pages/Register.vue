@@ -30,15 +30,18 @@
               ></v-text-field>
 
               <v-text-field
-                v-model="password"
-                label="Senha"
-                type="password"
-                required
-                class="register-input mb-4"
-                variant="outlined"
-                density="comfortable"
+              v-model="password"
+              :type="passwordVisible ? 'text' : 'password'"
+              label="Digite sua senha"
+              required
+              class="login-input mb-10"
+              variant="outlined"
+              density="comfortable"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="togglePasswordVisibility"
+              style="width: 300px"
               ></v-text-field>
-              
+
               <v-btn type="submit" block class="register-btn" size="large">Cadastrar</v-btn>
             </v-form>
             <div class="login text-center mt-4">
@@ -54,7 +57,7 @@
           {{ snackbarMessage }}
         </v-snackbar>
       </v-col>
-      
+
     </v-row>
   </v-container>
 </template>
@@ -73,7 +76,11 @@ export default {
     const email = ref('');
     const password = ref('');
     const router = useRouter();
-    
+    const passwordVisible = ref(false);
+    const togglePasswordVisibility = () => {
+      passwordVisible.value = !passwordVisible.value;
+    };
+
     const snackbar = ref(false);
     const snackbarMessage = ref('');
     const snackbarColor = ref('');
@@ -83,7 +90,7 @@ export default {
         snackbarMessage.value = 'Por favor, preencha todos os campos!';
         snackbarColor.value = 'error';
         snackbar.value = true;
-        return; 
+        return;
       }
 
       try {
@@ -109,7 +116,7 @@ export default {
         setTimeout(() => {
           router.push('/');
         }, 3000);
-        
+
 
       } catch (error) {
         snackbarMessage.value = error.response?.data?.message || 'Erro ao cadastrar usuário';
@@ -122,6 +129,8 @@ export default {
       name,
       email,
       password,
+      passwordVisible,
+      togglePasswordVisibility,
       handleRegister,
       logoGeoTrack,
       logoIto1,
@@ -195,8 +204,8 @@ export default {
 
 .register-card {
   background: white !important;
-  width: min(90vw, 420px); 
-  padding: 2vw; 
+  width: min(90vw, 420px);
+  padding: 2vw;
   border-radius: 30px;
   display: flex;
   flex-direction: column;
