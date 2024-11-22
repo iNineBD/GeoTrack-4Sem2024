@@ -15,7 +15,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-        }}</v-icon>
+      }}</v-icon>
     </template>
   </v-switch>
 
@@ -597,14 +597,17 @@ export default {
     };
 
     const handleRoutesReceived = (routes: any) => {
-
       clearMarkers();
 
       // Remove as rotas (linhas) existentes
       routeLines.forEach(line => {
         line.setMap(null);
       });
-      routeLines = [];  // Limpa a lista de linhas
+      routeLines = []; // Limpa a lista de linhas
+
+      let totalLat = 0;
+      let totalLng = 0;
+      let pointCount = 0;
 
       routes.routes.forEach((route: any) => {
         const routePath = [];
@@ -612,6 +615,11 @@ export default {
         route.coordinates.forEach((coord: any, index: number) => {
           const position = { latitude: coord.latitude, longitude: coord.longitude };
           routePath.push(position);
+
+          // Soma os pontos para cálculo do centro
+          totalLat += coord.latitude;
+          totalLng += coord.longitude;
+          pointCount++;
 
           let color = "#000B62";
           let scale = 5;
@@ -649,8 +657,15 @@ export default {
         routeLine.setMap(map.value);
         routeLines.push(routeLine);
       });
-
       eventBus.emit("stopIsLoading");
+      // Calcula o centro e ajusta o mapa
+      if (pointCount > 0) {
+        const centerLat = totalLat / pointCount;
+        const centerLng = totalLng / pointCount;
+
+        map.value.setCenter({ lat: centerLat, lng: centerLng });
+        map.value.setZoom(15); // Ajuste o zoom conforme necessário
+      }
     };
 
     function toggleTheme(): void {

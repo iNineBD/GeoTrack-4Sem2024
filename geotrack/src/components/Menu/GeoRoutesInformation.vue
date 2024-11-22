@@ -79,7 +79,7 @@ const displayedAddressesFinal = ref<string[]>([]);
 
 const getUserInitials = (fullName: string) => {
   const names = fullName.split(' ');
-  return names.slice(0, 2).join(' '); // Retorna os dois primeiros nomes
+  return names.slice(0, 3).join(' '); // Retorna os dois primeiros nomes
 };
 
 const getFormattedAddress = async (lat: number, lng: number) => {
