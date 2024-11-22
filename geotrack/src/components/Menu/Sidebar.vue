@@ -18,7 +18,7 @@
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
                 @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
-              <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived"
+              <GeoRoutesFilter @initializeMap="initializeMap" @initializeMapDark="initializeMapDark" @routesReceived="handleRoutesReceived"
                 v-if="route.path === '/georoutesfilter'" />
               <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints"
                 @go-to-location="navigateToLocation" />
