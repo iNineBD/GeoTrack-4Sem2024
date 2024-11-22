@@ -175,6 +175,8 @@ export default {
             routes: data.routes.map(route => ({
               startDate: route.date_start,
               endDate: route.date_end,
+              userName: this.selectedUser.name,
+              device: this.selectedUser.device,
               coordinates: route.coordinates.map(coord => ({
                 latitude: coord.latitude,
                 longitude: coord.longitude,
@@ -183,13 +185,9 @@ export default {
             })),
           };
 
+
           this.$emit("routesReceived", dados);
 
-          eventBus.emit("routesReceived", {
-            routes: data.routes,
-            userName: this.selectedUser.name,
-            device: this.selectedUser.device,
-          });
         } else if (response.status === 404) {
           this.showSnackbar("Dados não localizados para este usuário", "error");
           this.loading = false;

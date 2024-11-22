@@ -15,7 +15,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-      }}</v-icon>
+        }}</v-icon>
     </template>
   </v-switch>
 
@@ -657,11 +657,18 @@ export default {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
     };
 
+    // Array para armazenar as coordenadas diretamente
+    const coordinates: { lat: number; lng: number }[] = [];
+
+
     const plotPointRouteOnMap = (userData: any, color: string, scale: number) => {
       const position = {
         lat: userData.coords.latitude,
         lng: userData.coords.longitude,
       }; // Coordenadas
+
+      // Salva a coordenada no array
+      coordinates.push(position);
 
       const marker = new google.maps.Marker({
         position,
@@ -694,7 +701,16 @@ export default {
         infoWindow.close();
       });
 
-      centerMapOnMarker(position, 22);
+      // Calcula o ponto médio
+      const centerLat = (coordinates[0].lat + coordinates[coordinates.length - 1].lat) / 2;
+      const centerLng = (coordinates[0].lng + coordinates[coordinates.length - 1].lng) / 2;
+
+      const positionToZoom = {
+        lat: centerLat,
+        lng: centerLng,
+      };
+
+      centerMapOnMarker(positionToZoom, 15);
     };
 
     const plotPointOnMap = (userData: any) => {

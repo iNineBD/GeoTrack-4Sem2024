@@ -62,7 +62,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
 import GeoRoutesFilter from "../Filters/GeoRoutesFilter.vue";
-import GeoRoutesInformation from "./GeoRoutesInformation.vue";
+import GeoRoutesInformation from "../Menu/GeoRoutesInformation.vue";
 import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
 import { FilterData } from "@/pages/MapView.vue";
@@ -135,8 +135,6 @@ const clearStopPointsInformation = () => {
 const handleFilterData = async (data: FilterData) => {
   const result = await props.onConsult(data);
 
-  console.log("testesssss: ", result)
-
   if (result.success) {
     showStopPointsInformation.value = true;
     stopPoints.value = result.data;
@@ -170,8 +168,8 @@ const handleStopPointsReceived = (stopPoints: any) => {
 };
 
 const handleRoutesReceived = (routes: any) => {
-  console.log("Rotas recebidas no sidebar", routes);
-  geoRoutes.value = routes;
+  console.log("Rotas recebidas no sidebar", routes.routes);
+  geoRoutes.value = routes.routes;
   showGeoRoutesInformation.value = true;
   props.onRoutesReceived(routes);
 };
