@@ -15,7 +15,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-      }}</v-icon>
+        }}</v-icon>
     </template>
   </v-switch>
 
@@ -613,6 +613,12 @@ export default {
       let totalLng = 0;
       let pointCount = 0;
 
+      // Variáveis para calcular as extremidades (bounding box)
+      let minLat = Infinity;
+      let maxLat = -Infinity;
+      let minLng = Infinity;
+      let maxLng = -Infinity;
+
       routes.routes.forEach((route: any) => {
         const routePath = [];
 
@@ -624,6 +630,12 @@ export default {
           totalLat += coord.latitude;
           totalLng += coord.longitude;
           pointCount++;
+
+          // Atualiza os limites (bounding box)
+          if (coord.latitude < minLat) minLat = coord.latitude;
+          if (coord.latitude > maxLat) maxLat = coord.latitude;
+          if (coord.longitude < minLng) minLng = coord.longitude;
+          if (coord.longitude > maxLng) maxLng = coord.longitude;
 
           let color = "#000B62";
           let scale = 5;
@@ -661,16 +673,28 @@ export default {
         routeLine.setMap(map.value);
         routeLines.push(routeLine);
       });
+
       eventBus.emit("stopIsLoading");
-      // Calcula o centro e ajusta o mapa
+
+      // Ajusta o zoom dinamicamente
       if (pointCount > 0) {
         const centerLat = totalLat / pointCount;
         const centerLng = totalLng / pointCount;
 
+        const latDiff = maxLat - minLat;
+        const lngDiff = maxLng - minLng;
+        const maxDiff = Math.max(latDiff, lngDiff);
+
+        // Cálculo ajustado para um zoom mais próximo
+        const zoomBase = 17; // Base mais alta para aproximação inicial
+        const zoomAdjustment = Math.log2(maxDiff + 1) * 1.5; // Multiplicador reduz o impacto
+        const zoomLevel = Math.floor(zoomBase - zoomAdjustment);
+
         map.value.setCenter({ lat: centerLat, lng: centerLng });
-        map.value.setZoom(15); // Ajuste o zoom conforme necessário
+        map.value.setZoom(Math.max(2, Math.min(zoomLevel, 21))); // Limita o zoom entre 2 e 21
       }
     };
+
 
     function toggleTheme(): void {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
@@ -720,17 +744,41 @@ export default {
         infoWindow.close();
       });
 
-      // Calcula o ponto médio
-      const centerLat = (coordinates[0].lat + coordinates[coordinates.length - 1].lat) / 2;
-      const centerLng = (coordinates[0].lng + coordinates[coordinates.length - 1].lng) / 2;
+      // Calcula os limites (bounding box) da rota
+      let minLat = Infinity;
+      let maxLat = -Infinity;
+      let minLng = Infinity;
+      let maxLng = -Infinity;
 
+      coordinates.forEach(coord => {
+        if (coord.lat < minLat) minLat = coord.lat;
+        if (coord.lat > maxLat) maxLat = coord.lat;
+        if (coord.lng < minLng) minLng = coord.lng;
+        if (coord.lng > maxLng) maxLng = coord.lng;
+      });
+
+      // Calcula o centro do mapa
+      const centerLat = (minLat + maxLat) / 2;
+      const centerLng = (minLng + maxLng) / 2;
+
+      // Ajusta dinamicamente o zoom
+      const latDiff = maxLat - minLat;
+      const lngDiff = maxLng - minLng;
+      const maxDiff = Math.max(latDiff, lngDiff);
+
+      const zoomBase = 17; // Base inicial para aproximação
+      const zoomAdjustment = Math.log2(maxDiff + 1) * 1.5; // Ajuste dinâmico
+      const zoomLevel = Math.max(2, Math.min(Math.floor(zoomBase - zoomAdjustment), 21)); // Limita o zoom entre 2 e 21
+
+      // Reposiciona o mapa
       const positionToZoom = {
         lat: centerLat,
         lng: centerLng,
       };
 
-      centerMapOnMarker(positionToZoom, 15);
+      centerMapOnMarker(positionToZoom, zoomLevel);
     };
+
 
     const plotPointOnMap = (userData: any) => {
       const position = {
