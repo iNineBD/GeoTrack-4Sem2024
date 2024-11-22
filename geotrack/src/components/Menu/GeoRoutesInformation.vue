@@ -181,7 +181,6 @@ watch(
   letter-spacing: 0.009375em;
   line-height: 1.5;
   text-transform: none;
-  color: #000000 !important;
   opacity: 0.95;  /* 70% de opacidade em todo o elemento */
 }
 
