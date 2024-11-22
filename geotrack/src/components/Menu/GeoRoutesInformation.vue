@@ -1,6 +1,6 @@
 <template>
   <v-card class="stop-points-card" width="400px" height="300px" rounded="xl" elevation="4" color="primary">
-    <template v-if="geoRoutes && Object.keys(geoRoutes).length > 0">
+    <template v-if="isMapReady">
       <v-list class="scrollable-container bg-primary">
         <v-list-item>
           <v-sheet class="pa-2 mb-2" color="primary_light" elevation="0" rounded>
@@ -21,7 +21,6 @@
               </v-col>
               <v-col cols="11">
                 <v-list-item-title>
-
                   <v-sheet class="pa-2 mb-2" color="primary_light" elevation="0" rounded>
                     <v-row align="center" justify="space-between" style="padding: 5px 12px;">
                       <span style="font-weight: bold; font-size: 16px;">
@@ -29,7 +28,6 @@
                       </span>
                     </v-row>
                   </v-sheet>
-
                 </v-list-item-title>
                 <v-list-item-subtitle class="custom-subtitle">
                   <v-icon color="success" small>mdi-map-marker</v-icon>
@@ -47,16 +45,17 @@
       </v-list>
     </template>
     <template v-else>
-      <v-row justify="center">
-        <v-icon color="grey">mdi-alert</v-icon>
-        <span>Nenhuma rota encontrada.</span>
+      <v-row align="center" justify="center" class="loading-container">
+        <v-progress-circular indeterminate color="secondary" size="40"></v-progress-circular>
       </v-row>
     </template>
   </v-card>
 </template>
 
+
+
 <script setup lang="ts">
-import { defineProps, ref, watch, onMounted } from 'vue';
+import { defineProps, ref, watch, computed } from 'vue';
 import { eventBus } from '@/utils/EventBus';
 
 const props = defineProps<{
@@ -121,12 +120,20 @@ const showRoute = (route: any) => {
   eventBus.emit('showRouteOnMap', route);
 };
 
+const isMapReady = computed(() => {
+  return (
+    props.geoRoutes.length > 0 &&
+    displayedAddresses.value.length === props.geoRoutes.length &&
+    displayedAddressesFinal.value.length === props.geoRoutes.length
+  );
+});
+
 
 watch(
   () => props.geoRoutes,
-  () => {
-    fetchAddresses();
-    fetchAddressesFinal();
+  async () => {
+    await fetchAddresses();
+    await fetchAddressesFinal();
   },
   { immediate: true }
 );
@@ -182,4 +189,9 @@ watch(
   word-wrap: break-word;
   white-space: normal;
 }
+
+.loading-container {
+  height: 100%;
+}
+
 </style>
