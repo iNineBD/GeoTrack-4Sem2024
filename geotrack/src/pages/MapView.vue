@@ -15,7 +15,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-      }}</v-icon>
+        }}</v-icon>
     </template>
   </v-switch>
 
@@ -23,6 +23,10 @@
     <v-btn title="Relátorios de métricas" color="primary" icon="mdi-text-box-search-outline" @click="togglePanel"
       style="position: fixed; top: 12px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;">
     </v-btn>
+
+    <MetricsCard v-if="isPanelOpen"
+      style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
+    </MetricsCard>
 
   </div>
 
@@ -138,6 +142,8 @@ export default {
     let circleInstance: google.maps.Circle | null = null;
     // @ts-ignore
     const circles = ref<{ circle: google.maps.Circle; details: any }[]>([]);
+    // @ts-ignore
+    let routeLines: google.maps.Polyline[] = [];
 
     onMounted(() => {
       if (mapDiv.value) {
@@ -152,7 +158,15 @@ export default {
           navigateGeoToLocation(coords);
         });
       }
+
+      eventBus.on("selectedRoute", handleSelectedRoute);
     });
+
+    const handleSelectedRoute = (route: any) => {
+      console.log("Rota recebida no MapView:", route);
+      clearMarkers();
+      handleRoutesReceived({ routes: [route] });
+    };
 
     const navigateToLocation = (coordinates: [number, number]) => {
       if (map.value) {
@@ -589,12 +603,39 @@ export default {
     const handleRoutesReceived = (routes: any) => {
       clearMarkers();
 
+      // Remove as rotas (linhas) existentes
+      routeLines.forEach(line => {
+        line.setMap(null);
+      });
+      routeLines = []; // Limpa a lista de linhas
+
+      let totalLat = 0;
+      let totalLng = 0;
+      let pointCount = 0;
+
+      // Variáveis para calcular as extremidades (bounding box)
+      let minLat = Infinity;
+      let maxLat = -Infinity;
+      let minLng = Infinity;
+      let maxLng = -Infinity;
+
       routes.routes.forEach((route: any) => {
         const routePath = [];
 
         route.coordinates.forEach((coord: any, index: number) => {
           const position = { latitude: coord.latitude, longitude: coord.longitude };
           routePath.push(position);
+
+          // Soma os pontos para cálculo do centro
+          totalLat += coord.latitude;
+          totalLng += coord.longitude;
+          pointCount++;
+
+          // Atualiza os limites (bounding box)
+          if (coord.latitude < minLat) minLat = coord.latitude;
+          if (coord.latitude > maxLat) maxLat = coord.latitude;
+          if (coord.longitude < minLng) minLng = coord.longitude;
+          if (coord.longitude > maxLng) maxLng = coord.longitude;
 
           let color = "#000B62";
           let scale = 5;
@@ -630,20 +671,47 @@ export default {
           strokeWeight: 2,
         });
         routeLine.setMap(map.value);
+        routeLines.push(routeLine);
       });
 
       eventBus.emit("stopIsLoading");
+
+      // Ajusta o zoom dinamicamente
+      if (pointCount > 0) {
+        const centerLat = totalLat / pointCount;
+        const centerLng = totalLng / pointCount;
+
+        const latDiff = maxLat - minLat;
+        const lngDiff = maxLng - minLng;
+        const maxDiff = Math.max(latDiff, lngDiff);
+
+        // Cálculo ajustado para um zoom mais próximo
+        const zoomBase = 17; // Base mais alta para aproximação inicial
+        const zoomAdjustment = Math.log2(maxDiff + 1) * 1.5; // Multiplicador reduz o impacto
+        const zoomLevel = Math.floor(zoomBase - zoomAdjustment);
+
+        map.value.setCenter({ lat: centerLat, lng: centerLng });
+        map.value.setZoom(Math.max(2, Math.min(zoomLevel, 21))); // Limita o zoom entre 2 e 21
+      }
     };
+
 
     function toggleTheme(): void {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
     };
+
+    // Array para armazenar as coordenadas diretamente
+    const coordinates: { lat: number; lng: number }[] = [];
+
 
     const plotPointRouteOnMap = (userData: any, color: string, scale: number) => {
       const position = {
         lat: userData.coords.latitude,
         lng: userData.coords.longitude,
       }; // Coordenadas
+
+      // Salva a coordenada no array
+      coordinates.push(position);
 
       const marker = new google.maps.Marker({
         position,
@@ -676,8 +744,41 @@ export default {
         infoWindow.close();
       });
 
-      centerMapOnMarker(position, 22);
+      // Calcula os limites (bounding box) da rota
+      let minLat = Infinity;
+      let maxLat = -Infinity;
+      let minLng = Infinity;
+      let maxLng = -Infinity;
+
+      coordinates.forEach(coord => {
+        if (coord.lat < minLat) minLat = coord.lat;
+        if (coord.lat > maxLat) maxLat = coord.lat;
+        if (coord.lng < minLng) minLng = coord.lng;
+        if (coord.lng > maxLng) maxLng = coord.lng;
+      });
+
+      // Calcula o centro do mapa
+      const centerLat = (minLat + maxLat) / 2;
+      const centerLng = (minLng + maxLng) / 2;
+
+      // Ajusta dinamicamente o zoom
+      const latDiff = maxLat - minLat;
+      const lngDiff = maxLng - minLng;
+      const maxDiff = Math.max(latDiff, lngDiff);
+
+      const zoomBase = 17; // Base inicial para aproximação
+      const zoomAdjustment = Math.log2(maxDiff + 1) * 1.5; // Ajuste dinâmico
+      const zoomLevel = Math.max(2, Math.min(Math.floor(zoomBase - zoomAdjustment), 21)); // Limita o zoom entre 2 e 21
+
+      // Reposiciona o mapa
+      const positionToZoom = {
+        lat: centerLat,
+        lng: centerLng,
+      };
+
+      centerMapOnMarker(positionToZoom, zoomLevel);
     };
+
 
     const plotPointOnMap = (userData: any) => {
       const position = {

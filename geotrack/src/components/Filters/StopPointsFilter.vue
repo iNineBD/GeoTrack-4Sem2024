@@ -43,7 +43,7 @@
       </v-row>
     </v-card-actions>
   </v-card>
-  
+
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
@@ -127,7 +127,7 @@ export default {
       // Mapeando a resposta da API para o formato correto
       this.users = data.listUsers.map((user) => ({
         name: user.userName.toUpperCase(), // Nome do usuário
-        deviceId: user.idDevice, // ID do dispositivo 
+        deviceId: user.idDevice, // ID do dispositivo
       }));
 
       console.log("Successfully fetched users:", this.users);
@@ -210,7 +210,7 @@ export default {
     },
 
   },
-  
+
 
   watch: {
     selectedUsers(newValue) {
