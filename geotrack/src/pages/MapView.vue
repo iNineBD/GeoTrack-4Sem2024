@@ -1041,6 +1041,8 @@ export default {
         } else {
           initializeMap()
         }
+
+        window.location.reload();
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
         localStorage.removeItem("circleDetailsCached")
@@ -1048,7 +1050,6 @@ export default {
         showSnackbar(`Erro ao salvar a zona: ${error.response.data.message}`, "error");
       }
 
-      window.location.reload();
     };
 
     const deleteCircle = async () => {
