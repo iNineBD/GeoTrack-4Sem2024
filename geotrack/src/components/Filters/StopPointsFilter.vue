@@ -1,26 +1,66 @@
 <template>
-  <v-card class="mx-auto" width="100%" style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; "
-    color="primary">
-    <v-col style="padding: 20px 20px 0 20px;">
+  <v-card
+    class="mx-auto"
+    width="100%"
+    style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px"
+    color="primary"
+  >
+    <v-col style="padding: 5px 20px 0 20px">
+      <!-- Botão do Painel de Informações -->
+      <InfoPanel
+        style="display: flex; justify-content: flex-end; padding-bottom: 10px"
+      >
+      </InfoPanel>
       <!-- Users selection -->
-      <v-combobox v-model="selectedUsers" :items="users" label="Usuário" item-title="name"
-        prepend-icon="mdi-filter-variant" chips clearable multiple color="secondary">
+      <v-combobox
+        v-model="selectedUsers"
+        :items="users"
+        label="Usuário"
+        item-title="name"
+        prepend-icon="mdi-filter-variant"
+        chips
+        clearable
+        multiple
+        color="secondary"
+      >
         <template v-slot:selection="{ attrs, item, select, selected }">
-          <v-chip v-bind="attrs" :model-value="selected" closable @click="select" @click:close="remove(item)">
+          <v-chip
+            v-bind="attrs"
+            :model-value="selected"
+            closable
+            @click="select"
+            @click:close="remove(item)"
+          >
           </v-chip>
         </template>
       </v-combobox>
 
       <!-- Date selection -->
-      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="secondary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy"
-        :readonly="dateInputDisabled"></v-date-input>
+      <v-date-input
+        v-model="date"
+        label="Selecione o período"
+        multiple="range"
+        color="secondary"
+        :max="today"
+        :locale="locale"
+        :format="customDateFormat"
+        placeholder="dd/MM/yyyy"
+        :readonly="dateInputDisabled"
+        tooltip-data="Limite máximo de 30 dias"
+      ></v-date-input>
 
       <!-- Quick date filters using chips -->
       <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
-        <v-chip v-for="(filter, index) in quickFilters" :key="filter.label" @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
-          filter variant="flat" size="small">
+        <v-chip
+          v-for="(filter, index) in quickFilters"
+          :key="filter.label"
+          @click="setQuickFilter(filter.range, index)"
+          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'"
+          :active="selectedQuickFilter === index"
+          filter
+          variant="flat"
+          size="small"
+        >
           {{ filter.label }}
         </v-chip>
       </v-col>
@@ -29,29 +69,46 @@
     <v-card-actions class="d-flex" style="padding: 20px 20px 10px 20px">
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
-          <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary"
-            size="large" variant="flat" block rounded="xl" @click="handleConsult">
+          <v-btn
+            :loading="loading"
+            :disabled="ButtonDisabled || loading"
+            class="text-none"
+            color="secondary"
+            size="large"
+            variant="flat"
+            block
+            rounded="xl"
+            @click="handleConsult"
+          >
             Consultar
           </v-btn>
         </v-col>
         <v-col cols="4">
-          <v-btn class="text-none" color="primary_light" size="large" variant="flat" block rounded="xl"
-            @click="clearFields">
+          <v-btn
+            class="text-none"
+            color="primary_light"
+            size="large"
+            variant="flat"
+            block
+            rounded="xl"
+            @click="clearFields"
+          >
             Limpar
           </v-btn>
         </v-col>
       </v-row>
     </v-card-actions>
   </v-card>
-  
+
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
 </template>
 
 <script>
-import { eventBus } from '@/utils/EventBus';
-import axios from 'axios';
+import { eventBus } from "@/utils/EventBus";
+import axios from "axios";
+import InfoPanel from "../Info/InfoPanel.vue";
 
 export default {
   data: () => ({
@@ -87,12 +144,12 @@ export default {
     snackbarMessage: "",
   }),
 
-  emits: ['consult'],
+  emits: ["consult"],
 
   mounted() {
     this.fetchUsers();
-    eventBus.on('stopIsLoading', this.stopIsLoading);
-    eventBus.on("novoLogo", this.change)
+    eventBus.on("stopIsLoading", this.stopIsLoading);
+    eventBus.on("novoLogo", this.change);
     eventBus.on("clearFields", this.clearFields);
   },
 
@@ -119,20 +176,20 @@ export default {
 
     async fetchUsers() {
       try {
-      const response = await axios.get(
-        "http://localhost:8080/filters/users?page=0&qtdPage=1000",
-      );
-      const data = response.data;
+        const response = await axios.get(
+          "http://localhost:8080/filters/users?page=0&qtdPage=1000"
+        );
+        const data = response.data;
 
-      // Mapeando a resposta da API para o formato correto
-      this.users = data.listUsers.map((user) => ({
-        name: user.userName.toUpperCase(), // Nome do usuário
-        deviceId: user.idDevice, // ID do dispositivo 
-      }));
+        // Mapeando a resposta da API para o formato correto
+        this.users = data.listUsers.map((user) => ({
+          name: user.userName.toUpperCase(), // Nome do usuário
+          deviceId: user.idDevice, // ID do dispositivo
+        }));
 
-      console.log("Successfully fetched users:", this.users);
+        console.log("Successfully fetched users:", this.users);
       } catch (error) {
-      console.log("Error fetching users:", error);
+        console.log("Error fetching users:", error);
       }
     },
 
@@ -146,7 +203,7 @@ export default {
 
       const qtddias = Math.round(
         (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24)
       );
 
       if (qtddias > 31) {
@@ -165,7 +222,13 @@ export default {
       };
 
       console.log("Dados enviados:", requestData);
-      this.$emit('consult', requestData);  // Certifique-se de emitir o evento com os dados
+      this.$emit("consult", requestData); // Certifique-se de emitir o evento com os dados
+
+      // Simulação do retorno dos postos de parada
+      setTimeout(() => {
+        this.showStopPointsInformation = true; // Exibe o novo componente
+        this.loadingPage = false;
+      }, 2000); // Simulando o tempo de resposta
     },
 
     clearFields() {
@@ -174,7 +237,7 @@ export default {
       this.devices = [];
       this.selectedQuickFilter = null;
 
-      console.log("logo novo: ", this.logo)
+      console.log("logo novo: ", this.logo);
 
       if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");
@@ -208,20 +271,17 @@ export default {
       this.snackbarColor = "error";
       this.snackbar = true;
     },
-
   },
-  
 
   watch: {
     selectedUsers(newValue) {
       if (newValue.length > 5) {
         this.selectedUsers = newValue.slice(0, 5);
       }
-      console.log('users selecionados:', this.selectedUsers);
+      console.log("users selecionados:", this.selectedUsers);
     },
   },
 };
-
 </script>
 
 <style scoped></style>
