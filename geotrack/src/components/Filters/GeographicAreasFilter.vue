@@ -4,13 +4,13 @@
     width="100%"
     style="
       box-shadow: none;
-      border-radius: 0 0 20px 20px;
+      border-radius: 0 0 25px 20px;
       margin-bottom: 0px;
-      height: 350px;
+      height: 362px;
     "
     color="primary"
   >
-    <v-col style="padding: 5px 20px 0 20px">
+    <v-col style="padding: 5px 20px 0px 20px">
       <!-- Botão do Painel de Informações -->
       <InfoPanel
         style="display: flex; justify-content: flex-end; padding-bottom: 10px"
