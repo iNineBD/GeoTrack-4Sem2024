@@ -12,6 +12,7 @@ declare module 'vue' {
     GeographicStopPointsInformation: typeof import('./src/components/Menu/GeographicStopPointsInformation.vue')['default']
     GeoRoutesFilter: typeof import('./src/components/Filters/GeoRoutesFilter.vue')['default']
     GeoRoutesInformation: typeof import('./src/components/Menu/GeoRoutesInformation.vue')['default']
+    GeoRoutesModal: typeof import('./src/components/Info/GeoRoutesModal.vue')['default']
     InfoPanel: typeof import('./src/components/Info/InfoPanel.vue')['default']
     MetricsCard: typeof import('./src/components/Metrics/MetricsCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
