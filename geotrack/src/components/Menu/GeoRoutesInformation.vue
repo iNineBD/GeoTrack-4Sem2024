@@ -13,7 +13,7 @@
               </span>
             </v-row>
           </v-sheet>
-          <v-list-item v-for="(route, index) in geoRoutes" :key="index" @click="showRoute(route)" style="padding: 0;"
+          <v-list-item v-for="(route, index) in geoRoutes" :key="index" @click="showRoute(route, index)" style="padding: 0;"
             color="primary">
             <v-row align="start" no-gutters class="px-2 py-1">
               <v-col cols="1">
@@ -75,7 +75,6 @@ const props = defineProps<{
 const displayedAddresses = ref<string[]>([]);
 const displayedAddressesFinal = ref<string[]>([]);
 
-
 const getUserInitials = (fullName: string) => {
   const names = fullName.split(' ');
   return names.slice(0, 3).join(' '); // Retorna os dois primeiros nomes
@@ -115,9 +114,10 @@ const fetchAddressesFinal = async () => {
   }
 };
 
-const showRoute = (route: any) => {
+const showRoute = (route: any, index: number) => {
   console.log('Rota selecionada para exibição:', route);
   eventBus.emit('showRouteOnMap', route);
+  eventBus.emit('openPlayer', { route, index }); // Emite o evento para abrir o player
 };
 
 const isMapReady = computed(() => {
@@ -175,13 +175,13 @@ watch(
   display: block;
   white-space: normal;
   word-break: break-word;
-  font-family:"Roboto", sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 1rem;
   font-weight: 400;
   letter-spacing: 0.009375em;
   line-height: 1.5;
   text-transform: none;
-  opacity: 0.95;  /* 70% de opacidade em todo o elemento */
+  opacity: 0.95;
 }
 
 .v-list-item-title {
@@ -192,5 +192,4 @@ watch(
 .loading-container {
   height: 100%;
 }
-
 </style>

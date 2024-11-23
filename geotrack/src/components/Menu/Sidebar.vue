@@ -18,13 +18,14 @@
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
                 @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
-              <GeoRoutesFilter @initializeMap="initializeMap" @initializeMapDark="initializeMapDark" @routesReceived="handleRoutesReceived"
-                v-if="route.path === '/georoutesfilter'" />
+              <GeoRoutesFilter @initializeMap="initializeMap" @initializeMapDark="initializeMapDark"
+                @routesReceived="handleRoutesReceived" v-if="route.path === '/georoutesfilter'" />
               <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints"
                 @go-to-location="navigateToLocation" />
               <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
                 @navigate-to-stop-point="navigateGeoToLocation" />
               <GeoRoutesInformation v-if="showGeoRoutesInformation" :geoRoutes="geoRoutes" />
+              <RoutePlayer v-if="selectedRoute" :routeTitle="`Exibindo: ROTA ${routeNumber}`" :routeData="selectedRoute" @close="selectedRoute = null" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -65,6 +66,7 @@ import GeoRoutesFilter from "../Filters/GeoRoutesFilter.vue";
 import GeoRoutesInformation from "../Menu/GeoRoutesInformation.vue";
 import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
+import RoutePlayer from "./RoutePlayer.vue";
 import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 import { eventBus } from '@/utils/EventBus'; // Verifique se está importado corretamente
@@ -75,18 +77,29 @@ const route = useRoute();
 const router = useRouter();
 const emit = defineEmits(["initializeMap", "removeCircle", "initializeMapDark"]);
 const logo = ref("/src/assets/Logo.svg");
+const selectedRoute = ref(null); // Armazena os dados da rota selecionada
+const routeNumber = ref(null); // Número da rota para exibição
+const showPlayer = ref(false); // Controla a exibição do player
 
 onMounted(() => {
   eventBus.on("changeLogo", updateLogo);
   eventBus.on("novoLogo", change);
   eventBus.on("clearStopPointsInformation", clearStopPointsInformation);
   eventBus.on('showRouteOnMap', handleRouteFromSidebar);
+  eventBus.on('openPlayer', ({ route, index }) => {
+    console.log('Dados recebidos para o player:', route, 'Número da rota:', index + 1);
+
+    selectedRoute.value = route;
+    routeNumber.value = index + 1;
+    showPlayer.value = true;
+  });
 });
 
 onUnmounted(() => {
   eventBus.off("novoLogo", change);
   eventBus.off("changeLogo", updateLogo);
   eventBus.off('showRouteOnMap', handleRouteFromSidebar);
+  eventBus.off('openPlayer');
 });
 
 // Método que será chamado quando o evento "novoLogo" for emitido
