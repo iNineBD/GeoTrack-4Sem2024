@@ -552,7 +552,7 @@ export default {
     const fetchGeoJsonData = async (filterData: FilterData) => {
       try {
         const response = await axios.post(
-          "http://localhost:8080/stoppoint/find",
+          "handleGeographicAreaConsultstoppoint/find",
           filterData
         );
 
@@ -583,7 +583,6 @@ export default {
           });
           return { success: true, data: geoJsonResponses }
         }
-        console.log("tetstte: ", geoJsonResponses)
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           if (error.response.status === 404) {
@@ -1060,12 +1059,14 @@ export default {
           initializeMap()
         }
 
-        window.location.reload();
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // 2000 ms = 2 segundos
+
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
         localStorage.removeItem("circleDetailsCached")
-        showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
-        showSnackbar(`Erro ao salvar a zona: ${error.response.data.message}`, "error");
+        showSnackbar(error.response.data.message, "error");
       }
 
     };
@@ -1102,10 +1103,15 @@ export default {
         } else {
           initializeMap()
         }
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // 2000 ms = 2 segundos
       } catch (error) {
         console.log("Erro ao deletar os dados:", error);
         showSnackbar("Erro ao deletar a zona. Tente novamente.", "error");
       }
+
+
     };
 
     const removeCircle = (forceRemove?: boolean) => {

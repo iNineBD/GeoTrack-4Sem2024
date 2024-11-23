@@ -10,24 +10,11 @@
           <v-card-text>
             <p class="subtitle-1 mb-4 text-body-2 text-center ">Preencha os campos abaixo</p>
             <v-form @submit.prevent="handleRegister">
-              <v-text-field
-                v-model="name"
-                label="Nome completo"
-                required
-                class="register-input mb-2"
-                variant="outlined"
-                density="comfortable"
-                style="width: 300px;"
-              ></v-text-field>
+              <v-text-field v-model="name" label="Nome completo" required class="register-input mb-2" variant="outlined"
+                density="comfortable" style="width: 300px;"></v-text-field>
 
-              <v-text-field
-                v-model="email"
-                label="Email"
-                required
-                class="register-input mb-2"
-                variant="outlined"
-                density="comfortable"
-              ></v-text-field>
+              <v-text-field v-model="email" label="Email" required class="register-input mb-2" variant="outlined"
+                density="comfortable"></v-text-field>
 
               <v-text-field
               v-model="password"
@@ -68,6 +55,7 @@ import { useRouter } from 'vue-router';
 import logoGeoTrack from '../assets/GeoTrack-logo.png';
 import logoInine from '../assets/inine-logo.png';
 import logoIto1 from '../assets/ito1-logo.png';
+import { errorMessages } from 'vue/compiler-sfc';
 
 export default {
   name: 'Register',
@@ -119,9 +107,7 @@ export default {
 
 
       } catch (error) {
-        snackbarMessage.value = error.response?.data?.message || 'Erro ao cadastrar usuário';
-        snackbarColor.value = 'error';
-        snackbar.value = true;
+        console.log("erro: ", error.mensagem)
       }
     };
 

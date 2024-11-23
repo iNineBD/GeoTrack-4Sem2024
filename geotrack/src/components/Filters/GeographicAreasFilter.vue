@@ -336,20 +336,11 @@ export default {
           // Dados enviados para plotar o círculo escolhido
           this.$emit("consult", dataCircleAndUser);
           this.$emit("stopPointsReceived", dados);
-        } else if (response.status === 404) {
-          const errorData = await response.json();
-
-          console.log("Erro 404: ", errorData.message);
-
-          this.showSnackbar("Dados não localizados para este usuário", "error");
-          this.loading = false;
-          this.$emit("noPointsFound", errorData.message);
         }
       } catch (error) {
         console.log("Erro ao buscar pontos de parada:", error);
-        this.showSnackbar("Dados não localizados para este usuário", "error");
+        this.showSnackbar(error.response.data.message, "error");
         this.loading = false;
-        this.$emit("noPointsFound", errorData.message);
       }
     },
 
