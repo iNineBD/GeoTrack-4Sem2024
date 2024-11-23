@@ -10,7 +10,7 @@
     "
     color="primary"
   >
-    <v-col style="padding: 20px 20px 0 20px">
+    <v-col style="padding: 5px 20px 0px 20px">
       <!-- Botão do Painel de Informações -->
       <InfoPanel
         style="display: flex; justify-content: flex-end; padding-bottom: 10px"
