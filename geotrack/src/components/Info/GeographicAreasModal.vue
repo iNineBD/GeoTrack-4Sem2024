@@ -73,7 +73,7 @@
     <div v-else-if="currentPage === 4">
       <p>
         Com a Área Geográfica ativa, selecione um usuário e use os filtros
-        rápidos de data ou o calendário para escolher um período de até 30 dias.
+        rápidos de data ou o calendário para escolher um período de até 31 dias.
         Após isso, clique em "Consultar" e aguarde os resultados.
       </p>
       <div class="image-grid">

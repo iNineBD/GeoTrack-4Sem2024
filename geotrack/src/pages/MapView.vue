@@ -57,7 +57,7 @@
             rounded="xl" >
             Remover
           </v-btn>
-          <v-btn variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
+          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
             rounded="xl">
             Editar
           </v-btn>
@@ -681,7 +681,7 @@ export default {
           }
           circleDetails.value.center = `${center.lat}, ${center.lng}`;
           circleDetails.value.radius = `${radius}`;
-          
+
           circleForConsult();
 
           // Evento para abrir o modal quando o círculo for clicado

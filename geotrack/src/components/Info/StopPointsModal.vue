@@ -8,7 +8,7 @@
         possíveis dúvidas sobre como utilizar nossa aplicação. A imagem abaixo é
         referente ao filtro de Pontos de Parada, onde você pode buscar os Pontos
         de Parada de até cinco usuários diferentes dentro de um período de
-        trinta dias. Avance para a próxima tela para entender melhor como
+        31 dias. Avance para a próxima tela para entender melhor como
         funciona!
       </p>
       <div class="image-container">
@@ -25,7 +25,7 @@
       <h1 class="modal-title">Pontos de Parada</h1>
       <p>
         Para iniciar a busca, selecione até cinco usuários. Em seguida, use os
-        filtros de data ou escolha um período de até 30 dias no calendário.
+        filtros de data ou escolha um período de até 31 dias no calendário.
         Depois, clique em "Consultar" e aguarde os resultados.
       </p>
       <div class="image-grid">
