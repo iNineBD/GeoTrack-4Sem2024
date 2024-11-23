@@ -32,7 +32,7 @@
 
 
   <!-- Modal dialog para detalhes do círculo -->
-  <v-dialog v-model="dialog" max-width="420px">
+  <v-dialog v-model="dialog" max-width="420px" @click:outside="removeCircle(false)">
     <v-card rounded="xl" color="primary">
       <v-card-title class="text-center" style="padding: 10px 15px 0px 15px">
         <span class="headline">Detalhes da zona selecionada</span>
@@ -55,12 +55,12 @@
           <v-btn variant="flat" color="#008000" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
             Salvar
           </v-btn>
-          <v-btn variant="flat" color="primary_light" @click="removeCircle" style="margin: 0px 10px 15px 10px"
+          <v-btn variant="flat" color="primary_light" @click="removeCircle(true)" style="margin: 0px 10px 15px 10px"
             rounded="xl">
             Remover
           </v-btn>
-          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
-            rounded="xl">
+          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="primary_light" @click="editCircle"
+            style="margin: 0px 10px 15px 10px" rounded="xl">
             Editar
           </v-btn>
           <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="#FF0000" @click="deleteCircle"
@@ -82,7 +82,6 @@
 import vuetify from "@/plugins/vuetify";
 import { eventBus } from "@/utils/EventBus"; // Importando o EventBus
 import axios from "axios";
-import { Color } from "ol/color";
 import { onMounted, ref, watch } from "vue";
 import { id } from "vuetify/locale";
 
@@ -318,6 +317,14 @@ export default {
     }
 
     const initializeMapDark = () => {
+
+      circleDetails.value = {
+        id: "",
+        name: "",
+        type: "CIRCLE",
+        center: ``,
+        radius: ``,
+      };
       console.log("quantidade de marcadores: ", markers.length)
       if (markers.length > 0) {
         clearMarkers();
@@ -448,6 +455,15 @@ export default {
     }
 
     const initializeMap = () => {
+
+      circleDetails.value = {
+        id: "",
+        name: "",
+        type: "CIRCLE",
+        center: ``,
+        radius: ``,
+      };
+
       if (markers.length > 0) {
         clearMarkers();
         removeCircle();
@@ -918,6 +934,8 @@ export default {
         circleInstance = null;
       }
 
+      console.log("Novos detalhes do círculo", circleDetails.value);
+
       // Escuta o evento overlaycomplete para detectar quando o círculo foi desenhado
       const overlayCompleteListener = (event: any) => {
         if (event.type === google.maps.drawing.OverlayType.CIRCLE) {
@@ -1090,7 +1108,13 @@ export default {
       }
     };
 
-    const removeCircle = () => {
+    const removeCircle = (forceRemove?: boolean) => {
+      if (!forceRemove && circleDetails.value.id) {
+        console.log("Não limpo")
+        return;
+      }
+
+      console.log("Removiddoooooooooooooooooo")
       circleDetails.value = {
         id: "",
         name: "",
@@ -1103,7 +1127,8 @@ export default {
         circleInstance.setMap(null);
         circleInstance = null;
       }
-      localStorage.removeItem("circleDetailsCached")
+      localStorage.removeItem("circleDetailsCached");
+      localStorage.removeItem("cachedCircleDetails");
       eventBus.emit("clearSelectedGeoArea");
     };
 
