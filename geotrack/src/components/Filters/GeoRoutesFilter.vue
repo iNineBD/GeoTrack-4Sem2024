@@ -188,19 +188,9 @@ export default {
 
           this.$emit("routesReceived", dados);
 
-        } else if (response.status === 404) {
-          this.showSnackbar("Dados não localizados para este usuário", "error");
-          if (this.logo == "/src/assets/LogoWhite.svg") {
-            this.$emit("initializeMapDark");
-            eventBus.emit("clearStopPointsInformation");
-          } else {
-            this.$emit("initializeMap");
-            eventBus.emit("clearStopPointsInformation");
-          }
-          this.loading = false;
-        }
-      } catch (error) {
-        this.showSnackbar("Dados não localizados para este usuário", "error");
+        } } catch (error) {
+          console.log(error)
+          this.showSnackbar(error.response.data.message, "error");
         if (this.logo == "/src/assets/LogoWhite.svg") {
           this.$emit("initializeMapDark");
           eventBus.emit("clearStopPointsInformation");
