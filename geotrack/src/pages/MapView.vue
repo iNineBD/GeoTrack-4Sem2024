@@ -552,7 +552,7 @@ export default {
     const fetchGeoJsonData = async (filterData: FilterData) => {
       try {
         const response = await axios.post(
-          "handleGeographicAreaConsultstoppoint/find",
+          "http://localhost:8080/stoppoint/find",
           filterData
         );
 

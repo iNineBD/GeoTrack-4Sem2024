@@ -222,7 +222,7 @@ export default {
 
       console.log("Dados enviados: ", requestData);
 
-      const url = `http://localhost:8080/routes?deviceId=${requestData.deviceId}&&dateStart=${requestData.startDate}&dateEnd=${requestData.finalDate}`;
+      const url = `http://localhost:8080/routes?deviceId=${requestData.deviceId}&dateStart=${requestData.startDate}&dateEnd=${requestData.finalDate}`;
 
       try {
         const response = await axios.get(url);
