@@ -1,6 +1,6 @@
 <template>
     <v-card class="mx-auto" width="100%"
-        style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; height: 350px;" color="primary">
+        style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; height: 290px;" color="primary">
         <v-col style="padding: 20px 20px 0 20px">
             <!-- Card das áreas geográficas -->
             <v-card-actions class="d-flex justify-space-between">
@@ -113,37 +113,35 @@ export default {
         ButtonDisabled() {
             const cachedDetails = localStorage.getItem("cachedCircleDetails");
             const cachedCircle = JSON.parse(cachedDetails);
-
-
-            console.log('teste: ', cachedCircle)
-
             return !this.date || (!this.selectedGeoArea && !cachedCircle);
         },
     },
 
     methods: {
+        // Função para exibir o snackbar
         showSnackbar(message, color = "success") {
             this.snackbarMessage = message; // Define a mensagem
             this.snackbarColor = color; // Define a cor
             this.snackbar = true; // Torna o snackbar visível
         },
-
+        // Função para limpar a área geográfica selecionada
         clearSelectedGeoArea() {
             this.selectedGeoArea = null;
         },
+        // Função para alterar o logo
         change(newLogo) {
             this.logo = newLogo;
         },
-
+        // Função para parar o loading
         stopIsLoading() {
             this.loading = false;
         },
-
+        //
         async reloadGeoArea() {
             this.selectedGeoArea = null;
             this.fetchGeoAreas();
         },
-
+        // Função para buscar as áreas geográficas
         async fetchGeoAreas() {
             try {
                 const response = await axios.get("http://localhost:8080/zone");
@@ -160,7 +158,7 @@ export default {
                 console.log("Erro ao buscar áreas geográficas:", error);
             }
         },
-
+        // Função para lidar com a mudança de área geográfica
         async handleGeoAreaChange() {
             if (!this.selectedGeoArea) {
                 console.log("Área geográfica não selecionada ou foi limpa");
@@ -196,23 +194,20 @@ export default {
 
             this.$emit("consult", dataCircle);
         },
+        data() {
+            return {
+                users: [], // Para armazenar a lista de usuários localmente
+                loading: false
+            };
+        },
 
         async handleConsult() {
             this.loading = true;
             const cachedDetails = localStorage.getItem('cachedCircleDetails');
             const cachedCircle = JSON.parse(cachedDetails);
             let selectedArea = null;
-            if (
-                !this.date ||
-                (!this.selectedGeoArea && !cachedCircle)
-            ) {
-                console.log("Dados incompletos para a consulta");
-                this.loading = false;
-                return;
-            }
 
             if (this.selectedGeoArea) {
-
                 selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
                 if (!selectedArea) {
                     console.log("Área geográfica não encontrada");
@@ -223,7 +218,6 @@ export default {
                 selectedArea = cachedCircle;
                 selectedArea.latitude = selectedArea.center.latitude;
                 selectedArea.longitude = selectedArea.center.longitude;
-                console.log('passooou ', selectedArea)
             }
 
             const qtddias = Math.round(
@@ -237,66 +231,52 @@ export default {
                 return;
             }
 
+            // Ajustando os dados enviados
             const requestData = {
+                sessionId: selectedArea.id,
                 startDate: new Date(this.date[0]).toLocaleDateString("en-CA"),
-                finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString(
-                    "en-CA"
-                ),
-                latitude: selectedArea.latitude,
-                longitude: selectedArea.longitude,
-                radius: selectedArea.radius,
+                finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString("en-CA")
             };
 
             console.log("Dados enviados: ", requestData);
 
-            const url = `http://localhost:8080/stoppointsession/pointsInSession?deviceId=${requestData.deviceId}&startDate=${requestData.startDate}&endDate=${requestData.finalDate}&latitude=${requestData.latitude}&longitude=${requestData.longitude}&radius=${requestData.radius}`;
+            // Montando a URL conforme esperado
+            const url = `http://localhost:8080/usersInSession?idSession=${requestData.sessionId}&dataInicio=${requestData.startDate}&dataFim=${requestData.finalDate}`;
 
             console.log("URL: ", url);
 
             try {
+                // Realizando a requisição GET
                 const response = await axios.get(url);
+
+                console.log("Usuários recebidos:", this.users);
                 if (response.status === 200) {
                     const data = await response.data;
+                    console.log("Usuários recebidos:", data.users);
 
-                    console.log("Pontos de parada recebidos:", data.stopPoints);
+                    // Armazenando a lista de usuários localmente
+                    this.users = data.users;
+                    // Emitindo o evento para outros componentes ouvirem
+                    this.$emit("usersReceived", data.users);
 
-                    const dataCircle = {
-                        id: selectedArea.id,
-                        name: selectedArea.name,
-                        latitude: selectedArea.latitude,
-                        longitude: selectedArea.longitude,
-                        radius: selectedArea.radius,
-                    };
-
-                    const coord = data.stopPoints;
-
-                    const dados = {
-                        device: this.selected.device,
-                        coords: coord, // Definindo corretamente um array para coordenadas
-                    };
-
-                    console.log("DADOS DA CONSULTA AQUI!!!", dados)
-
-                    // Dados enviados para plotar o círculo escolhido
-                    this.$emit("consult", dataCircle);
-                    this.$emit("stopPointsReceived", dados);
                 } else if (response.status === 404) {
                     const errorData = await response.json();
 
                     console.log("Erro 404: ", errorData.message);
 
-                    this.showSnackbar("Dados não localizados para este usuário", "error");
+                    this.showSnackbar("Dados não localizados para esta sessão", "error");
                     this.loading = false;
-                    this.$emit("noPointsFound", errorData.message);
+                    this.$emit("noUsersFound", errorData.message);
                 }
             } catch (error) {
-                console.log("Erro ao buscar pontos de parada:", error);
-                this.showSnackbar("Dados não localizados para este usuário", "error");
+                console.log("Erro ao buscar dados:", error);
+                this.showSnackbar("Dados não localizados para esta sessão", "error");
                 this.loading = false;
-                this.$emit("noPointsFound", errorData.message);
+                this.$emit("noUsersFound", error.response?.data?.message || "Erro desconhecido");
             }
         },
 
+        // Limpa os campos do filtro
         clearFields() {
             this.date = null;
             this.devices = [];

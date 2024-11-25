@@ -46,8 +46,8 @@ const routes = [
     }
   },
   {
-    path: '/StopPointInZoneFilter',
-    name: 'StopPointInZoneFilter',
+    path: '/UsersInZoneFilter',
+    name: 'UsersInZoneFilter',
     component: MapView,
     beforeEnter: (to, from, next) => {
       if (isTokenExpired()) {

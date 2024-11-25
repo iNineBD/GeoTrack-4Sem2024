@@ -20,7 +20,7 @@
                 @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
 
-              <StopPointInZoneFilter v-if="route.path === '/StopPointInZoneFilter'" @removeCircle="handleRemoveCircle"
+              <UsersInZoneFilter v-if="route.path === '/UsersInZoneFilter'" @removeCircle="handleRemoveCircle"
                 @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
                 @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" />
@@ -58,8 +58,9 @@
       <!-- Botão para GeoRoutesFilter -->
       <v-btn key="map-marker" @click="handleGeoRoutesFilterClick" icon="mdi-map-marker-distance" title="Filtro de Rotas"
         color="primary"></v-btn>
+
       <!-- Botão para stopPointInZone -->
-      <v-btn key="map-marker" @click="handleStopPointInZoneFilter" icon="" title="Filtro de pontos de parada em zona"
+      <v-btn key="map-marker" @click="handleUsersInZone" icon="mdi-file-marker" title="Filtro de usuários em zona"
         color="primary"></v-btn>
 
       <!-- Botão para Sair -->
@@ -75,7 +76,7 @@ import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
 import GeoRoutesFilter from "../Filters/GeoRoutesFilter.vue";
 import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
-import StopPointInZoneFilter from '../Filters/StopPointInZoneFilter.vue'
+import UsersInZoneFilter from '../Filters/UsersInZoneFilter.vue'
 import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 import { eventBus } from '@/utils/EventBus'; // Verifique se está importado corretamente
@@ -227,7 +228,7 @@ const goToFilterGeoRoutes = () => {
 };
 
 const goToStopPointsZone = () => {
-  router.push("/StopPointInZoneFilter");
+  router.push("/UsersInZoneFilter");
   //@ts-ignore
   panel.value = [0];
   toggleDial();
@@ -264,7 +265,7 @@ const handleGeoRoutesFilterClick = () => {
   handlePanelChange();
 };
 
-const handleStopPointInZoneFilter = () => {
+const handleUsersInZone = () => {
   goToStopPointsZone();
   handlePanelChange();
 };
