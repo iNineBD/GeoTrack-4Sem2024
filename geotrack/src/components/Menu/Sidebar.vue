@@ -234,7 +234,6 @@ const clearStopPointsInformation = () => {
 const handleFilterData = async (data: FilterData) => {
   const result = await props.onConsult(data);
 
-
   if (result.success) {
     showStopPointsInformation.value = true;
     stopPoints.value = result.data;

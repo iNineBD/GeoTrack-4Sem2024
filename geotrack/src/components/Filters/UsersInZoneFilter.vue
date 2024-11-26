@@ -67,46 +67,24 @@
       </v-col>
     </v-col>
 
-    <v-card-actions
-      class="d-flex justify-space-between"
-      style="padding: 20px 20px 0 20px"
-    >
-      <v-row class="d-flex" no-gutters style="justify-content: space-around">
-        <v-col cols="7">
-          <v-btn
-            :loading="loading"
-            :disabled="ButtonDisabled || loading"
-            class="text-none"
-            color="secondary"
-            size="large"
-            variant="flat"
-            block
-            rounded="xl"
-            @click="handleConsult"
-          >
-            Consultar
-          </v-btn>
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            class="text-none"
-            color="primary_light"
-            size="large"
-            variant="flat"
-            block
-            rounded="xl"
-            @click="clearFields"
-          >
-            Limpar
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card-actions>
-  </v-card>
+        <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
+            <v-row class="d-flex" no-gutters style="justify-content: space-around">
+                <v-col cols="7">
+                    <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary"
+                        size="large" variant="flat" block rounded="xl" @click="handleConsult">
+                        Consultar
+                    </v-btn>
+                </v-col>
+                <v-col cols="4">
+                    <v-btn class="text-none" color="primary_light" size="large" variant="flat" block rounded="xl"
+                        @click="clearFields">
+                        Limpar
+                    </v-btn>
+                </v-col>
+            </v-row>
+        </v-card-actions>
+    </v-card>
 
-  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
-    {{ snackbarMessage }}
-  </v-snackbar>
 </template>
 
 <script>
