@@ -51,17 +51,17 @@ const props = defineProps<{
 
 const isPlaying = ref(false);
 const progress = ref(0);
-const speeds = [2.0, 1.5, 1.0, 0.5];
+const speeds = [2.0, 1.5, 1.0, 0.5, 0.1];
 const selectedSpeed = ref("1.0");
 const showSpeedMenu = ref(false);
 
 const emit = defineEmits<{
     (event: 'play' | 'pause'): void;
+    (event: 'speedChange', speed: number): void;
 }>();
 
 const togglePlay = () => {
     isPlaying.value = !isPlaying.value;
-    console.log("Situação do player:", isPlaying.value)
     emit(isPlaying.value ? "play" : "pause");
 };
 
@@ -72,6 +72,7 @@ const resetPlayer = () => {
 
 const selectSpeed = (speed: number) => {
     selectedSpeed.value = speed.toFixed(1); // Atualiza o botão com a velocidade selecionada
+    emit("speedChange", speed);
     showSpeedMenu.value = false;
 };
 </script>

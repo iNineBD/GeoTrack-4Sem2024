@@ -27,9 +27,7 @@
     <MetricsCard v-if="isPanelOpen"
       style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
     </MetricsCard>
-
   </div>
-
 
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px" @click:outside="removeCircle(false)">
@@ -651,10 +649,11 @@ export default {
 
           let color = "#000B62";
           let scale = 4;
+          let label = null;
 
-          if (index === 0) { color = "green"; scale = 8; }
+          if (index === 0) { color = "green"; scale = 8; label = { text: "I", color: "white", fontSize: "12px" }; }
 
-          if (index === route.coordinates.length - 1) { color = "red"; scale = 8; }
+          if (index === route.coordinates.length - 1) { color = "red"; scale = 8; label = { text: "F", color: "white", fontSize: "12px" }; }
 
           plotPointRouteOnMap(
             {
@@ -662,7 +661,8 @@ export default {
               coords: position,
             },
             color,
-            scale
+            scale,
+            label
           );
         });
 
@@ -693,17 +693,21 @@ export default {
 
         let count = 0;
         let animationFrameId: number | null = null; // Armazena o ID da animação
-        let isPaused = false; // Inicia como pausado
+        let isPaused = true; // Inicia como pausado
+        let speedFactor = 1.0; // Velocidade padrão
+
+        eventBus.on('speedChange', (speed: number) => {
+          console.log(`Alterando a velocidade para ${speed}x`);
+          speedFactor = speed; // Atualiza a velocidade global
+        });
 
         // Função para atualizar o deslocamento do símbolo
         const animate = () => {
-          if (!isPaused) { // Só atualiza se não estiver pausado
-            count = (count + 1) % 200;
-            const icons = routeLine.get("icons");
-            if (icons.length > 0) {
-              icons[0].offset = `${count / 2}%`;
-              routeLine.set("icons", icons);
-            }
+          count = (count + speedFactor) % 200;
+          const icons = routeLine.get("icons");
+          if (icons.length > 0) {
+            icons[0].offset = `${count / 2}%`;
+            routeLine.set("icons", icons);
           }
           animationFrameId = requestAnimationFrame(animate); // Continua a animação
         };
@@ -713,7 +717,7 @@ export default {
           routeLine.set("icons", [
             {
               icon: lineSymbol,
-              offset: "0%", // Início da animação
+              offset: `${count / 2}%`, // Começa do deslocamento atual
             },
           ]);
         };
@@ -721,34 +725,32 @@ export default {
         // Inicia a animação
         const startAnimation = () => {
           console.log("Iniciando a animação...");
-          animate();
+          if (animationFrameId) cancelAnimationFrame(animationFrameId); // Cancela qualquer animação anterior
+          isPaused = false; // Retira o estado de pausa
+          animate(); // Inicia a animação
         };
 
-        // Função para pausar a animação
+        // Pausa a animação
         const pauseAnimation = () => {
-          isPaused = true;
           console.log("Animação pausada");
-
-          // Manter o ícone visível e parado
-          const icons = routeLine.get("icons");
-          if (icons.length > 0) {
-            icons[0].offset = `${count / 2}%`; // Congela na posição atual
-            routeLine.set("icons", icons); // Aplica a posição congelada
+          isPaused = true;
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId); // Cancela a animação
+            animationFrameId = null;
           }
         };
 
         // Adicionando métodos de controle de play/pause à `routeLine`
         routeLine.play = () => {
-          isPaused = false;
-          showIcon()
-          startAnimation();
           console.log("Animação retomada");
+          if (!isPaused) return; // Impede múltiplos inícios
+          showIcon() // Garante que o ícone esteja visível
+          startAnimation(); // Reinicia a animação
         };
 
         routeLine.pause = () => {
-          isPaused = true;
+          if (isPaused) return;
           pauseAnimation()
-          console.log("Animação pausada");
         };
 
         // Adicionando o controle de play/pause via eventBus
@@ -790,7 +792,7 @@ export default {
     const coordinates: { lat: number; lng: number }[] = [];
 
 
-    const plotPointRouteOnMap = (userData: any, color: string, scale: number) => {
+    const plotPointRouteOnMap = (userData: any, color: string, scale: number, label: any) => {
       const position = {
         lat: userData.coords.latitude,
         lng: userData.coords.longitude,
@@ -810,6 +812,7 @@ export default {
           strokeWeight: 2,
           strokeColor: "#ffffff",
         },
+        label: label,
       });
 
       // Adiciona o marcador no array global para controle

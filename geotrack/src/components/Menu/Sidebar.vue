@@ -26,7 +26,7 @@
                 @navigate-to-stop-point="navigateGeoToLocation" />
               <GeoRoutesInformation v-if="showGeoRoutesInformation" :geoRoutes="geoRoutes" />
               <RoutePlayer v-if="selectedRoute" :routeTitle="`Exibindo: ROTA ${routeNumber}`" :routeData="selectedRoute"
-                @close="selectedRoute = null" @play="handlePlay" @pause="handlePause" />
+                @close="selectedRoute = null" @play="handlePlay" @pause="handlePause" @speedChange="handleSpeedChange" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -296,6 +296,11 @@ const handlePause = () => {
   console.log("Pause acionado no Sidebar");
   eventBus.emit('routePause');
 };
+
+const handleSpeedChange = (speed: number) => {
+  console.log("Velocidade selecionada:", speed);
+  eventBus.emit('speedChange', speed);
+}
 
 </script>
 
