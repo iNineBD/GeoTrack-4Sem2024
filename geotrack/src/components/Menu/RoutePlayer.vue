@@ -13,10 +13,7 @@
                     <v-icon v-if="isPlaying">mdi-pause</v-icon>
                     <v-icon v-else>mdi-play</v-icon>
                 </v-btn>
-                <v-progress-linear
-                    v-model="progress"
-                    class="player-progress mx-3"
-                    height="8" color="secondary"
+                <v-progress-linear v-model="progress" class="player-progress mx-3" height="8" color="secondary"
                     background-color="primary-darken-1" rounded>
                 </v-progress-linear>
             </v-row>
@@ -33,10 +30,7 @@
                         </v-btn>
                     </template>
                     <v-list>
-                        <v-list-item
-                            v-for="(speed, index) in speeds"
-                            :key="index"
-                            @click="selectSpeed(speed)"
+                        <v-list-item v-for="(speed, index) in speeds" :key="index" @click="selectSpeed(speed)"
                             class="text-secondary">
                             <v-list-item-title>{{ `${speed}x` }}</v-list-item-title>
                         </v-list-item>
@@ -57,12 +51,18 @@ const props = defineProps<{
 
 const isPlaying = ref(false);
 const progress = ref(0);
-const speeds = [0.5, 1.0, 1.5, 2.0];
+const speeds = [2.0, 1.5, 1.0, 0.5];
 const selectedSpeed = ref("1.0");
 const showSpeedMenu = ref(false);
 
+const emit = defineEmits<{
+    (event: 'play' | 'pause'): void;
+}>();
+
 const togglePlay = () => {
     isPlaying.value = !isPlaying.value;
+    console.log("Situação do player:", isPlaying.value)
+    emit(isPlaying.value ? "play" : "pause");
 };
 
 const resetPlayer = () => {

@@ -15,7 +15,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-        }}</v-icon>
+      }}</v-icon>
     </template>
   </v-switch>
 
@@ -163,7 +163,6 @@ export default {
 
     const handleSelectedRoute = (route: any) => {
       console.log("Rota recebida no MapView:", route);
-      clearMarkers();
       handleRoutesReceived({ routes: [route] });
     };
 
@@ -619,9 +618,7 @@ export default {
       clearMarkers();
 
       // Remove as rotas (linhas) existentes
-      routeLines.forEach(line => {
-        line.setMap(null);
-      });
+      routeLines.forEach(line => line.setMap(null));
       routeLines = []; // Limpa a lista de linhas
 
       let totalLat = 0;
@@ -653,22 +650,20 @@ export default {
           if (coord.longitude > maxLng) maxLng = coord.longitude;
 
           let color = "#000B62";
-          let scale = 5;
+          let scale = 4;
 
-          if (index === 0) {
-            color = "green";
-            scale = 10;
-          }
+          if (index === 0) { color = "green"; scale = 8; }
 
-          if (index === route.coordinates.length - 1) {
-            color = "red";
-            scale = 10;
-          }
+          if (index === route.coordinates.length - 1) { color = "red"; scale = 8; }
 
-          plotPointRouteOnMap({
-            device: `Data: ${coord.date}`,
-            coords: position,
-          }, color, scale);
+          plotPointRouteOnMap(
+            {
+              device: `Data: ${coord.date}`,
+              coords: position,
+            },
+            color,
+            scale
+          );
         });
 
         // Converte os pontos da rota para o formato Google Maps
@@ -677,6 +672,13 @@ export default {
           lng: point.longitude,
         }));
 
+        // Configuração inicial do símbolo
+        const lineSymbol = {
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          scale: 5,
+          strokeColor: "#FF0000",
+        };
+
         // Desenha a linha da rota no mapa
         const routeLine = new google.maps.Polyline({
           path: googleRoutePath,
@@ -684,9 +686,79 @@ export default {
           strokeColor: '#000B62',
           strokeOpacity: 1.0,
           strokeWeight: 2,
+          icons: [],
         });
         routeLine.setMap(map.value);
         routeLines.push(routeLine);
+
+        let count = 0;
+        let animationFrameId: number | null = null; // Armazena o ID da animação
+        let isPaused = false; // Inicia como pausado
+
+        // Função para atualizar o deslocamento do símbolo
+        const animate = () => {
+          if (!isPaused) { // Só atualiza se não estiver pausado
+            count = (count + 1) % 200;
+            const icons = routeLine.get("icons");
+            if (icons.length > 0) {
+              icons[0].offset = `${count / 2}%`;
+              routeLine.set("icons", icons);
+            }
+          }
+          animationFrameId = requestAnimationFrame(animate); // Continua a animação
+        };
+
+        // Função para mostrar o ícone
+        const showIcon = () => {
+          routeLine.set("icons", [
+            {
+              icon: lineSymbol,
+              offset: "0%", // Início da animação
+            },
+          ]);
+        };
+
+        // Inicia a animação
+        const startAnimation = () => {
+          console.log("Iniciando a animação...");
+          animate();
+        };
+
+        // Função para pausar a animação
+        const pauseAnimation = () => {
+          isPaused = true;
+          console.log("Animação pausada");
+
+          // Manter o ícone visível e parado
+          const icons = routeLine.get("icons");
+          if (icons.length > 0) {
+            icons[0].offset = `${count / 2}%`; // Congela na posição atual
+            routeLine.set("icons", icons); // Aplica a posição congelada
+          }
+        };
+
+        // Adicionando métodos de controle de play/pause à `routeLine`
+        routeLine.play = () => {
+          isPaused = false;
+          showIcon()
+          startAnimation();
+          console.log("Animação retomada");
+        };
+
+        routeLine.pause = () => {
+          isPaused = true;
+          pauseAnimation()
+          console.log("Animação pausada");
+        };
+
+        // Adicionando o controle de play/pause via eventBus
+        eventBus.on('routePlay', () => {
+          routeLine.play();
+        });
+
+        eventBus.on('routePause', () => {
+          routeLine.pause();
+        });
       });
 
       eventBus.emit("stopIsLoading");
@@ -709,7 +781,6 @@ export default {
         map.value.setZoom(Math.max(2, Math.min(zoomLevel, 21))); // Limita o zoom entre 2 e 21
       }
     };
-
 
     function toggleTheme(): void {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";

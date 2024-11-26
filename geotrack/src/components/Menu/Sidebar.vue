@@ -25,7 +25,8 @@
               <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
                 @navigate-to-stop-point="navigateGeoToLocation" />
               <GeoRoutesInformation v-if="showGeoRoutesInformation" :geoRoutes="geoRoutes" />
-              <RoutePlayer v-if="selectedRoute" :routeTitle="`Exibindo: ROTA ${routeNumber}`" :routeData="selectedRoute" @close="selectedRoute = null" />
+              <RoutePlayer v-if="selectedRoute" :routeTitle="`Exibindo: ROTA ${routeNumber}`" :routeData="selectedRoute"
+                @close="selectedRoute = null" @play="handlePlay" @pause="handlePause" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -284,6 +285,16 @@ const navigateGeoToLocation = (coord: [number, number]) => {
 const handleRouteFromSidebar = (route: any) => {
   console.log('Rota recebida no Sidebar:', route);
   eventBus.emit("selectedRoute", route);
+};
+
+const handlePlay = () => {
+  console.log("Play acionado no Sidebar");
+  eventBus.emit('routePlay');
+};
+
+const handlePause = () => {
+  console.log("Pause acionado no Sidebar");
+  eventBus.emit('routePause');
 };
 
 </script>

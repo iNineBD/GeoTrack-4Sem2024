@@ -51,7 +51,6 @@
 import { eventBus } from '@/utils/EventBus';
 import axios from 'axios';
 
-
 export default {
   data: () => ({
     today: new Date().toISOString().substr(0, 10),
@@ -188,9 +187,10 @@ export default {
 
           this.$emit("routesReceived", dados);
 
-        } } catch (error) {
-          console.log(error)
-          this.showSnackbar(error.response.data.message, "error");
+        }
+      } catch (error) {
+        console.log(error)
+        this.showSnackbar(error.response.data.message, "error");
         if (this.logo == "/src/assets/LogoWhite.svg") {
           this.$emit("initializeMapDark");
           eventBus.emit("clearStopPointsInformation");
