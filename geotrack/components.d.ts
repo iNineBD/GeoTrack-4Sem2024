@@ -8,8 +8,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     GeographicAreasFilter: typeof import('./src/components/Filters/GeographicAreasFilter.vue')['default']
+    GeographicAreasModal: typeof import('./src/components/Info/GeographicAreasModal.vue')['default']
     GeographicStopPointsInformation: typeof import('./src/components/Menu/GeographicStopPointsInformation.vue')['default']
     GeoRoutesFilter: typeof import('./src/components/Filters/GeoRoutesFilter.vue')['default']
+    GeoRoutesInformation: typeof import('./src/components/Menu/GeoRoutesInformation.vue')['default']
+    GeoRoutesModal: typeof import('./src/components/Info/GeoRoutesModal.vue')['default']
+    InfoPanel: typeof import('./src/components/Info/InfoPanel.vue')['default']
     MetricsCard: typeof import('./src/components/Metrics/MetricsCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -20,5 +24,6 @@ declare module 'vue' {
     UserInZone: typeof import('./src/components/Menu/UserInZone.vue')['default']
     UserInZoneInformation: typeof import('./src/components/Menu/UserInZoneInformation.vue')['default']
     UsersInZoneFilter: typeof import('./src/components/Filters/UsersInZoneFilter.vue')['default']
+    StopPointsModal: typeof import('./src/components/Info/StopPointsModal.vue')['default']
   }
 }

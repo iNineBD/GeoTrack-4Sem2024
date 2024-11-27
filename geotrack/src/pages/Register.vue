@@ -10,35 +10,25 @@
           <v-card-text>
             <p class="subtitle-1 mb-4 text-body-2 text-center ">Preencha os campos abaixo</p>
             <v-form @submit.prevent="handleRegister">
-              <v-text-field
-                v-model="name"
-                label="Nome completo"
-                required
-                class="register-input mb-2"
-                variant="outlined"
-                density="comfortable"
-                style="width: 300px;"
-              ></v-text-field>
+              <v-text-field v-model="name" label="Nome completo" required class="register-input mb-2" variant="outlined"
+                density="comfortable" style="width: 300px;"></v-text-field>
+
+              <v-text-field v-model="email" label="Email" required class="register-input mb-2" variant="outlined"
+                density="comfortable"></v-text-field>
 
               <v-text-field
-                v-model="email"
-                label="Email"
-                required
-                class="register-input mb-2"
-                variant="outlined"
-                density="comfortable"
+              v-model="password"
+              :type="passwordVisible ? 'text' : 'password'"
+              label="Digite sua senha"
+              required
+              class="login-input mb-10"
+              variant="outlined"
+              density="comfortable"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="togglePasswordVisibility"
+              style="width: 300px"
               ></v-text-field>
 
-              <v-text-field
-                v-model="password"
-                label="Senha"
-                type="password"
-                required
-                class="register-input mb-4"
-                variant="outlined"
-                density="comfortable"
-              ></v-text-field>
-              
               <v-btn type="submit" block class="register-btn" size="large">Cadastrar</v-btn>
             </v-form>
             <div class="login text-center mt-4">
@@ -54,7 +44,7 @@
           {{ snackbarMessage }}
         </v-snackbar>
       </v-col>
-      
+
     </v-row>
   </v-container>
 </template>
@@ -65,6 +55,7 @@ import { useRouter } from 'vue-router';
 import logoGeoTrack from '../assets/GeoTrack-logo.png';
 import logoInine from '../assets/inine-logo.png';
 import logoIto1 from '../assets/ito1-logo.png';
+import { errorMessages } from 'vue/compiler-sfc';
 
 export default {
   name: 'Register',
@@ -73,7 +64,11 @@ export default {
     const email = ref('');
     const password = ref('');
     const router = useRouter();
-    
+    const passwordVisible = ref(false);
+    const togglePasswordVisibility = () => {
+      passwordVisible.value = !passwordVisible.value;
+    };
+
     const snackbar = ref(false);
     const snackbarMessage = ref('');
     const snackbarColor = ref('');
@@ -83,7 +78,7 @@ export default {
         snackbarMessage.value = 'Por favor, preencha todos os campos!';
         snackbarColor.value = 'error';
         snackbar.value = true;
-        return; 
+        return;
       }
 
       try {
@@ -109,12 +104,10 @@ export default {
         setTimeout(() => {
           router.push('/');
         }, 3000);
-        
+
 
       } catch (error) {
-        snackbarMessage.value = error.response?.data?.message || 'Erro ao cadastrar usuário';
-        snackbarColor.value = 'error';
-        snackbar.value = true;
+        console.log("erro: ", error.mensagem)
       }
     };
 
@@ -122,6 +115,8 @@ export default {
       name,
       email,
       password,
+      passwordVisible,
+      togglePasswordVisibility,
       handleRegister,
       logoGeoTrack,
       logoIto1,
@@ -195,8 +190,8 @@ export default {
 
 .register-card {
   background: white !important;
-  width: min(90vw, 420px); 
-  padding: 2vw; 
+  width: min(90vw, 420px);
+  padding: 2vw;
   border-radius: 30px;
   display: flex;
   flex-direction: column;

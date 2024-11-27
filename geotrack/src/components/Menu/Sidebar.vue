@@ -25,9 +25,8 @@
                 @usersReceived="handleUsersReceived" @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark" @clearFields="handleClearFields" />
 
-              <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived"
+              <GeoRoutesFilter @initializeMap="initializeMap" @initializeMapDark="initializeMapDark" @routesReceived="handleRoutesReceived"
                 v-if="route.path === '/georoutesfilter'" />
-
               <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints"
                 @go-to-location="navigateToLocation" />
 
@@ -36,6 +35,7 @@
 
               <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
                 @navigate-to-stop-point="navigateGeoToLocation" />
+              <GeoRoutesInformation v-if="showGeoRoutesInformation" :geoRoutes="geoRoutes" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -77,9 +77,10 @@ import { ref, onMounted, onUnmounted } from "vue";
 import StopPointsFilter from "../Filters/StopPointsFilter.vue";
 import GeographicAreasFilter from "../Filters/GeographicAreasFilter.vue";
 import GeoRoutesFilter from "../Filters/GeoRoutesFilter.vue";
-import StopPointsInformation from "../Menu/StopPointsInformation.vue";
-import GeographicStopPointsInformation from "../Menu/GeographicStopPointsInformation.vue";
 import UsersInZoneFilter from "../Filters/UsersInZoneFilter.vue";
+import GeoRoutesInformation from "../Menu/GeoRoutesInformation.vue";
+import StopPointsInformation from '../Menu/StopPointsInformation.vue';
+import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
 import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 import { eventBus } from "@/utils/EventBus"; // Verifique se está importado corretamente
@@ -100,11 +101,13 @@ onMounted(() => {
   eventBus.on("changeLogo", updateLogo);
   eventBus.on("novoLogo", change);
   eventBus.on("clearStopPointsInformation", clearStopPointsInformation);
+  eventBus.on('showRouteOnMap', handleRouteFromSidebar);
 });
 
 onUnmounted(() => {
   eventBus.off("novoLogo", change);
   eventBus.off("changeLogo", updateLogo);
+  eventBus.off('showRouteOnMap', handleRouteFromSidebar);
 });
 
 // Método que será chamado quando o evento "novoLogo" for emitido
@@ -118,11 +121,9 @@ const toggleDial = () => {
 };
 
 const updateLogo = () => {
-  logo.value =
-    logo.value === "/src/assets/Logo.svg"
-      ? "/src/assets/LogoWhite.svg"
-      : "/src/assets/Logo.svg";
-  eventBus.emit("novoLogo", logo.value);
+
+  logo.value = logo.value === "/src/assets/Logo.svg" ? "/src/assets/LogoWhite.svg" : "/src/assets/Logo.svg";
+  eventBus.emit("novoLogo", logo.value)
 };
 
 // Definindo as props
@@ -147,11 +148,14 @@ const showGeographicStopPointsInformation = ref(false);
 const showUserInZoneInformation = ref(false);
 const geoStopPoints = ref<any[]>([]);
 const userZoneInfo = ref<any[]>([]);
+const showGeoRoutesInformation = ref(false);
+const geoRoutes = ref<any[]>([]);
 
 const clearStopPointsInformation = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
   showUserInZoneInformation.value = false; // Adicione esta linha para ocultar o componente UserInZoneInformation
+  showGeoRoutesInformation.value = false;
 };
 
 const handleFilterData = async (data: FilterData) => {
@@ -196,7 +200,9 @@ const handleUsersReceived = (users: any) => {
 };
 
 const handleRoutesReceived = (routes: any) => {
-  console.log("Rotas recebidas no sidebar", routes);
+  console.log("Rotas recebidas no sidebar", routes.routes);
+  geoRoutes.value = routes.routes;
+  showGeoRoutesInformation.value = true;
   props.onRoutesReceived(routes);
 };
 
@@ -266,6 +272,7 @@ const handlePanelChange = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
   showUserInZoneInformation.value = false; // Adicione esta linha para ocultar o componente UserInZoneInformation
+  showGeoRoutesInformation.value = false;
 };
 
 const handleStopPointsFilterClick = () => {
@@ -282,6 +289,7 @@ const handleGeoRoutesFilterClick = () => {
   goToFilterGeoRoutes();
   handlePanelChange();
 };
+
 
 const handleUsersInZone = () => {
   goToStopPointsZone();
@@ -313,6 +321,12 @@ const navigateGeoToLocation = (coord: [number, number]) => {
   console.log("COORDS AQUII", coord);
   eventBus.emit("navigateGeoToLocation", coord);
 };
+
+const handleRouteFromSidebar = (route: any) => {
+  console.log('Rota recebida no Sidebar:', route);
+  eventBus.emit("selectedRoute", route);
+};
+
 </script>
 
 

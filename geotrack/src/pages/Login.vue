@@ -29,13 +29,16 @@
               ></v-text-field>
 
               <v-text-field
-                v-model="password"
-                label="Digite sua senha"
-                type="password"
-                required
-                class="login-input mb-4"
-                variant="outlined"
-                density="comfortable"
+              v-model="password"
+              :type="passwordVisible ? 'text' : 'password'"
+              label="Digite sua senha"
+              required
+              class="login-input mb-10"
+              variant="outlined"
+              density="comfortable"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="togglePasswordVisibility"
+              style="width: 300px"
               ></v-text-field>
 
               <v-btn type="submit" block class="login-btn" size="large">
@@ -74,12 +77,17 @@ export default {
     const email = ref("");
     const password = ref("");
     const router = useRouter();
+    const passwordVisible = ref(false);
+    const togglePasswordVisibility = () => {
+      passwordVisible.value = !passwordVisible.value;
+    };
 
     const snackbar = ref(false);
     const snackbarMessage = ref("");
     const snackbarColor = ref("");
 
     const handleLogin = async () => {
+      localStorage.removeItem("token");
       try {
       const response = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
@@ -93,7 +101,10 @@ export default {
       });
 
       if (!response.ok) {
-        throw new Error("Erro no login");
+        const errorData = await response.json();
+        snackbarMessage.value = errorData.message;
+        snackbarColor.value = 'error';
+        snackbar.value = true;
       }
 
       const data = await response.json();
@@ -106,17 +117,15 @@ export default {
 
       router.push("/stoppointsfilter");
       } catch (error) {
-      console.error("Erro no login:", error.message);
-
-      snackbarMessage.value = error.message || "Erro desconhecido no login";
-      snackbarColor.value = "error";
-      snackbar.value = true;
+      console.error("Erro no login:", error);
       }
     };
 
     return {
       email,
       password,
+      passwordVisible,
+      togglePasswordVisibility,
       handleLogin,
       logoGeoTrack,
       logoIto1,
@@ -155,11 +164,11 @@ export default {
 
 .yellow-section {
   background-position: center;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
- 
+
   border-radius: 20px;
 }
 

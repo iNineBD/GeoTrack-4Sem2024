@@ -15,7 +15,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-      }}</v-icon>
+        }}</v-icon>
     </template>
   </v-switch>
 
@@ -24,11 +24,15 @@
       style="position: fixed; top: 12px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;">
     </v-btn>
 
+    <MetricsCard v-if="isPanelOpen"
+      style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
+    </MetricsCard>
+
   </div>
 
 
   <!-- Modal dialog para detalhes do círculo -->
-  <v-dialog v-model="dialog" max-width="420px">
+  <v-dialog v-model="dialog" max-width="420px" @click:outside="removeCircle(false)">
     <v-card rounded="xl" color="primary">
       <v-card-title class="text-center" style="padding: 10px 15px 0px 15px">
         <span class="headline">Detalhes da zona selecionada</span>
@@ -51,12 +55,12 @@
           <v-btn variant="flat" color="#008000" @click="saveCircle" style="margin: 0px 10px 15px 10px" rounded="xl">
             Salvar
           </v-btn>
-          <v-btn variant="flat" color="primary_light" @click="removeCircle" style="margin: 0px 10px 15px 10px"
+          <v-btn variant="flat" color="primary_light" @click="removeCircle(true)" style="margin: 0px 10px 15px 10px"
             rounded="xl">
             Remover
           </v-btn>
-          <v-btn variant="flat" color="primary_light" @click="editCircle" style="margin: 0px 10px 15px 10px"
-            rounded="xl">
+          <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="primary_light" @click="editCircle"
+            style="margin: 0px 10px 15px 10px" rounded="xl">
             Editar
           </v-btn>
           <v-btn v-if="!(circleDetails.id == '')" variant="flat" color="#FF0000" @click="deleteCircle"
@@ -78,7 +82,6 @@
 import vuetify from "@/plugins/vuetify";
 import { eventBus } from "@/utils/EventBus"; // Importando o EventBus
 import axios from "axios";
-import { Color } from "ol/color";
 import { onMounted, ref, watch } from "vue";
 import { id } from "vuetify/locale";
 
@@ -138,6 +141,8 @@ export default {
     let circleInstance: google.maps.Circle | null = null;
     // @ts-ignore
     const circles = ref<{ circle: google.maps.Circle; details: any }[]>([]);
+    // @ts-ignore
+    let routeLines: google.maps.Polyline[] = [];
 
     onMounted(() => {
       if (mapDiv.value) {
@@ -152,7 +157,15 @@ export default {
           navigateGeoToLocation(coords);
         });
       }
+
+      eventBus.on("selectedRoute", handleSelectedRoute);
     });
+
+    const handleSelectedRoute = (route: any) => {
+      console.log("Rota recebida no MapView:", route);
+      clearMarkers();
+      handleRoutesReceived({ routes: [route] });
+    };
 
     const navigateToLocation = (coordinates: [number, number]) => {
       if (map.value) {
@@ -304,6 +317,14 @@ export default {
     }
 
     const initializeMapDark = () => {
+
+      circleDetails.value = {
+        id: "",
+        name: "",
+        type: "CIRCLE",
+        center: ``,
+        radius: ``,
+      };
       console.log("quantidade de marcadores: ", markers.length)
       if (markers.length > 0) {
         clearMarkers();
@@ -434,6 +455,15 @@ export default {
     }
 
     const initializeMap = () => {
+
+      circleDetails.value = {
+        id: "",
+        name: "",
+        type: "CIRCLE",
+        center: ``,
+        radius: ``,
+      };
+
       if (markers.length > 0) {
         clearMarkers();
         removeCircle();
@@ -553,7 +583,6 @@ export default {
           });
           return { success: true, data: geoJsonResponses }
         }
-        console.log("tetstte: ", geoJsonResponses)
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           if (error.response.status === 404) {
@@ -589,12 +618,39 @@ export default {
     const handleRoutesReceived = (routes: any) => {
       clearMarkers();
 
+      // Remove as rotas (linhas) existentes
+      routeLines.forEach(line => {
+        line.setMap(null);
+      });
+      routeLines = []; // Limpa a lista de linhas
+
+      let totalLat = 0;
+      let totalLng = 0;
+      let pointCount = 0;
+
+      // Variáveis para calcular as extremidades (bounding box)
+      let minLat = Infinity;
+      let maxLat = -Infinity;
+      let minLng = Infinity;
+      let maxLng = -Infinity;
+
       routes.routes.forEach((route: any) => {
         const routePath = [];
 
         route.coordinates.forEach((coord: any, index: number) => {
           const position = { latitude: coord.latitude, longitude: coord.longitude };
           routePath.push(position);
+
+          // Soma os pontos para cálculo do centro
+          totalLat += coord.latitude;
+          totalLng += coord.longitude;
+          pointCount++;
+
+          // Atualiza os limites (bounding box)
+          if (coord.latitude < minLat) minLat = coord.latitude;
+          if (coord.latitude > maxLat) maxLat = coord.latitude;
+          if (coord.longitude < minLng) minLng = coord.longitude;
+          if (coord.longitude > maxLng) maxLng = coord.longitude;
 
           let color = "#000B62";
           let scale = 5;
@@ -630,20 +686,47 @@ export default {
           strokeWeight: 2,
         });
         routeLine.setMap(map.value);
+        routeLines.push(routeLine);
       });
 
       eventBus.emit("stopIsLoading");
+
+      // Ajusta o zoom dinamicamente
+      if (pointCount > 0) {
+        const centerLat = totalLat / pointCount;
+        const centerLng = totalLng / pointCount;
+
+        const latDiff = maxLat - minLat;
+        const lngDiff = maxLng - minLng;
+        const maxDiff = Math.max(latDiff, lngDiff);
+
+        // Cálculo ajustado para um zoom mais próximo
+        const zoomBase = 17; // Base mais alta para aproximação inicial
+        const zoomAdjustment = Math.log2(maxDiff + 1) * 1.5; // Multiplicador reduz o impacto
+        const zoomLevel = Math.floor(zoomBase - zoomAdjustment);
+
+        map.value.setCenter({ lat: centerLat, lng: centerLng });
+        map.value.setZoom(Math.max(2, Math.min(zoomLevel, 21))); // Limita o zoom entre 2 e 21
+      }
     };
+
 
     function toggleTheme(): void {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
     };
+
+    // Array para armazenar as coordenadas diretamente
+    const coordinates: { lat: number; lng: number }[] = [];
+
 
     const plotPointRouteOnMap = (userData: any, color: string, scale: number) => {
       const position = {
         lat: userData.coords.latitude,
         lng: userData.coords.longitude,
       }; // Coordenadas
+
+      // Salva a coordenada no array
+      coordinates.push(position);
 
       const marker = new google.maps.Marker({
         position,
@@ -676,8 +759,41 @@ export default {
         infoWindow.close();
       });
 
-      centerMapOnMarker(position, 22);
+      // Calcula os limites (bounding box) da rota
+      let minLat = Infinity;
+      let maxLat = -Infinity;
+      let minLng = Infinity;
+      let maxLng = -Infinity;
+
+      coordinates.forEach(coord => {
+        if (coord.lat < minLat) minLat = coord.lat;
+        if (coord.lat > maxLat) maxLat = coord.lat;
+        if (coord.lng < minLng) minLng = coord.lng;
+        if (coord.lng > maxLng) maxLng = coord.lng;
+      });
+
+      // Calcula o centro do mapa
+      const centerLat = (minLat + maxLat) / 2;
+      const centerLng = (minLng + maxLng) / 2;
+
+      // Ajusta dinamicamente o zoom
+      const latDiff = maxLat - minLat;
+      const lngDiff = maxLng - minLng;
+      const maxDiff = Math.max(latDiff, lngDiff);
+
+      const zoomBase = 17; // Base inicial para aproximação
+      const zoomAdjustment = Math.log2(maxDiff + 1) * 1.5; // Ajuste dinâmico
+      const zoomLevel = Math.max(2, Math.min(Math.floor(zoomBase - zoomAdjustment), 21)); // Limita o zoom entre 2 e 21
+
+      // Reposiciona o mapa
+      const positionToZoom = {
+        lat: centerLat,
+        lng: centerLng,
+      };
+
+      centerMapOnMarker(positionToZoom, zoomLevel);
     };
+
 
     const plotPointOnMap = (userData: any) => {
       const position = {
@@ -817,6 +933,8 @@ export default {
         circleInstance = null;
       }
 
+      console.log("Novos detalhes do círculo", circleDetails.value);
+
       // Escuta o evento overlaycomplete para detectar quando o círculo foi desenhado
       const overlayCompleteListener = (event: any) => {
         if (event.type === google.maps.drawing.OverlayType.CIRCLE) {
@@ -940,14 +1058,17 @@ export default {
         } else {
           initializeMap()
         }
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // 2000 ms = 2 segundos
+
       } catch (error) {
         console.log("Erro ao enviar os dados:", error);
         localStorage.removeItem("circleDetailsCached")
-        showSnackbar("Erro ao salvar a zona. Tente novamente.", "error");
-        showSnackbar(`Erro ao salvar a zona: ${error.response.data.message}`, "error");
+        showSnackbar(error.response.data.message, "error");
       }
 
-      window.location.reload();
     };
 
     const deleteCircle = async () => {
@@ -982,13 +1103,24 @@ export default {
         } else {
           initializeMap()
         }
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // 2000 ms = 2 segundos
       } catch (error) {
         console.log("Erro ao deletar os dados:", error);
         showSnackbar("Erro ao deletar a zona. Tente novamente.", "error");
       }
+
+
     };
 
-    const removeCircle = () => {
+    const removeCircle = (forceRemove?: boolean) => {
+      if (!forceRemove && circleDetails.value.id) {
+        console.log("Não limpo")
+        return;
+      }
+
+      console.log("Removiddoooooooooooooooooo")
       circleDetails.value = {
         id: "",
         name: "",
@@ -1001,7 +1133,8 @@ export default {
         circleInstance.setMap(null);
         circleInstance = null;
       }
-      localStorage.removeItem("circleDetailsCached")
+      localStorage.removeItem("circleDetailsCached");
+      localStorage.removeItem("cachedCircleDetails");
       eventBus.emit("clearSelectedGeoArea");
     };
 

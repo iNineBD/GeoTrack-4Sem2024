@@ -1,7 +1,14 @@
 <template>
-  <v-card class="mx-auto" width="100%"
-    style="box-shadow: none; border-radius: 0 0 20px 20px; margin-bottom: 0px; height: 350px;" color="primary">
-    <v-col style="padding: 20px 20px 0 20px">
+  <v-card class="mx-auto" width="100%" style="
+      box-shadow: none;
+      border-radius: 0 0 25px 20px;
+      margin-bottom: 0px;
+      height: 362px;
+    " color="primary">
+    <v-col style="padding: 5px 20px 0px 20px">
+      <!-- Botão do Painel de Informações -->
+      <InfoPanel style="display: flex; justify-content: flex-end; padding-bottom: 10px">
+      </InfoPanel>
       <!-- Card das áreas geográficas -->
       <v-card-actions class="d-flex justify-space-between">
         <v-row class="d-flex align-center no-gutters">
@@ -9,7 +16,7 @@
             <!-- Combobox de áreas geográficas -->
             <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="secondary" v-model="selectedGeoArea"
               :items="geoAreas" item-value="id" item-title="name" clearable :multiple="false"
-              @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
+              @update:model-value="handleGeoAreaChange" @click:clear="clearFields" prepend-icon="mdi-map-search">
             </v-combobox>
           </v-col>
 
@@ -63,15 +70,19 @@
     </v-card-actions>
   </v-card>
 
+  <!-- Loading progress circular -->
+  <v-col v-if="loadingPage" id="loadingStopPoints" class="d-flex justify-center mt-4">
+    <v-progress-circular color="primary" indeterminate> </v-progress-circular>
+  </v-col>
+
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
 </template>
 
 <script>
-import { eventBus } from '@/utils/EventBus';
-import axios from 'axios';
-
+import { eventBus } from "@/utils/EventBus";
+import axios from "axios";
 
 export default {
   data: () => ({
@@ -114,10 +125,10 @@ export default {
   mounted() {
     this.fetchUsers();
     this.fetchGeoAreas();
-    eventBus.on('clearSelectedGeoArea', this.clearSelectedGeoArea);
-    eventBus.on('stopIsLoading', this.stopIsLoading);
-    eventBus.on('reloadGeoArea', this.reloadGeoArea);
-    eventBus.on("novoLogo", this.change)
+    eventBus.on("clearSelectedGeoArea", this.clearSelectedGeoArea);
+    eventBus.on("stopIsLoading", this.stopIsLoading);
+    eventBus.on("reloadGeoArea", this.reloadGeoArea);
+    eventBus.on("novoLogo", this.change);
     eventBus.on("clearFields", this.clearFields);
   },
 
@@ -130,10 +141,13 @@ export default {
       const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
 
+      console.log("teste: ", cachedCircle);
 
-      console.log('teste: ', cachedCircle)
-
-      return !this.selectedUser || !this.date || (!this.selectedGeoArea && !cachedCircle);
+      return (
+        !this.selectedUser ||
+        !this.date ||
+        (!this.selectedGeoArea && !cachedCircle)
+      );
     },
   },
 
@@ -162,38 +176,38 @@ export default {
 
     async fetchUsers() {
       try {
-      const response = await axios.get(
-        "http://localhost:8080/filters/users?page=0&qtdPage=1000"
-      );
-      const data = response.data;
+        const response = await axios.get(
+          "http://localhost:8080/filters/users?page=0&qtdPage=1000"
+        );
+        const data = response.data;
 
-      // Mapeando a resposta da API para o formato correto
-      this.users = data.listUsers.map((user) => ({
-        name: user.userName.toUpperCase(), // Nome do usuário
-        deviceId: user.idDevice, // ID do dispositivo associado
-        device: user.deviceName,
-      }));
+        // Mapeando a resposta da API para o formato correto
+        this.users = data.listUsers.map((user) => ({
+          name: user.userName.toUpperCase(), // Nome do usuário
+          deviceId: user.idDevice, // ID do dispositivo associado
+          device: user.deviceName,
+        }));
 
-      console.log("Sucesso ao buscar usuários: ", this.users);
+        console.log("Sucesso ao buscar usuários: ", this.users);
       } catch (error) {
-      console.log("Erro ao buscar usuários: ", error);
+        console.log("Erro ao buscar usuários: ", error);
       }
     },
 
     async fetchGeoAreas() {
       try {
-      const response = await axios.get("http://localhost:8080/zone");
-      const data = response.data;
-      this.geoAreas = data.map((area) => ({
-        id: area.id,
-        name: area.name,
-        latitude: area.center.latitude,
-        longitude: area.center.longitude,
-        radius: area.radius,
-      }));
-      console.log("Áreas geográficas carregadas:", data);
+        const response = await axios.get("http://localhost:8080/zone");
+        const data = response.data;
+        this.geoAreas = data.map((area) => ({
+          id: area.id,
+          name: area.name,
+          latitude: area.center.latitude,
+          longitude: area.center.longitude,
+          radius: area.radius,
+        }));
+        console.log("Áreas geográficas carregadas:", data);
       } catch (error) {
-      console.log("Erro ao buscar áreas geográficas:", error);
+        console.log("Erro ao buscar áreas geográficas:", error);
       }
     },
 
@@ -204,7 +218,7 @@ export default {
         return; // Interrompe a execução da função
       }
 
-      const cachedDetails = localStorage.getItem('cachedCircleDetails');
+      const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
 
       const selectedArea = this.geoAreas.find(
@@ -235,7 +249,7 @@ export default {
 
     async handleConsult() {
       this.loading = true;
-      const cachedDetails = localStorage.getItem('cachedCircleDetails');
+      const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
       let selectedArea = null;
 
@@ -250,8 +264,9 @@ export default {
       }
 
       if (this.selectedGeoArea) {
-
-        selectedArea = this.geoAreas.find(area => area.id === this.selectedGeoArea.id);
+        selectedArea = this.geoAreas.find(
+          (area) => area.id === this.selectedGeoArea.id
+        );
         if (!selectedArea) {
           console.log("Área geográfica não encontrada");
           this.loading = false;
@@ -261,7 +276,7 @@ export default {
         selectedArea = cachedCircle;
         selectedArea.latitude = selectedArea.center.latitude;
         selectedArea.longitude = selectedArea.center.longitude;
-        console.log('passooou ', selectedArea)
+        console.log("passooou ", selectedArea);
       }
 
       const qtddias = Math.round(
@@ -316,25 +331,16 @@ export default {
             coords: coord, // Definindo corretamente um array para coordenadas
           };
 
-          console.log("DADOS DA CONSULTA AQUI!!!", dados)
+          console.log("DADOS DA CONSULTA AQUI!!!", dados);
 
           // Dados enviados para plotar o círculo escolhido
           this.$emit("consult", dataCircleAndUser);
           this.$emit("stopPointsReceived", dados);
-        } else if (response.status === 404) {
-          const errorData = await response.json();
-
-          console.log("Erro 404: ", errorData.message);
-
-          this.showSnackbar("Dados não localizados para este usuário", "error");
-          this.loading = false;
-          this.$emit("noPointsFound", errorData.message);
         }
       } catch (error) {
         console.log("Erro ao buscar pontos de parada:", error);
-        this.showSnackbar("Dados não localizados para este usuário", "error");
+        this.showSnackbar(error.response.data.message, "error");
         this.loading = false;
-        this.$emit("noPointsFound", errorData.message);
       }
     },
 
@@ -349,7 +355,10 @@ export default {
       this.radius = null;
       this.circleDrawn = false;
 
-      console.log("logo novo: ", this.logo)
+      console.log("logo novo: ", this.selectedGeoArea);
+
+      localStorage.removeItem("circleDetailsCached");
+      localStorage.removeItem("cachedCircleDetails");
 
       if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");
@@ -363,6 +372,7 @@ export default {
     drawCircle() {
       this.$emit("drawCircle");
     },
+
     setQuickFilter(range, index) {
       if (this.selectedQuickFilter === index) {
         this.selectedQuickFilter = null;
