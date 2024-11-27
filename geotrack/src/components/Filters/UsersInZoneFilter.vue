@@ -327,8 +327,8 @@ export default {
       this.radius = null;
       this.circleDrawn = false;
 
+      this.$emit("clearFields");
       console.log("logo novo: ", this.logo);
-
       if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");
         eventBus.emit("clearStopPointsInformation");

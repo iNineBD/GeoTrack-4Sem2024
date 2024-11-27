@@ -46,6 +46,7 @@
                 @usersReceived="handleUsersInZoneReceived"
                 @initializeMap="initializeMap"
                 @initializeMapDark="initializeMapDark"
+                @clearFields="handleClearFields"
               />
 
               <GeoRoutesFilter
@@ -65,6 +66,7 @@
                 :onUsersInZoneReceived="handleUsersInZoneReceived"
                 @go-to-location="navigateToLocation"
                 @usersReceived="handleUsersInZoneReceived"
+                @clearFields="handleClearFields"
               />
 
               <GeographicStopPointsInformation
@@ -374,12 +376,15 @@ const handleHomeClick = () => {
   handlePanelChange();
   clearStopPointsInformation();
   eventBus.emit("clearFields");
-
   if (logo.value == "/src/assets/LogoWhite.svg") {
     initializeMapDark();
   } else {
     initializeMap();
   }
+};
+
+const handleClearFields = () => {
+  eventBus.emit("ClearFields");
 };
 
 // navigateToLocation é para ir até os pontos do filtro de usuários
