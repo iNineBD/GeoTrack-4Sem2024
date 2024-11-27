@@ -1,111 +1,96 @@
 <template>
-  <v-card
-    v-if="isVisible"
-    class="users-list-card"
-    width="400px"
-    height="300px"
-    rounded="xl"
-    elevation="4"
-    color="primary"
-  >
-    <v-row
-      align="center"
-      justify="center"
-      style="padding: 5px 12px; margin-top: 10px"
-    >
-      <span style="font-weight: bolder; font-size: 20px">
-        Usuários neste período
-      </span>
-    </v-row>
-    <v-divider style="margin-top: 10px"></v-divider>
-    <v-card-text style="max-height: 200px; overflow-y: auto">
-      <template v-if="users && users.length > 0">
-        <v-list-item v-for="(user, index) in users" :key="index" class="mb-1">
-          <v-sheet class="pa-3" color="primary">
-            <v-row
-              align="center"
-              margin-top="5px"
-              justify="space-between"
-              style="padding: 5px 12px"
-            >
-              <span style="font-weight: 600; font-size: 15px">
-                {{ user }}
+  <v-card class="user-zone-card" width="400px" height="300px" rounded="xl" elevation="4" color="primary">
+    <template v-if="userZoneInfo && userZoneInfo.users && userZoneInfo.users.length > 0">
+      <v-list class="scrollable-container bg-primary">
+        <v-list-item>
+          <v-sheet class="pa-2 mb-2" color="primary_light" elevation="0" rounded>
+            <v-row align="center" justify="space-between" style="padding: 5px 12px;">
+              <span style="font-weight: bold; font-size: 16px;">
+                {{ "USUÁRIOS" }}
               </span>
-              <v-divider style="width: 80%; margin: 10px auto"></v-divider>
             </v-row>
           </v-sheet>
+          <v-list style="padding: 0;" class="bg-primary">
+            <v-list-item v-for="(user, userIndex) in userZoneInfo.users" :key="userIndex" style="padding: 0;" color="primary">
+              <v-row align="start" no-gutters class="px-2 py-1">
+                <v-col cols="1">
+                  <v-icon color="secondary" class="mr-1 mt-1">mdi-map-marker</v-icon>
+                </v-col>
+                <v-col cols="11">
+                  <v-list-item-title>
+                    {{ user.toUpperCase() }}
+                  </v-list-item-title>
+                </v-col>
+              </v-row>
+              <v-divider v-if="userIndex < userZoneInfo.users.length - 1"></v-divider>
+            </v-list-item>
+          </v-list>
         </v-list-item>
-      </template>
-      <template v-else>
-        <v-row justify="center">
-          <v-icon color="grey">mdi-alert</v-icon>
-          <span>Nenhum usuário encontrado neste período.</span>
-        </v-row>
-      </template>
-    </v-card-text>
+      </v-list>
+    </template>
+    <template v-else>
+      <v-row justify="center" align="center">
+        <v-icon color="grey">mdi-alert</v-icon>
+        <span>Nenhuma zona encontrada.</span>
+      </v-row>
+    </template>
   </v-card>
 </template>
 
-<script>
-import { eventBus } from "@/utils/EventBus";
+<script setup lang="ts">
+import { defineProps, watch } from 'vue';
 
-export default {
-  data() {
-    return {
-      users: [], // Lista de usuários que será populada pelo evento
-      isVisible: true, // Controle de visibilidade do card
-    };
+const props = defineProps<{
+  userZoneInfo: {
+    users: Array<{
+      names: string;
+    }> | undefined;
+  };
+}>();
+
+watch(
+  () => props.userZoneInfo,
+  (newUserZoneInfo) => {
+    console.log(newUserZoneInfo?.users);
   },
-  mounted() {
-    // Escutando os eventos necessários
-    eventBus.on("usersReceived", this.updateUsers);
-    eventBus.on("ClearFields", this.clearFields);
-    console.log("UserInZoneInformation montado", this.users);
-  },
-  beforeUnmount() {
-    // Removendo os ouvintes dos eventos
-    eventBus.off("usersReceived", this.updateUsers);
-    eventBus.off("ClearFields", this.clearFields);
-  },
-  methods: {
-    updateUsers(users) {
-      console.log("Dados recebidos:", users);
-      this.users = users; // Atualizando a lista de usuários com os dados recebidos
-      this.isVisible = true; // Mostrando o card
-    },
-    clearFields() {
-      console.log("ClearFields recebido");
-      this.users = []; // Limpando os usuários
-      this.isVisible = false; // Ocultando o card
-    },
-  },
-};
+  { immediate: true }
+);
 </script>
 
-<style>
-.icon-container {
-  position: relative;
+<style scoped>
+.user-zone-card {
+  box-shadow: none;
+  border-radius: 0;
+  position: fixed;
+  margin-top: 15px;
 }
 
-.plus-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 16px;
-  color: terceary;
+.scrollable-container {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.title-text {
-  font-weight: bold;
-  font-size: 16px;
+.scrollable-container::-webkit-scrollbar {
+  width: 10px;
 }
 
-.no-shadow {
-  box-shadow: none !important;
+.scrollable-container::-webkit-scrollbar-track {
+  background: #f0f0f5;
+  border-radius: 5px;
 }
 
-.rounded {
-  border-radius: 0 !important;
+.scrollable-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c7c9ff, #7a7de9);
+  border-radius: 10px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6b6fe1, #4f51d3);
+}
+
+.v-list-item-title {
+  word-wrap: break-word;
+  white-space: normal;
 }
 </style>

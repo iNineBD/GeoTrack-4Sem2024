@@ -1,12 +1,7 @@
 <template>
   <div class="floating-panel">
     <v-container width="400px" class="panel-container" style="padding: 0px">
-      <v-expansion-panels
-        v-model="panel"
-        rounded="xl"
-        elevation="4"
-        color="primary"
-      >
+      <v-expansion-panels v-model="panel" rounded="xl" elevation="4" color="primary">
         <v-expansion-panel>
           <template v-slot:title>
             <v-row class="panel-header" justify="center" align="center">
@@ -14,141 +9,65 @@
             </v-row>
           </template>
           <v-expansion-panel-text style="padding: 0px">
-            <v-container
-              width="400px"
-              class="filter-container"
-              style="padding: 0px"
-            >
+            <v-container width="400px" class="filter-container" style="padding: 0px">
               <v-divider :thickness="2" />
               <!-- Exibe o filtro correto com base na rota -->
-              <StopPointsFilter
-                v-if="route.path === '/stoppointsfilter'"
-                @consult="handleFilterData"
-                @initializeMap="initializeMap"
-                @initializeMapDark="initializeMapDark"
-              />
+              <StopPointsFilter v-if="route.path === '/stoppointsfilter'" @consult="handleFilterData"
+                @initializeMap="initializeMap" @initializeMapDark="initializeMapDark" />
 
-              <GeographicAreasFilter
-                v-if="route.path === '/geographicareasfilter'"
-                @removeCircle="handleRemoveCircle"
-                @drawCircle="handleDrawCircle"
-                @consult="handleGeographicAreaConsult"
-                @stopPointsReceived="handleStopPointsReceived"
-                @initializeMap="initializeMap"
-                @initializeMapDark="initializeMapDark"
-              />
+              <GeographicAreasFilter v-if="route.path === '/geographicareasfilter'" @removeCircle="handleRemoveCircle"
+                @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
+                @stopPointsReceived="handleStopPointsReceived" @initializeMap="initializeMap"
+                @initializeMapDark="initializeMapDark" />
 
-              <UsersInZoneFilter
-                v-if="route.path === '/UsersInZoneFilter'"
-                @removeCircle="handleRemoveCircle"
-                @drawCircle="handleDrawCircle"
-                @consult="handleGeographicAreaConsult"
-                @usersReceived="handleUsersInZoneReceived"
-                @initializeMap="initializeMap"
-                @initializeMapDark="initializeMapDark"
-                @clearFields="handleClearFields"
-              />
+              <UsersInZoneFilter v-if="route.path === '/UsersInZoneFilter'" @removeCircle="handleRemoveCircle"
+                @drawCircle="handleDrawCircle" @consult="handleGeographicAreaConsult"
+                @usersReceived="handleUsersReceived" @initializeMap="initializeMap"
+                @initializeMapDark="initializeMapDark" @clearFields="handleClearFields" />
 
-              <GeoRoutesFilter
-                @initializeMap="initializeMap"
-                @routesReceived="handleRoutesReceived"
-                v-if="route.path === '/georoutesfilter'"
-              />
+              <GeoRoutesFilter @initializeMap="initializeMap" @routesReceived="handleRoutesReceived"
+                v-if="route.path === '/georoutesfilter'" />
 
-              <StopPointsInformation
-                v-if="showStopPointsInformation"
-                :stopPoints="stopPoints"
-                @go-to-location="navigateToLocation"
-              />
+              <StopPointsInformation v-if="showStopPointsInformation" :stopPoints="stopPoints"
+                @go-to-location="navigateToLocation" />
 
-              <UserInZoneInformation
-                v-if="showUserInZoneInformation"
-                :onUsersInZoneReceived="handleUsersInZoneReceived"
-                @go-to-location="navigateToLocation"
-                @usersReceived="handleUsersInZoneReceived"
-                @clearFields="handleClearFields"
-              />
+              <UserInZoneInformation v-if="showUserInZoneInformation" :userZoneInfo="userZoneInfo"
+                @go-to-location="navigateToLocation" />
 
-              <GeographicStopPointsInformation
-                v-if="showGeographicStopPointsInformation"
-                :geoStopPoints="geoStopPoints"
-                @navigate-to-stop-point="navigateGeoToLocation"
-              />
+              <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
+                @navigate-to-stop-point="navigateGeoToLocation" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
 
-    <v-speed-dial
-      v-model="dial"
-      location="bottom center"
-      transition="scale-transition"
-      class="speed-dial"
-    >
+    <v-speed-dial v-model="dial" location="bottom center" transition="scale-transition" class="speed-dial">
       <template v-slot:activator="{ props: activatorProps }">
-        <v-btn
-          v-bind="activatorProps"
-          icon="mdi-menu"
-          large
-          elevation="4"
-          color="primary"
-        ></v-btn>
+        <v-btn v-bind="activatorProps" icon="mdi-menu" large elevation="4" color="primary"></v-btn>
       </template>
 
       <!-- Botão para Home -->
-      <v-btn
-        key="map-marker"
-        @click="handleHomeClick"
-        icon="mdi-home"
-        title="Home"
-        color="primary"
-      ></v-btn>
+      <v-btn key="map-marker" @click="handleHomeClick" icon="mdi-home" title="Home" color="primary"></v-btn>
 
       <!-- Botão para StopPointsFilter -->
-      <v-btn
-        key="map-marker"
-        @click="handleStopPointsFilterClick"
-        icon="mdi-map-marker"
-        title="Filtro de Pontos de Parada"
-        color="primary"
-      ></v-btn>
+      <v-btn key="map-marker" @click="handleStopPointsFilterClick" icon="mdi-map-marker"
+        title="Filtro de Pontos de Parada" color="primary"></v-btn>
 
       <!-- Botão para GeographicAreasFilter -->
-      <v-btn
-        key="map-marker"
-        @click="handleGeographicAreasFilterClick"
-        icon="mdi-map-search"
-        title="Filtro de Áreas Geográficas"
-        color="primary"
-      ></v-btn>
+      <v-btn key="map-marker" @click="handleGeographicAreasFilterClick" icon="mdi-map-search"
+        title="Filtro de Áreas Geográficas" color="primary"></v-btn>
 
       <!-- Botão para GeoRoutesFilter -->
-      <v-btn
-        key="map-marker"
-        @click="handleGeoRoutesFilterClick"
-        icon="mdi-map-marker-distance"
-        title="Filtro de Rotas"
-        color="primary"
-      ></v-btn>
+      <v-btn key="map-marker" @click="handleGeoRoutesFilterClick" icon="mdi-map-marker-distance" title="Filtro de Rotas"
+        color="primary"></v-btn>
 
       <!-- Botão para UsersInZone -->
-      <v-btn
-        key="map-marker"
-        @click="handleUsersInZone"
-        icon="mdi-file-marker"
-        title="Filtro de usuários em zona"
-        color="primary"
-      ></v-btn>
+      <v-btn key="map-marker" @click="handleUsersInZone" icon="mdi-file-marker" title="Filtro de usuários em zona"
+        color="primary"></v-btn>
 
       <!-- Botão para Sair -->
-      <v-btn
-        key="map-marker"
-        icon="mdi-export"
-        @click="handleLogout"
-        title="Saída"
-        color="#F44336"
-      ></v-btn>
+      <v-btn key="map-marker" icon="mdi-export" @click="handleLogout" title="Saída" color="#F44336"></v-btn>
     </v-speed-dial>
   </div>
 </template>
@@ -212,7 +131,7 @@ const props = defineProps<{
   onDrawCircle: () => void;
   onGeographicAreaConsult: (data: FilterData) => any;
   onStopPointsReceived: (stopPoints: any) => void;
-  onUsersInZoneReceived: (usersReceived: any) => any;
+  onUsersReceived: (userZoneInfo: any) => void;
   onRoutesReceived: (routes: any) => void;
 }>();
 
@@ -227,10 +146,12 @@ const stopPoints = ref<StopPoint[]>([]);
 const showGeographicStopPointsInformation = ref(false);
 const showUserInZoneInformation = ref(false);
 const geoStopPoints = ref<any[]>([]);
+const userZoneInfo = ref<any[]>([]);
 
 const clearStopPointsInformation = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
+  showUserInZoneInformation.value = false; // Adicione esta linha para ocultar o componente UserInZoneInformation
 };
 
 const handleFilterData = async (data: FilterData) => {
@@ -261,23 +182,17 @@ const handleGeographicAreaConsult = (data: FilterData) => {
 };
 
 const handleStopPointsReceived = (stopPoints: any) => {
-  console.log(
-    "Pontos de parada recebidos do GeographicAreasFilter:",
-    stopPoints
-  );
   console.log("RESULT:", stopPoints);
   geoStopPoints.value = stopPoints;
   showGeographicStopPointsInformation.value = true;
   props.onStopPointsReceived(stopPoints);
 };
 
-const handleUsersInZoneReceived = (usersReceived: any) => {
-  console.log("Usuários recebidos do UsersInZone:", usersReceived);
-  console.log("RESULT:", usersReceived);
-  const users = usersReceived;
-  eventBus.emit("usersReceived", users);
+const handleUsersReceived = (users: any) => {
+  console.log("RESULT:", users);
+  userZoneInfo.value = users;
   showUserInZoneInformation.value = true;
-  props.onUsersInZoneReceived(usersReceived);
+  props.onUsersReceived(users);
 };
 
 const handleRoutesReceived = (routes: any) => {
@@ -350,6 +265,7 @@ const handleLogout = () => {
 const handlePanelChange = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
+  showUserInZoneInformation.value = false; // Adicione esta linha para ocultar o componente UserInZoneInformation
 };
 
 const handleStopPointsFilterClick = () => {
