@@ -1,28 +1,25 @@
 <template>
-    <v-card class="player-card" width="400px" height="150px" rounded="xl" elevation="4" color="primary">
-        <!-- Cabeçalho com título e botão de fechar -->
+    <v-card class="player-card" width="400px" height="100px" rounded="xl" elevation="4" color="primary">
+        <!-- Cabeçalho com título -->
         <v-card-title class="d-flex justify-space-between align-center">
             <span>{{ routeTitle }}</span>
-            <span class="close-button" @click="$emit('close')">X</span>
         </v-card-title>
 
         <v-card-text>
-            <!-- Barra de progresso com botão Play -->
+            <!-- Controles principais: Play/Pause, Barra de progresso, Velocidade -->
             <v-row align="center" justify="space-between" no-gutters>
+                <!-- Botão Play/Pause -->
                 <v-btn icon @click="togglePlay" size="small" color="primary">
                     <v-icon v-if="isPlaying">mdi-pause</v-icon>
                     <v-icon v-else>mdi-play</v-icon>
                 </v-btn>
+
+                <!-- Barra de Progresso -->
                 <v-progress-linear v-model="progress" class="player-progress mx-3" height="8" color="secondary"
                     background-color="primary-darken-1" rounded>
                 </v-progress-linear>
-            </v-row>
 
-            <!-- Controles adicionais -->
-            <v-row align="center" justify="space-between" class="mt-2">
-                <v-btn icon text size="small" color="primary" @click="resetPlayer">
-                    <v-icon left>mdi-replay</v-icon>
-                </v-btn>
+                <!-- Controle de Velocidade -->
                 <v-menu v-model="showSpeedMenu" offset-y>
                     <template #activator="{ props }">
                         <v-btn icon text size="small" color="primary" v-bind="props">
@@ -42,7 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { eventBus } from '@/utils/EventBus';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps<{
     routeTitle: string;
@@ -60,14 +58,21 @@ const emit = defineEmits<{
     (event: 'speedChange', speed: number): void;
 }>();
 
-const togglePlay = () => {
-    isPlaying.value = !isPlaying.value;
-    emit(isPlaying.value ? "play" : "pause");
+const handleUpdateButtonState = (state: string) => {
+    isPlaying.value = state === 'play';
 };
 
-const resetPlayer = () => {
-    progress.value = 0;
-    isPlaying.value = false;
+onMounted(() => {
+    eventBus.on('updateButtonState', handleUpdateButtonState);
+});
+
+onUnmounted(() => {
+    eventBus.off('updateButtonState', handleUpdateButtonState);
+});
+
+const togglePlay = () => {
+    isPlaying.value = !isPlaying.value;
+    emit(isPlaying.value ? 'play' : 'pause');
 };
 
 const selectSpeed = (speed: number) => {

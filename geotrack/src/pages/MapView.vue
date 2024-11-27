@@ -703,7 +703,17 @@ export default {
 
         // Função para atualizar o deslocamento do símbolo
         const animate = () => {
-          count = (count + speedFactor) % 200;
+          count += speedFactor % 200;
+
+          // Verifica se o deslocamento atingiu ou passou de 100%
+          if (count >= 200) {
+            console.log("Animação chegou ao fim da rota");
+            pauseAnimation(); // Pausa a animação automaticamente
+            count = 200; // Mantém o ícone no final
+            eventBus.emit('updateButtonState', 'pause');
+            return; // Encerra a função sem continuar o loop
+          }
+
           const icons = routeLine.get("icons");
           if (icons.length > 0) {
             icons[0].offset = `${count / 2}%`;
@@ -727,6 +737,7 @@ export default {
           console.log("Iniciando a animação...");
           if (animationFrameId) cancelAnimationFrame(animationFrameId); // Cancela qualquer animação anterior
           isPaused = false; // Retira o estado de pausa
+          if (count >= 200) count = 0; // Reinicia o deslocamento se estava no final
           animate(); // Inicia a animação
         };
 
@@ -743,7 +754,7 @@ export default {
         // Adicionando métodos de controle de play/pause à `routeLine`
         routeLine.play = () => {
           console.log("Animação retomada");
-          if (!isPaused) return; // Impede múltiplos inícios
+          if (!isPaused && count < 200) return; // Impede múltiplos inícios ou reinício antes do fim
           showIcon() // Garante que o ícone esteja visível
           startAnimation(); // Reinicia a animação
         };

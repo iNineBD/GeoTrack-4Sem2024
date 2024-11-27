@@ -26,7 +26,8 @@
                 @navigate-to-stop-point="navigateGeoToLocation" />
               <GeoRoutesInformation v-if="showGeoRoutesInformation" :geoRoutes="geoRoutes" />
               <RoutePlayer v-if="selectedRoute" :routeTitle="`Exibindo: ROTA ${routeNumber}`" :routeData="selectedRoute"
-                @close="selectedRoute = null" @play="handlePlay" @pause="handlePause" @speedChange="handleSpeedChange" />
+                @close="selectedRoute = null" @play="handlePlay" @pause="handlePause"
+                @speedChange="handleSpeedChange" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -94,6 +95,11 @@ onMounted(() => {
     routeNumber.value = index + 1;
     showPlayer.value = true;
   });
+  eventBus.on("removePlayer", () => {
+    console.log("Evento removePlayer recebido no Sidebar.");
+    selectedRoute.value = null; // Remove a rota selecionada
+    showPlayer.value = false;  // Oculta o player
+  });
 });
 
 onUnmounted(() => {
@@ -101,6 +107,7 @@ onUnmounted(() => {
   eventBus.off("changeLogo", updateLogo);
   eventBus.off('showRouteOnMap', handleRouteFromSidebar);
   eventBus.off('openPlayer');
+  eventBus.off("removePlayer");
 });
 
 // Método que será chamado quando o evento "novoLogo" for emitido
@@ -242,6 +249,7 @@ const handlePanelChange = () => {
   showStopPointsInformation.value = false;
   showGeographicStopPointsInformation.value = false;
   showGeoRoutesInformation.value = false;
+  eventBus.emit("removePlayer");
 };
 
 const handleStopPointsFilterClick = () => {
@@ -303,7 +311,6 @@ const handleSpeedChange = (speed: number) => {
 }
 
 </script>
-
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
