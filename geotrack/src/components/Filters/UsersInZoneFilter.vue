@@ -16,6 +16,15 @@
               @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
             </v-combobox>
           </v-col>
+
+          <v-col cols="auto" style="padding: 0px 0px 20px 10px">
+            <div class="icon-container">
+              <v-btn icon @click="drawCircle" class="no-shadow rounded" :disabled="disableDrawButton">
+                <v-icon>mdi-circle-outline</v-icon>
+                <v-icon class="plus-icon">mdi-plus</v-icon>
+              </v-btn>
+            </div>
+          </v-col>
         </v-row>
       </v-card-actions>
 
