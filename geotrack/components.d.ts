@@ -18,8 +18,12 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Menu/Sidebar.vue')['default']
+    StopPointInZoneFilter: typeof import('./src/components/Filters/StopPointInZoneFilter.vue')['default']
     StopPointsFilter: typeof import('./src/components/Filters/StopPointsFilter.vue')['default']
     StopPointsInformation: typeof import('./src/components/Menu/StopPointsInformation.vue')['default']
+    UserInZone: typeof import('./src/components/Menu/UserInZone.vue')['default']
+    UserInZoneInformation: typeof import('./src/components/Menu/UserInZoneInformation.vue')['default']
+    UsersInZoneFilter: typeof import('./src/components/Filters/UsersInZoneFilter.vue')['default']
     StopPointsModal: typeof import('./src/components/Info/StopPointsModal.vue')['default']
   }
 }
