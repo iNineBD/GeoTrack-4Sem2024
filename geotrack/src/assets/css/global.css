@@ -1,10 +1,29 @@
 .gm-style-mtc-bbw {
-    right: 45px !important;
-    left: auto !important;
-    top: auto !important;
-    position: absolute !important;
-  }
+  right: 45px !important;
+  left: auto !important;
+  top: auto !important;
+  position: absolute !important;
+}
 
-  .v-expansion-panel-text__wrapper {
-    padding: 0px !important
-  }
+.v-expansion-panel-text__wrapper {
+  padding: 0px !important
+}
+
+.gm-iv-address {
+  position: absolute;
+  top: 05px;
+  left: 45px;
+  width: 300px;
+  height: 70px;
+}
+
+.gm-iv-small-container {
+  position: absolute;
+  top: 05px;
+  left: 20px;
+  height: 70px;
+}
+
+.gm-iv-small-container .gm-iv-address {
+  width: 200px;
+}

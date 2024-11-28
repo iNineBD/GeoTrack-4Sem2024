@@ -1,10 +1,10 @@
 <template>
-  <Sidebar @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
+  <Sidebar v-show="!isStreetViewActive"  @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
     @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap"
     @initializeMap="initializeMap" @removeCircle="removeCircle" @initializeMapDark="initializeMapDark"
     @routesReceived="handleRoutesReceived" />
   <div ref="mapDiv" style="height: 100vh; width: 100%"></div>
-  <v-switch v-model="isDarkTheme" hide-details inset style="
+  <v-switch v-if="!isStreetViewActive" v-model="isDarkTheme" hide-details inset style="
       position: fixed;
       top: -5px;
       right: 240px;
@@ -15,14 +15,14 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-        }}</v-icon>
+      }}</v-icon>
     </template>
   </v-switch>
 
   <div>
-    <v-btn title="Relátorios de métricas" color="primary" icon="mdi-text-box-search-outline" @click="togglePanel"
-      style="position: fixed; top: 12px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;">
-    </v-btn>
+    <v-btn v-if="!isStreetViewActive" title="Relátorios de métricas" color="primary" icon="mdi-text-box-search-outline"
+      @click="togglePanel"
+      style="position: fixed; top: 12px; right: 320px; z-index: 10; width: 40px; height: 40px; border-radius: 50%;"></v-btn>
 
     <MetricsCard v-if="isPanelOpen"
       style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
@@ -118,6 +118,7 @@ export default {
     const snackbar = ref(false); // Controle de visibilidade do snackbar
     const snackbarColor = ref("success"); // Inicializa a cor do snackbar como "success"
     const snackbarMessage = ref(""); // Mensagem do snackbar
+    const isStreetViewActive = ref(false);
 
     // Método para exibir o snackbar
     //@ts-ignore
@@ -455,7 +456,6 @@ export default {
     }
 
     const initializeMap = () => {
-
       circleDetails.value = {
         id: "",
         name: "",
@@ -475,6 +475,25 @@ export default {
         estilo = updateDarkMode;
       }
 
+      const checkStreetView = () => {
+        const streetView = map.value.getStreetView(); // Obtém o Street View associado ao mapa
+        return streetView.getVisible(); // Retorna true se o Street View estiver ativo
+      };
+
+      // Função para atualizar a variável reativa
+      const updateStreetViewState = () => {
+        isStreetViewActive.value = checkStreetView();
+      };
+
+      const logStreetViewState = () => {
+        updateStreetViewState();
+        if (checkStreetView()) {
+          console.log("Street View está ativo.");
+        } else {
+          console.log("Street View não está ativo.");
+        }
+      };
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -487,22 +506,33 @@ export default {
               center: userLocation,
               zoom: 12,
               minZoom: 4, // Limite inferior de zoom
-              // @ts-ignore
-              styles: estilo,
+              styles: estilo, // @ts-ignore
             });
+
+            // Verifica e loga o estado do Street View
+            logStreetViewState();
+
+            // Escuta mudanças no estado do Street View
+            const streetView = map.value.getStreetView();
+            streetView.addListener("visible_changed", logStreetViewState);
+
             addCurrentLocationMarker(userLocation);
           },
           (error) => {
-            // Se a localização não for aceita, inicie o mapa com a localização padrão
+            // Localização padrão caso o usuário não permita acesso à localização
             const defaultLocation = { lat: -14.235, lng: -51.9253 };
             map.value = new google.maps.Map(mapDiv.value!, {
               center: defaultLocation,
               zoom: 3,
               minZoom: 4, // Limite inferior de zoom
-              // @ts-ignore
-              styles: estilo,
+              styles: estilo, // @ts-ignore
             });
-            // Não chama addMarker se a geolocalização falhar
+
+            // Verifica e loga o estado do Street View
+            logStreetViewState();
+
+            const streetView = map.value.getStreetView();
+            streetView.addListener("visible_changed", logStreetViewState);
           }
         );
       } else {
@@ -511,11 +541,17 @@ export default {
           center: defaultLocation,
           zoom: 10,
           minZoom: 4,
-          // @ts-ignore
-          styles: estilo,
+          styles: estilo, // @ts-ignore
         });
+
+        // Verifica e loga o estado do Street View
+        logStreetViewState();
+
+        const streetView = map.value.getStreetView();
+        streetView.addListener("visible_changed", logStreetViewState);
       }
     };
+
 
     const addCurrentLocationMarker = (position: google.maps.LatLngLiteral) => {
       if (map.value) {
@@ -1222,6 +1258,7 @@ export default {
 
       isPanelOpen,
       togglePanel,
+      isStreetViewActive,
     };
   },
 };
