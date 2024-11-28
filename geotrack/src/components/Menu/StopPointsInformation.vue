@@ -26,7 +26,7 @@
                                     <v-list-item-title>
                                         {{ featureAddress }}
                                     </v-list-item-title>
-                                    <!-- <v-list-item-subtitle>
+                                     <v-list-item-subtitle>
                                         {{ "Data: " }}{{
                                             formatDate(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.startDate)
                                         }},
@@ -41,7 +41,7 @@
                                         Tempo parado: {{ " " }}{{
                                             getStopDuration(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.startDate,
                                                 stopPoints[index].geoJsonDTO.features[featureIndex].geometry.endDate) }} minutos
-                                    </v-list-item-subtitle> -->
+                                    </v-list-item-subtitle> 
                                 </v-col>
                             </v-row>
                             <v-divider v-if="featureIndex < displayedAddresses[index].length"></v-divider>
