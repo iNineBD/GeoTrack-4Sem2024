@@ -216,9 +216,7 @@ export default {
       const requestData = {
         devices: deviceIds, // Array de IDs dos dispositivos
         startDate: new Date(this.date[0]).toLocaleDateString("en-CA"), // Data de início
-        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString(
-          "en-CA"
-        ), // Data de fim
+        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString("en-CA"), // Data de fim
       };
 
       console.log("Dados enviados:", requestData);
@@ -265,12 +263,14 @@ export default {
         (user) => user.id !== item.id
       );
     },
+
     // Método para exibir o snackbar
     showSnackbar(message, color = "success") {
       this.snackbarMessage = message;
       this.snackbarColor = "error";
       this.snackbar = true;
     },
+
   },
 
   watch: {
