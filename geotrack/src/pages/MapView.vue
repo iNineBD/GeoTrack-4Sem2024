@@ -27,9 +27,7 @@
     <MetricsCard v-if="isPanelOpen && !isStreetViewActive"
       style="position: fixed; top: 7px; right: 370px; z-index: 10; width: 210px; border-radius: 0px;">
     </MetricsCard>
-
   </div>
-
 
   <!-- Modal dialog para detalhes do círculo -->
   <v-dialog v-model="dialog" max-width="420px" @click:outside="removeCircle(false)">
@@ -164,7 +162,6 @@ export default {
 
     const handleSelectedRoute = (route: any) => {
       console.log("Rota recebida no MapView:", route);
-      clearMarkers();
       handleRoutesReceived({ routes: [route] });
     };
 
@@ -655,9 +652,7 @@ export default {
       clearMarkers();
 
       // Remove as rotas (linhas) existentes
-      routeLines.forEach(line => {
-        line.setMap(null);
-      });
+      routeLines.forEach(line => line.setMap(null));
       routeLines = []; // Limpa a lista de linhas
 
       let totalLat = 0;
@@ -671,7 +666,7 @@ export default {
       let maxLng = -Infinity;
 
       routes.routes.forEach((route: any) => {
-        const routePath = [];
+        const routePath: { latitude: number; longitude: number }[] = [];
 
         route.coordinates.forEach((coord: any, index: number) => {
           const position = { latitude: coord.latitude, longitude: coord.longitude };
@@ -683,28 +678,36 @@ export default {
           pointCount++;
 
           // Atualiza os limites (bounding box)
-          if (coord.latitude < minLat) minLat = coord.latitude;
-          if (coord.latitude > maxLat) maxLat = coord.latitude;
-          if (coord.longitude < minLng) minLng = coord.longitude;
-          if (coord.longitude > maxLng) maxLng = coord.longitude;
+          minLat = Math.min(minLat, coord.latitude);
+          maxLat = Math.max(maxLat, coord.latitude);
+          minLng = Math.min(minLng, coord.longitude);
+          maxLng = Math.max(maxLng, coord.longitude);
 
           let color = "#000B62";
-          let scale = 5;
+          let scale = 4;
+          let label = null;
 
           if (index === 0) {
             color = "green";
-            scale = 10;
+            scale = 8;
+            label = { text: "I", color: "white", fontSize: "12px" };
           }
 
           if (index === route.coordinates.length - 1) {
             color = "red";
-            scale = 10;
+            scale = 8;
+            label = { text: "F", color: "white", fontSize: "12px" };
           }
 
-          plotPointRouteOnMap({
-            device: `Data: ${coord.date}`,
-            coords: position,
-          }, color, scale);
+          plotPointRouteOnMap(
+            {
+              device: `Data: ${coord.date}`,
+              coords: position,
+            },
+            color,
+            scale,
+            label
+          );
         });
 
         // Converte os pontos da rota para o formato Google Maps
@@ -713,6 +716,13 @@ export default {
           lng: point.longitude,
         }));
 
+        // Configuração inicial do símbolo
+        const lineSymbol = {
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          scale: 5,
+          strokeColor: "#FF0000",
+        };
+
         // Desenha a linha da rota no mapa
         const routeLine = new google.maps.Polyline({
           path: googleRoutePath,
@@ -720,12 +730,88 @@ export default {
           strokeColor: '#000B62',
           strokeOpacity: 1.0,
           strokeWeight: 2,
+          icons: [],
         });
         routeLine.setMap(map.value);
         routeLines.push(routeLine);
-      });
 
-      eventBus.emit("stopIsLoading");
+        let count = 0;
+        let animationFrameId: number | null = null; // Armazena o ID da animação
+        let isPaused = true; // Inicia como pausado
+        let speedFactor = 1.0; // Velocidade padrão
+
+        eventBus.on('speedChange', (speed: number) => {
+          speedFactor = speed;
+        });
+
+        // Função para atualizar o deslocamento do símbolo
+        const animate = () => {
+          count += speedFactor % 200;
+
+          // Verifica se o deslocamento atingiu ou passou de 100%
+          if (count >= 200) {
+            pauseAnimation();
+            count = 200; // Mantém o ícone no final
+            eventBus.emit('updateButtonState', 'pause');
+            return; // Encerra a função sem continuar o loop
+          }
+
+          const icons = routeLine.get("icons");
+          if (icons.length > 0) {
+            icons[0].offset = `${count / 2}%`;
+            routeLine.set("icons", icons);
+          }
+          animationFrameId = requestAnimationFrame(animate); // Continua a animação
+        };
+
+        // Função para mostrar o ícone
+        const showIcon = () => {
+          routeLine.set("icons", [
+            {
+              icon: lineSymbol,
+              offset: `${count / 2}%`,
+            },
+          ]);
+        };
+
+        // Inicia a animação
+        const startAnimation = () => {
+          if (animationFrameId) cancelAnimationFrame(animationFrameId); // Cancela qualquer animação anterior
+          isPaused = false; // Retira o estado de pausa
+          if (count >= 200) count = 0; // Reinicia o deslocamento se estava no final
+          animate();
+        };
+
+        // Pausa a animação
+        const pauseAnimation = () => {
+          isPaused = true;
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId); // Cancela a animação
+            animationFrameId = null;
+          }
+        };
+
+        // Adicionando métodos de controle de play/pause à `routeLine`
+        routeLine.play = () => {
+          if (!isPaused && count < 200) return; // Impede múltiplos inícios ou reinício antes do fim
+          showIcon() // Garante que o ícone esteja visível
+          startAnimation(); // Reinicia a animação
+        };
+
+        routeLine.pause = () => {
+          if (isPaused) return;
+          pauseAnimation()
+        };
+
+        // Adicionando o controle de play/pause via eventBus
+        eventBus.on('routePlay', () => {
+          routeLine.play();
+        });
+
+        eventBus.on('routePause', () => {
+          routeLine.pause();
+        });
+      });
 
       // Ajusta o zoom dinamicamente
       if (pointCount > 0) {
@@ -744,8 +830,9 @@ export default {
         map.value.setCenter({ lat: centerLat, lng: centerLng });
         map.value.setZoom(Math.max(2, Math.min(zoomLevel, 21))); // Limita o zoom entre 2 e 21
       }
-    };
 
+      eventBus.emit("stopIsLoading");
+    };
 
     function toggleTheme(): void {
       vuetify.theme.global.name.value = isDarkTheme.value ? "dark" : "light";
@@ -755,7 +842,7 @@ export default {
     const coordinates: { lat: number; lng: number }[] = [];
 
 
-    const plotPointRouteOnMap = (userData: any, color: string, scale: number) => {
+    const plotPointRouteOnMap = (userData: any, color: string, scale: number, label: any) => {
       const position = {
         lat: userData.coords.latitude,
         lng: userData.coords.longitude,
@@ -775,6 +862,7 @@ export default {
           strokeWeight: 2,
           strokeColor: "#ffffff",
         },
+        label: label,
       });
 
       // Adiciona o marcador no array global para controle

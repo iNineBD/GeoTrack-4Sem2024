@@ -15,6 +15,7 @@ declare module 'vue' {
     GeoRoutesModal: typeof import('./src/components/Info/GeoRoutesModal.vue')['default']
     InfoPanel: typeof import('./src/components/Info/InfoPanel.vue')['default']
     MetricsCard: typeof import('./src/components/Metrics/MetricsCard.vue')['default']
+    RoutePlayer: typeof import('./src/components/Menu/RoutePlayer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Menu/Sidebar.vue')['default']

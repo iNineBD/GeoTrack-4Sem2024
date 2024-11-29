@@ -259,6 +259,8 @@ export default {
         }
         this.loading = false;
       }
+
+      eventBus.emit("removePlayer");
     },
 
     clearFields() {
@@ -268,6 +270,8 @@ export default {
       this.selectedQuickFilter = null;
       this.latitude = null;
       this.longitude = null;
+
+      eventBus.emit("removePlayer");
 
       if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");

@@ -36,6 +36,9 @@
               <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
                 @navigate-to-stop-point="navigateGeoToLocation" />
               <GeoRoutesInformation v-if="showGeoRoutesInformation" :geoRoutes="geoRoutes" />
+              <RoutePlayer v-if="selectedRoute" :routeTitle="`Exibindo ROTA ${routeNumber}`" :routeData="selectedRoute"
+                @close="selectedRoute = null" @play="handlePlay" @pause="handlePause"
+                @speedChange="handleSpeedChange" />
             </v-container>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -81,6 +84,7 @@ import UsersInZoneFilter from "../Filters/UsersInZoneFilter.vue";
 import GeoRoutesInformation from "../Menu/GeoRoutesInformation.vue";
 import StopPointsInformation from '../Menu/StopPointsInformation.vue';
 import GeographicStopPointsInformation from '../Menu/GeographicStopPointsInformation.vue';
+import RoutePlayer from "./RoutePlayer.vue";
 import { FilterData } from "@/pages/MapView.vue";
 import { useRoute, useRouter } from "vue-router";
 import { eventBus } from "@/utils/EventBus"; // Verifique se está importado corretamente
@@ -96,18 +100,35 @@ const emit = defineEmits([
   "initializeMapDark",
 ]);
 const logo = ref("/src/assets/Logo.svg");
+const selectedRoute = ref(null); // Armazena os dados da rota selecionada
+const routeNumber = ref(null); // Número da rota para exibição
+const showPlayer = ref(false); // Controla a exibição do player
 
 onMounted(() => {
   eventBus.on("changeLogo", updateLogo);
   eventBus.on("novoLogo", change);
   eventBus.on("clearStopPointsInformation", clearStopPointsInformation);
   eventBus.on('showRouteOnMap', handleRouteFromSidebar);
+  eventBus.on('openPlayer', ({ route, index }) => {
+    console.log('Dados recebidos para o player:', route, 'Número da rota:', index + 1);
+
+    selectedRoute.value = route;
+    routeNumber.value = index + 1;
+    showPlayer.value = true;
+  });
+  eventBus.on("removePlayer", () => {
+    console.log("Evento removePlayer recebido no Sidebar.");
+    selectedRoute.value = null; // Remove a rota selecionada
+    showPlayer.value = false;  // Oculta o player
+  });
 });
 
 onUnmounted(() => {
   eventBus.off("novoLogo", change);
   eventBus.off("changeLogo", updateLogo);
   eventBus.off('showRouteOnMap', handleRouteFromSidebar);
+  eventBus.off('openPlayer');
+  eventBus.off("removePlayer");
 });
 
 // Método que será chamado quando o evento "novoLogo" for emitido
@@ -273,6 +294,7 @@ const handlePanelChange = () => {
   showGeographicStopPointsInformation.value = false;
   showUserInZoneInformation.value = false; // Adicione esta linha para ocultar o componente UserInZoneInformation
   showGeoRoutesInformation.value = false;
+  eventBus.emit("removePlayer");
 };
 
 const handleStopPointsFilterClick = () => {
@@ -327,8 +349,22 @@ const handleRouteFromSidebar = (route: any) => {
   eventBus.emit("selectedRoute", route);
 };
 
-</script>
+const handlePlay = () => {
+  console.log("Play acionado no Sidebar");
+  eventBus.emit('routePlay');
+};
 
+const handlePause = () => {
+  console.log("Pause acionado no Sidebar");
+  eventBus.emit('routePause');
+};
+
+const handleSpeedChange = (speed: number) => {
+  console.log("Velocidade selecionada:", speed);
+  eventBus.emit('speedChange', speed);
+}
+
+</script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
