@@ -630,7 +630,7 @@ export default {
       let maxLng = -Infinity;
 
       routes.routes.forEach((route: any) => {
-        const routePath = [];
+        const routePath: { latitude: number; longitude: number }[] = [];
 
         route.coordinates.forEach((coord: any, index: number) => {
           const position = { latitude: coord.latitude, longitude: coord.longitude };
@@ -642,18 +642,26 @@ export default {
           pointCount++;
 
           // Atualiza os limites (bounding box)
-          if (coord.latitude < minLat) minLat = coord.latitude;
-          if (coord.latitude > maxLat) maxLat = coord.latitude;
-          if (coord.longitude < minLng) minLng = coord.longitude;
-          if (coord.longitude > maxLng) maxLng = coord.longitude;
+          minLat = Math.min(minLat, coord.latitude);
+          maxLat = Math.max(maxLat, coord.latitude);
+          minLng = Math.min(minLng, coord.longitude);
+          maxLng = Math.max(maxLng, coord.longitude);
 
           let color = "#000B62";
           let scale = 4;
           let label = null;
 
-          if (index === 0) { color = "green"; scale = 8; label = { text: "I", color: "white", fontSize: "12px" }; }
+          if (index === 0) {
+            color = "green";
+            scale = 8;
+            label = { text: "I", color: "white", fontSize: "12px" };
+          }
 
-          if (index === route.coordinates.length - 1) { color = "red"; scale = 8; label = { text: "F", color: "white", fontSize: "12px" }; }
+          if (index === route.coordinates.length - 1) {
+            color = "red";
+            scale = 8;
+            label = { text: "F", color: "white", fontSize: "12px" };
+          }
 
           plotPointRouteOnMap(
             {
@@ -697,8 +705,7 @@ export default {
         let speedFactor = 1.0; // Velocidade padrão
 
         eventBus.on('speedChange', (speed: number) => {
-          console.log(`Alterando a velocidade para ${speed}x`);
-          speedFactor = speed; // Atualiza a velocidade global
+          speedFactor = speed;
         });
 
         // Função para atualizar o deslocamento do símbolo
@@ -707,8 +714,7 @@ export default {
 
           // Verifica se o deslocamento atingiu ou passou de 100%
           if (count >= 200) {
-            console.log("Animação chegou ao fim da rota");
-            pauseAnimation(); // Pausa a animação automaticamente
+            pauseAnimation();
             count = 200; // Mantém o ícone no final
             eventBus.emit('updateButtonState', 'pause');
             return; // Encerra a função sem continuar o loop
@@ -727,23 +733,21 @@ export default {
           routeLine.set("icons", [
             {
               icon: lineSymbol,
-              offset: `${count / 2}%`, // Começa do deslocamento atual
+              offset: `${count / 2}%`,
             },
           ]);
         };
 
         // Inicia a animação
         const startAnimation = () => {
-          console.log("Iniciando a animação...");
           if (animationFrameId) cancelAnimationFrame(animationFrameId); // Cancela qualquer animação anterior
           isPaused = false; // Retira o estado de pausa
           if (count >= 200) count = 0; // Reinicia o deslocamento se estava no final
-          animate(); // Inicia a animação
+          animate();
         };
 
         // Pausa a animação
         const pauseAnimation = () => {
-          console.log("Animação pausada");
           isPaused = true;
           if (animationFrameId) {
             cancelAnimationFrame(animationFrameId); // Cancela a animação
@@ -753,7 +757,6 @@ export default {
 
         // Adicionando métodos de controle de play/pause à `routeLine`
         routeLine.play = () => {
-          console.log("Animação retomada");
           if (!isPaused && count < 200) return; // Impede múltiplos inícios ou reinício antes do fim
           showIcon() // Garante que o ícone esteja visível
           startAnimation(); // Reinicia a animação
@@ -774,8 +777,6 @@ export default {
         });
       });
 
-      eventBus.emit("stopIsLoading");
-
       // Ajusta o zoom dinamicamente
       if (pointCount > 0) {
         const centerLat = totalLat / pointCount;
@@ -793,6 +794,8 @@ export default {
         map.value.setCenter({ lat: centerLat, lng: centerLng });
         map.value.setZoom(Math.max(2, Math.min(zoomLevel, 21))); // Limita o zoom entre 2 e 21
       }
+
+      eventBus.emit("stopIsLoading");
     };
 
     function toggleTheme(): void {

@@ -25,7 +25,7 @@
               <GeographicStopPointsInformation v-if="showGeographicStopPointsInformation" :geoStopPoints="geoStopPoints"
                 @navigate-to-stop-point="navigateGeoToLocation" />
               <GeoRoutesInformation v-if="showGeoRoutesInformation" :geoRoutes="geoRoutes" />
-              <RoutePlayer v-if="selectedRoute" :routeTitle="`Exibindo: ROTA ${routeNumber}`" :routeData="selectedRoute"
+              <RoutePlayer v-if="selectedRoute" :routeTitle="`Exibindo ROTA ${routeNumber}`" :routeData="selectedRoute"
                 @close="selectedRoute = null" @play="handlePlay" @pause="handlePause"
                 @speedChange="handleSpeedChange" />
             </v-container>
