@@ -110,14 +110,14 @@ onMounted(() => {
   eventBus.on("clearStopPointsInformation", clearStopPointsInformation);
   eventBus.on('showRouteOnMap', handleRouteFromSidebar);
   eventBus.on('openPlayer', ({ route, index }) => {
-    console.log('Dados recebidos para o player:', route, 'Número da rota:', index + 1);
+
 
     selectedRoute.value = route;
     routeNumber.value = index + 1;
     showPlayer.value = true;
   });
   eventBus.on("removePlayer", () => {
-    console.log("Evento removePlayer recebido no Sidebar.");
+
     selectedRoute.value = null; // Remove a rota selecionada
     showPlayer.value = false;  // Oculta o player
   });
@@ -134,7 +134,7 @@ onUnmounted(() => {
 // Método que será chamado quando o evento "novoLogo" for emitido
 const change = (newLogo: string) => {
   logo.value = newLogo; // Atualizando o valor do logo com o valor recebido
-  console.log("logo enviado: ", logo.value);
+
 };
 
 const toggleDial = () => {
@@ -185,11 +185,11 @@ const handleFilterData = async (data: FilterData) => {
   if (result.success) {
     showStopPointsInformation.value = true;
     stopPoints.value = result.data;
-    console.log("Aqui está os pontos salvos: ", stopPoints.value);
+
   } else {
     showStopPointsInformation.value = false;
     stopPoints.value = [];
-    console.log("Aqui está a lista vazia: ", stopPoints.value);
+
   }
 };
 
@@ -202,26 +202,26 @@ const handleRemoveCircle = () => {
 };
 
 const handleGeographicAreaConsult = (data: FilterData) => {
-  console.log("Dados recebidos do GeographicAreasFilter:", data);
+
   props.onGeographicAreaConsult(data);
 };
 
 const handleStopPointsReceived = (stopPoints: any) => {
-  console.log("RESULT:", stopPoints);
+
   geoStopPoints.value = stopPoints;
   showGeographicStopPointsInformation.value = true;
   props.onStopPointsReceived(stopPoints);
 };
 
 const handleUsersReceived = (users: any) => {
-  console.log("RESULT:", users);
+
   userZoneInfo.value = users;
   showUserInZoneInformation.value = true;
   props.onUsersReceived(users);
 };
 
 const handleRoutesReceived = (routes: any) => {
-  console.log("Rotas recebidas no sidebar", routes.routes);
+
   geoRoutes.value = routes.routes;
   showGeoRoutesInformation.value = true;
   props.onRoutesReceived(routes);
@@ -340,27 +340,27 @@ const navigateToLocation = (coordinates: [number, number]) => {
 
 // navigateGeoToLocation é para ir até os pontos do filtro de áreas geográficas
 const navigateGeoToLocation = (coord: [number, number]) => {
-  console.log("COORDS AQUII", coord);
+
   eventBus.emit("navigateGeoToLocation", coord);
 };
 
 const handleRouteFromSidebar = (route: any) => {
-  console.log('Rota recebida no Sidebar:', route);
+
   eventBus.emit("selectedRoute", route);
 };
 
 const handlePlay = () => {
-  console.log("Play acionado no Sidebar");
+
   eventBus.emit('routePlay');
 };
 
 const handlePause = () => {
-  console.log("Pause acionado no Sidebar");
+
   eventBus.emit('routePause');
 };
 
 const handleSpeedChange = (speed: number) => {
-  console.log("Velocidade selecionada:", speed);
+
   eventBus.emit('speedChange', speed);
 }
 

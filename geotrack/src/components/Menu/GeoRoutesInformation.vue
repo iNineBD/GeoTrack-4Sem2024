@@ -91,7 +91,7 @@ const getFormattedAddress = async (lat: number, lng: number) => {
 
     return data.results.length > 0 ? data.results[0].formatted_address : 'Endereço não encontrado';
   } catch (error) {
-    console.error('Erro ao buscar endereço:', error);
+
     return 'Erro ao buscar endereço';
   }
 };
@@ -115,7 +115,7 @@ const fetchAddressesFinal = async () => {
 };
 
 const showRoute = (route: any, index: number) => {
-  console.log('Rota selecionada para exibição:', route);
+
   eventBus.emit('showRouteOnMap', route);
   eventBus.emit('openPlayer', { route, index }); // Emite o evento para abrir o player
 };

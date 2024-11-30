@@ -166,7 +166,7 @@ export default {
     });
 
     const handleSelectedRoute = (route: any) => {
-      console.log("Rota recebida no MapView:", route);
+
       handleRoutesReceived({ routes: [route] });
     };
 
@@ -328,7 +328,7 @@ export default {
         center: ``,
         radius: ``,
       };
-      console.log("quantidade de marcadores: ", markers.length)
+
       if (markers.length > 0) {
         clearMarkers();
         removeCircle();
@@ -490,9 +490,9 @@ export default {
       const logStreetViewState = () => {
         updateStreetViewState();
         if (checkStreetView()) {
-          console.log("Street View está ativo.");
+
         } else {
-          console.log("Street View não está ativo.");
+
         }
       };
 
@@ -624,17 +624,17 @@ export default {
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           if (error.response.status === 404) {
-            console.log("Erro 404: ", error.response.data.message);
+
             showSnackbar(error.response.data.message, "error");
             return { success: false, data: [geoJsonResponses] }
           } else {
-            console.error(
+
               "Erro ao buscar os dados GeoJSON:",
               error.response.data
             );
           }
         } else {
-          console.error("Erro de rede ou outro erro:", error);
+
         }
       } finally {
         eventBus.emit("stopIsLoading");
@@ -797,7 +797,7 @@ export default {
           if (count >= 100) {
             count = 0; // Reinicia o deslocamento se estava no final
           }
-          console.log("Iniciando animação");
+
           animate(); // Garante que a animação seja iniciada
         };
 
@@ -808,31 +808,31 @@ export default {
             cancelAnimationFrame(animationFrameId); // Cancela a animação
             animationFrameId = null;
           }
-          console.log("Animação pausada");
+
         };
 
         // Adicionando métodos de controle de play/pause à `routeLine`
         routeLine.play = () => {
           if (!isPaused && count >= 100) return; // Impede múltiplos inícios ou reinício antes do fim
-          console.log("Chamando play");
+
           showIcon() // Garante que o ícone esteja visível
           startAnimation(); // Reinicia a animação
         };
 
         routeLine.pause = () => {
           if (isPaused) return;
-          console.log("Chamando pause");
+
           pauseAnimation()
         };
 
         // Adicionando o controle de play/pause via eventBus
         eventBus.on('routePlay', () => {
-          console.log("Evento routePlay recebido");
+
           routeLine.play();
         });
 
         eventBus.on('routePause', () => {
-          console.log("Evento routePause recebido");
+
           routeLine.pause();
         });
       });
@@ -1062,7 +1062,7 @@ export default {
       const id = circleDetails.value.id;
       const type = circleDetails.value.type;
 
-      console.log("id antigo", circleDetails.value);
+
 
       // Fecha o dialog inicialmente
       dialog.value = false;
@@ -1081,7 +1081,7 @@ export default {
         circleInstance = null;
       }
 
-      console.log("Novos detalhes do círculo", circleDetails.value);
+
 
       // Escuta o evento overlaycomplete para detectar quando o círculo foi desenhado
       const overlayCompleteListener = (event: any) => {
@@ -1107,7 +1107,7 @@ export default {
             },
           };
 
-          console.log("Novos detalhes do círculo", circleDetails.value);
+
 
           // Armazenando os dados no localStorage
           localStorage.setItem(
@@ -1127,7 +1127,7 @@ export default {
         overlayCompleteListener
       );
 
-      console.log("Esperando o novo círculo ser desenhado...");
+
     };
 
     const circleForConsult = async () => {
@@ -1176,7 +1176,7 @@ export default {
         radius: parseFloat(circleDetails.value.radius),
       };
 
-      console.log("Dados para insert no banco: ", payload);
+
 
       try {
         if (!Number.isInteger(parseInt(updateZone.id, 10))) {
@@ -1185,13 +1185,13 @@ export default {
             payload
           );
 
-          console.log("Dados enviados com sucesso:", response.data);
+
         } else {
           const response = await axios.put(
             "http://localhost:8080/zone",
             updateZone
           );
-          console.log("Dados enviados com sucesso para update:", response.data);
+
         }
         showSnackbar("Zona salva com sucesso!", "success");
         dialog.value = false;
@@ -1212,7 +1212,7 @@ export default {
         }, 500); // 2000 ms = 2 segundos
 
       } catch (error) {
-        console.log("Erro ao enviar os dados:", error);
+
         localStorage.removeItem("circleDetailsCached")
         showSnackbar(error.response.data.message, "error");
       }
@@ -1236,8 +1236,8 @@ export default {
         const response = await axios.delete("http://localhost:8080/zone", {
           data: payload,
         });
-        console.log("Dados enviados com sucesso:", response.data);
-        console.log({ data: payload });
+
+
         showSnackbar("Zona deletada com sucesso!", "success");
 
         dialog.value = false;
@@ -1255,7 +1255,7 @@ export default {
           window.location.reload();
         }, 500); // 2000 ms = 2 segundos
       } catch (error) {
-        console.log("Erro ao deletar os dados:", error);
+
         showSnackbar("Erro ao deletar a zona. Tente novamente.", "error");
       }
 
@@ -1264,11 +1264,11 @@ export default {
 
     const removeCircle = (forceRemove?: boolean) => {
       if (!forceRemove && circleDetails.value.id) {
-        console.log("Não limpo")
+
         return;
       }
 
-      console.log("Removiddoooooooooooooooooo")
+
       circleDetails.value = {
         id: "",
         name: "",
@@ -1318,7 +1318,7 @@ export default {
     };
 
     const handleGeographicAreaConsult = (data: any) => {
-      console.log("Dados geográficos recebidos do Sidebar:", data);
+
       circleDetails.value = {
         id: data.id,
         name: data.name,
@@ -1336,7 +1336,7 @@ export default {
 
     // Observando o valor de `isDarkTheme`
     watch(isPanelOpen, (newValue) => {
-      console.log('chegou', newValue)
+
     });
 
     return {

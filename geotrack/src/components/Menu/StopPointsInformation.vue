@@ -103,13 +103,13 @@ const getFormattedAddress = async (lat: number, lng: number) => {
     try {
         const response = await fetch(url);
         const data = await response.json();
-        console.log("ENDEREÇO:", data);
+
 
         const formattedAddress = data.results.length > 0 ? data.results[0].formatted_address : 'Endereço não encontrado';
 
         return formattedAddress;
     } catch (error) {
-        console.error('Erro ao buscar endereço:', error);
+
         return 'Erro ao buscar endereço';
     }
 };

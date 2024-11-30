@@ -107,7 +107,7 @@ export default {
       }
 
       const data = await response.json();
-      console.info("Login bem-sucedido:", data);
+
       localStorage.setItem("token", data.token);
 
       snackbarMessage.value = "Login bem-sucedido!";
@@ -116,7 +116,7 @@ export default {
 
       router.push("/stoppointsfilter");
       } catch (error) {
-      console.error("Erro no login:", error);
+
       }
     };
 
