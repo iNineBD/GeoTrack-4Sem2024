@@ -7,7 +7,7 @@
       <p>
         Sejam bem-vindos ao GeoTrack! Essa página está destinada a solucionar
         possíveis dúvidas sobre como utilizar nossa aplicação. A imagem abaixo é
-        referente ao filtro de pesquisa de usuários em zonas, onde você pode visualiar os usuários que passaram dentro
+        referente ao filtro de pesquisa de usuários em zonas, onde você pode visualizar os usuários que passaram dentro
         de uma área específica.
       </p>
       <div class="image-container">
