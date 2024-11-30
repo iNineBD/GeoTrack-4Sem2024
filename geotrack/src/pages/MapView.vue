@@ -1,5 +1,5 @@
 <template>
-  <Sidebar v-show="!isStreetViewActive"  @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
+  <Sidebar v-show="!isStreetViewActive" @consult="fetchGeoJsonData" @drawCircle="enableCircleDrawing"
     @geographicAreaConsult="handleGeographicAreaConsult" @stopPointsReceived="handleStopPointsOnMap"
     @initializeMap="initializeMap" @removeCircle="removeCircle" @initializeMapDark="initializeMapDark"
     @routesReceived="handleRoutesReceived" />
@@ -15,7 +15,7 @@
     <template v-slot:thumb>
       <v-icon>{{
         isDarkTheme ? "mdi-weather-night" : "mdi-weather-sunny"
-      }}</v-icon>
+        }}</v-icon>
     </template>
   </v-switch>
 
@@ -143,7 +143,12 @@ export default {
     // @ts-ignore
     let routeLines: google.maps.Polyline[] = [];
 
+    const isPlaying = ref(false);
+
     onMounted(() => {
+      eventBus.on('animationEnded', () => {
+        isPlaying.value = false; // Change to play icon when animation ends
+      });
       if (mapDiv.value) {
         initializeDrawingManager();
         initializeMap();
@@ -744,24 +749,33 @@ export default {
           speedFactor = speed;
         });
 
+        const routeLength = google.maps.geometry.spherical.computeLength(routeLine.getPath());
+        const speed = 11; // Velocidade em metros por segundo
+        const step = (speed / routeLength) * 100; // Incremento proporcional ao comprimento da rota
+
+
         // Função para atualizar o deslocamento do símbolo
         const animate = () => {
-          count += speedFactor % 200;
+
+          // Interrompe imediatamente se pausado
+          if (isPaused) return;
+          count += step * speedFactor;
 
           // Verifica se o deslocamento atingiu ou passou de 100%
-          if (count >= 200) {
+          if (count >= 100) {
             pauseAnimation();
-            count = 200; // Mantém o ícone no final
+            count = 100;
             eventBus.emit('updateButtonState', 'pause');
-            return; // Encerra a função sem continuar o loop
+            eventBus.emit('animationEnded');
+            return;
           }
 
           const icons = routeLine.get("icons");
           if (icons.length > 0) {
-            icons[0].offset = `${count / 2}%`;
+            icons[0].offset = `${count}%`;
             routeLine.set("icons", icons);
           }
-          animationFrameId = requestAnimationFrame(animate); // Continua a animação
+          animationFrameId = requestAnimationFrame(animate);
         };
 
         // Função para mostrar o ícone
@@ -769,17 +783,22 @@ export default {
           routeLine.set("icons", [
             {
               icon: lineSymbol,
-              offset: `${count / 2}%`,
+              offset: `${count}%`,
             },
           ]);
         };
 
         // Inicia a animação
         const startAnimation = () => {
-          if (animationFrameId) cancelAnimationFrame(animationFrameId); // Cancela qualquer animação anterior
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId); // Cancela qualquer animação anterior
+          }
           isPaused = false; // Retira o estado de pausa
-          if (count >= 200) count = 0; // Reinicia o deslocamento se estava no final
-          animate();
+          if (count >= 100) {
+            count = 0; // Reinicia o deslocamento se estava no final
+          }
+          console.log("Iniciando animação");
+          animate(); // Garante que a animação seja iniciada
         };
 
         // Pausa a animação
@@ -789,26 +808,31 @@ export default {
             cancelAnimationFrame(animationFrameId); // Cancela a animação
             animationFrameId = null;
           }
+          console.log("Animação pausada");
         };
 
         // Adicionando métodos de controle de play/pause à `routeLine`
         routeLine.play = () => {
-          if (!isPaused && count < 200) return; // Impede múltiplos inícios ou reinício antes do fim
+          if (!isPaused && count >= 100) return; // Impede múltiplos inícios ou reinício antes do fim
+          console.log("Chamando play");
           showIcon() // Garante que o ícone esteja visível
           startAnimation(); // Reinicia a animação
         };
 
         routeLine.pause = () => {
           if (isPaused) return;
+          console.log("Chamando pause");
           pauseAnimation()
         };
 
         // Adicionando o controle de play/pause via eventBus
         eventBus.on('routePlay', () => {
+          console.log("Evento routePlay recebido");
           routeLine.play();
         });
 
         eventBus.on('routePause', () => {
+          console.log("Evento routePause recebido");
           routeLine.pause();
         });
       });
@@ -1347,6 +1371,7 @@ export default {
       isPanelOpen,
       togglePanel,
       isStreetViewActive,
+      isPlaying,
     };
   },
 };

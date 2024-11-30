@@ -7,7 +7,8 @@
     " color="primary">
     <v-col style="padding: 5px 20px 0px 20px">
       <!-- Botão do Painel de Informações -->
-      <InfoPanel style="display: flex; justify-content: flex-end; padding-bottom: 10px">
+      <InfoPanel
+        style="display: flex; justify-content: flex-end; padding-bottom: 10px">
       </InfoPanel>
       <!-- Card das áreas geográficas -->
       <v-card-actions class="d-flex justify-space-between">

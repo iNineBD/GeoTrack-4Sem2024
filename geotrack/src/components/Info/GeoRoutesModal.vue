@@ -12,10 +12,7 @@
         entender melhor como funciona!
       </p>
       <div class="image-container">
-        <img
-          src="../../assets/infoImgs/StopPointsModal/interfaceClean.jpg"
-          alt="Menu Rotas"
-        />
+        <img src="../../assets/infoImgs/StopPointsModal/interfaceClean.jpg" alt="Menu Rotas" />
         <p class="image-caption">Menu Rotas</p>
       </div>
     </div>
@@ -29,17 +26,11 @@
       </p>
       <div class="image-grid">
         <div class="image-item">
-          <img
-            src="../../assets/infoImgs/GeoRoutesModal/RotasSelecionarUsuario.png"
-            alt="Selecionar Usuário"
-          />
+          <img src="../../assets/infoImgs/GeoRoutesModal/RotasSelecionarUsuario.png" alt="Selecionar Usuário" />
           <p class="image-caption">Selecionar Usuário</p>
         </div>
         <div class="image-item">
-          <img
-            src="../../assets/infoImgs/GeoRoutesModal/RotasSelecionarData.png"
-            alt="Selecionar Data"
-          />
+          <img src="../../assets/infoImgs/GeoRoutesModal/RotasSelecionarData.png" alt="Selecionar Data" />
           <p class="image-caption">Selecionar Data</p>
         </div>
       </div>
@@ -54,28 +45,29 @@
         período selecionado, com pontos de início e fim.
       </p>
       <div class="image-container">
-        <img
-          src="../../assets/infoImgs/GeoRoutesModal/RotasDados.png"
-          alt="Dados na Tela"
-        />
+        <img src="../../assets/infoImgs/GeoRoutesModal/RotasDados.png" alt="Dados na Tela" />
         <p class="image-caption">Dados na Tela</p>
+      </div>
+    </div>
+
+    <!-- Página 4 -->
+    <div v-else-if="currentPage === 4">
+      <p>
+        Quando você seleciona uma rota, aparece um player no qual você pode ver o tempo da rota e a distância
+        percorrida. Com isso, você também verá uma animação percorrendo a rota.
+      </p>
+      <div class="image-container">
+        <img src="../../assets/infoImgs/GeoRoutesModal/routeSelected.png" alt="Exibição do player" />
+        <p class="image-caption">Exibição do player</p>
       </div>
     </div>
 
     <!-- Navegação -->
     <div class="modal-navigation">
-      <v-btn
-        :disabled="currentPage === 1"
-        @click="currentPage--"
-        class="nav-btn"
-      >
+      <v-btn :disabled="currentPage === 1" @click="currentPage--" class="nav-btn">
         Anterior
       </v-btn>
-      <v-btn
-        :disabled="currentPage === totalPages"
-        @click="currentPage++"
-        class="nav-btn"
-      >
+      <v-btn :disabled="currentPage === totalPages" @click="currentPage++" class="nav-btn">
         Próximo
       </v-btn>
     </div>
@@ -89,7 +81,7 @@
 import { ref } from "vue";
 
 const currentPage = ref(1);
-const totalPages = 3;
+const totalPages = 4;
 </script>
 
 <style scoped>
@@ -99,33 +91,40 @@ const totalPages = 3;
   border-radius: 10px;
   text-align: center;
 }
+
 .modal-title {
   font-size: 24px;
   margin-bottom: 16px;
   color: #333;
 }
+
 .modal-navigation {
   display: flex;
   justify-content: space-between;
   margin: 20px 0;
 }
+
 .nav-btn {
   margin: 0 10px;
 }
+
 p {
   font-size: 18px;
   line-height: 1.6;
   color: #444;
 }
+
 .image-grid {
   display: flex;
   justify-content: space-around;
   gap: 20px;
   margin-top: 20px;
 }
+
 .image-item {
   text-align: center;
 }
+
 .image-container img,
 .image-item img {
   width: 90%;
@@ -135,6 +134,7 @@ p {
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .image-caption {
   font-size: 16px;
   color: #666;

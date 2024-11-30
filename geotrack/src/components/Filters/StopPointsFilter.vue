@@ -8,8 +8,7 @@
     <v-col style="padding: 5px 20px 0 20px">
       <!-- Botão do Painel de Informações -->
       <InfoPanel
-        style="display: flex; justify-content: flex-end; padding-bottom: 10px"
-      >
+        style="display: flex; justify-content: flex-end; padding-bottom: 10px">
       </InfoPanel>
       <!-- Users selection -->
       <v-combobox

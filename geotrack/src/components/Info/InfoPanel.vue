@@ -4,11 +4,13 @@ import { useRoute } from "vue-router";
 import StopPointsModal from "./StopPointsModal.vue";
 import GeographicAreasModal from "./GeographicAreasModal.vue";
 import GeoRoutesModal from "./GeoRoutesModal.vue";
+import UserInZoneModal from "./UserInZoneModal.vue";
 
 type RoutePath =
   | "/stoppointsfilter"
   | "/geographicareasfilter"
-  | "/georoutesfilter";
+  | "/georoutesfilter"
+  | "/UsersInZoneFilter";
 
 const showModal = ref(false);
 const route = useRoute();
@@ -17,6 +19,7 @@ const modalsMap: Record<RoutePath, any> = {
   "/stoppointsfilter": StopPointsModal,
   "/geographicareasfilter": GeographicAreasModal,
   "/georoutesfilter": GeoRoutesModal,
+  "/UsersInZoneFilter": UserInZoneModal,
 };
 
 const ModalComponent = computed(() => {

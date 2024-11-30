@@ -5,7 +5,11 @@
       margin-bottom: 0px;
       height: 290px;
     " color="primary">
-    <v-col style="padding: 20px 20px 0 20px">
+    <v-col style="padding: 5px 20px 0 20px">
+      <!-- Botão do Painel de Informações -->
+      <InfoPanel
+        style="display: flex; justify-content: flex-end; padding-bottom: 10px">
+      </InfoPanel>
       <!-- Card das áreas geográficas -->
       <v-card-actions class="d-flex justify-space-between">
         <v-row class="d-flex align-center no-gutters">
@@ -71,6 +75,7 @@
 <script>
 import { eventBus } from "@/utils/EventBus";
 import axios from "axios";
+import InfoPanel from "../Info/InfoPanel.vue";
 
 export default {
   data: () => ({
