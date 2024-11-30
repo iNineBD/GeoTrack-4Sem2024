@@ -3,7 +3,7 @@
       box-shadow: none;
       border-radius: 0 0 20px 20px;
       margin-bottom: 0px;
-      height: 296px;
+      height: 182px;
     " color="primary">
     <v-col style="padding: 5px 20px 0 20px">
       <v-row style="align-items: center; padding: 0px 0 7px 0; position: relative;">
@@ -39,24 +39,9 @@
           </v-col>
         </v-row>
       </v-card-actions>
-
-      <!-- Date selection -->
-      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="secondary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :readonly="dateInputDisabled">
-      </v-date-input>
-
-      <!-- Quick date filters using chips -->
-      <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
-        <v-chip style="margin: 0px 2px !important" size="small" v-for="(filter, index) in quickFilters"
-          :key="filter.label" @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
-          filter class="ma-2" variant="flat">
-          {{ filter.label }}
-        </v-chip>
-      </v-col>
     </v-col>
 
-    <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
+    <v-card-actions class="d-flex justify-space-between" style="padding: 4px 20px 0 20px">
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
           <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary"
@@ -93,21 +78,6 @@ export default {
     date: null,
     locale: "pt",
     customDateFormat: "dd/MM/yyyy",
-    quickFilters: [
-      { label: "Hoje", range: [new Date(), new Date()] },
-      {
-        label: "Últimos 3 dias",
-        range: [new Date(Date.now() - 3 * 864e5), new Date()],
-      },
-      {
-        label: "Última semana",
-        range: [new Date(Date.now() - 7 * 864e5), new Date()],
-      },
-      {
-        label: "Último mês",
-        range: [new Date(Date.now() - 30 * 864e5), new Date()],
-      },
-    ],
     selectedQuickFilter: null,
     dateInputDisabled: false,
     geoAreas: [],
@@ -138,7 +108,7 @@ export default {
     ButtonDisabled() {
       const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
-      return !this.date || (!this.selectedGeoArea && !cachedCircle);
+      return (!this.selectedGeoArea && !cachedCircle);
     },
   },
 
@@ -245,31 +215,15 @@ export default {
         selectedArea.latitude = selectedArea.center.latitude;
         selectedArea.longitude = selectedArea.center.longitude;
       }
-
-      const qtddias = Math.round(
-        (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
-        (1000 * 60 * 60 * 24)
-      );
-
-      if (qtddias > 31) {
-        this.showSnackbar("Mais que 31 dias selecionados", "error");
-        this.loading = false;
-        return;
-      }
-
       // Ajustando os dados enviados
       const requestData = {
         sessionId: selectedArea.id,
-        startDate: new Date(this.date[0]).toLocaleDateString("en-CA"),
-        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString(
-          "en-CA"
-        ),
       };
 
       console.log("Dados enviados: ", requestData);
 
       // Montando a URL conforme esperado
-      const url = `http://localhost:8080/usersInSession?idSession=${requestData.sessionId}&dataInicio=${requestData.startDate}&dataFim=${requestData.finalDate}`;
+      const url = `http://localhost:8080/usersInSession?idSession=${requestData.sessionId}`;
 
       console.log("URL: ", url);
 
