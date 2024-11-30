@@ -12,7 +12,7 @@
         entender melhor como funciona!
       </p>
       <div class="image-container">
-        <img src="../../assets/infoImgs/StopPointsModal/interfaceClean.jpg" alt="Menu Rotas" />
+        <img src="../../assets/infoImgs/GeoRoutesModal/rotasInterface.png" alt="Menu Rotas" />
         <p class="image-caption">Menu Rotas</p>
       </div>
     </div>

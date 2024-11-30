@@ -13,7 +13,7 @@
       </p>
       <div class="image-container">
         <img
-          src="../../assets/infoImgs/StopPointsModal/interfaceClean.jpg"
+          src="../../assets/infoImgs/StopPointsModal/interfaceClean.png"
           alt="Menu Pontos de Parada"
         />
         <p class="image-caption">Menu Pontos de Parada</p>

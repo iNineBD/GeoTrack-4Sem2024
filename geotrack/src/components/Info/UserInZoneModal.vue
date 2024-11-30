@@ -28,7 +28,7 @@
       <div class="image-grid">
         <div class="image-item">
           <img
-            src="../../assets/infoImgs/GeographicAreasModal/AGCriarArea.png"
+            src="../../assets/infoImgs/UserInZoneModal/criarArea.png"
             alt="Criação de Área Geográfica"
           />
           <p class="image-caption">Exemplo de Criação de Área Geográfica</p>
@@ -70,38 +70,12 @@
     <!-- Página 4 -->
     <div v-else-if="currentPage === 4">
       <p>
-        Com a Área Geográfica ativa, use os filtros rápidos de data ou o calendário para escolher um período de até 31 dias.
-        Após isso, clique em "Consultar" e aguarde os resultados.
-      </p>
-      <div class="image-grid">
-        <div class="image-item">
-          <img
-            src="../../assets/infoImgs/UserInZoneModal/areaSelecionada.png"
-            alt="Selecionar Usuário"
-          />
-          <p class="image-caption">Selecionar Usuário</p>
-        </div>
-        <div class="image-item">
-          <img
-            src="../../assets/infoImgs/GeographicAreasModal/AGSelecionarData.png"
-            alt="Selecionar Data"
-          />
-          <p class="image-caption">Selecionar Data</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Página 5 -->
-    <div v-else-if="currentPage === 5">
-      <p>
-        Aqui você vê o resultado da consulta. Os Pontos de Parada são exibidos
-        no mapa, e abaixo do menu, você encontrará os detalhes, incluindo o nome
-        do usuário, identificação do dispositivo e todos os pontos encontrados
-        no período e área selecionados.
+        Aqui você vê o resultado da consulta. Todos os usuários que passaram nesta área são exibidos
+        abaixo do menu.
       </p>
       <div class="image-container">
         <img
-          src="../../assets/infoImgs/GeographicAreasModal/AGDados.png"
+          src="../../assets/infoImgs/UserInZoneModal/dados.png"
           alt="Dados na Tela"
         />
         <p class="image-caption">Dados na Tela</p>
@@ -135,7 +109,7 @@
 import { ref } from "vue";
 
 const currentPage = ref(1);
-const totalPages = 5;
+const totalPages = 4;
 </script>
 
 <style scoped>
