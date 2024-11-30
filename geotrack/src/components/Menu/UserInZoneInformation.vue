@@ -51,7 +51,7 @@ const props = defineProps<{
 watch(
   () => props.userZoneInfo,
   (newUserZoneInfo) => {
-    console.log(newUserZoneInfo?.users);
+
   },
   { immediate: true }
 );

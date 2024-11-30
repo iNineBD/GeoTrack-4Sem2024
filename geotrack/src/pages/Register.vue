@@ -4,65 +4,93 @@
       <v-col class="blue-section" cols="12">
         <v-card class="register-card" elevation="2">
           <div class="logo-container">
-            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-2">
+            <img
+              :src="logoGeoTrack"
+              alt="GeoTrack Logo"
+              class="main-logo mb-2"
+            />
           </div>
-          <v-card-title class="text-h5 font-weight-bold text-center">Cadastro de Usuário</v-card-title>
+          <v-card-title class="text-h5 font-weight-bold text-center"
+            >Cadastro de Usuário</v-card-title
+          >
           <v-card-text>
-            <p class="subtitle-1 mb-4 text-body-2 text-center ">Preencha os campos abaixo</p>
+            <p class="subtitle-1 mb-4 text-body-2 text-center">
+              Preencha os campos abaixo
+            </p>
             <v-form @submit.prevent="handleRegister">
-              <v-text-field v-model="name" label="Nome completo" required class="register-input mb-2" variant="outlined"
-                density="comfortable" style="width: 300px;"></v-text-field>
-
-              <v-text-field v-model="email" label="Email" required class="register-input mb-2" variant="outlined"
-                density="comfortable"></v-text-field>
-
               <v-text-field
-              v-model="password"
-              :type="passwordVisible ? 'text' : 'password'"
-              label="Digite sua senha"
-              required
-              class="login-input mb-10"
-              variant="outlined"
-              density="comfortable"
-              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="togglePasswordVisibility"
-              style="width: 300px"
+                v-model="name"
+                label="Nome completo"
+                required
+                class="register-input mb-2"
+                variant="outlined"
+                density="comfortable"
+                style="width: 300px"
               ></v-text-field>
 
-              <v-btn type="submit" block class="register-btn" size="large">Cadastrar</v-btn>
+              <v-text-field
+                v-model="email"
+                label="Email"
+                required
+                class="register-input mb-2"
+                variant="outlined"
+                density="comfortable"
+              ></v-text-field>
+
+              <v-text-field
+                v-model="password"
+                :type="passwordVisible ? 'text' : 'password'"
+                label="Digite sua senha"
+                required
+                class="login-input mb-10"
+                variant="outlined"
+                density="comfortable"
+                :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append-inner="togglePasswordVisibility"
+                style="width: 300px"
+              ></v-text-field>
+
+              <v-btn type="submit" block class="register-btn" size="large"
+                >Cadastrar</v-btn
+              >
             </v-form>
             <div class="login text-center mt-4">
               <router-link to="/">Já possui cadastro? Faça login</router-link>
             </div>
           </v-card-text>
           <div class="partner-logos mt-4">
-            <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo">
-            <img :src="logoInine" alt="INine Logo" class="partner-logo">
+            <img :src="logoIto1" alt="ITO1 Logo" class="partner-logo" />
+            <img :src="logoInine" alt="INine Logo" class="partner-logo" />
           </div>
         </v-card>
-        <v-snackbar v-model="snackbar" :color="snackbarColor" top :timeout="3000" class="text-center">
+        <v-snackbar
+          v-model="snackbar"
+          :color="snackbarColor"
+          top
+          :timeout="3000"
+          class="text-center"
+        >
           {{ snackbarMessage }}
         </v-snackbar>
       </v-col>
-
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import logoGeoTrack from '../assets/GeoTrack-logo.png';
-import logoInine from '../assets/inine-logo.png';
-import logoIto1 from '../assets/ito1-logo.png';
-import { errorMessages } from 'vue/compiler-sfc';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import logoGeoTrack from "../assets/GeoTrack-logo.png";
+import logoInine from "../assets/inine-logo.png";
+import logoIto1 from "../assets/ito1-logo.png";
+import { errorMessages } from "vue/compiler-sfc";
 
 export default {
-  name: 'Register',
+  name: "Register",
   setup() {
-    const name = ref('');
-    const email = ref('');
-    const password = ref('');
+    const name = ref("");
+    const email = ref("");
+    const password = ref("");
     const router = useRouter();
     const passwordVisible = ref(false);
     const togglePasswordVisibility = () => {
@@ -70,22 +98,22 @@ export default {
     };
 
     const snackbar = ref(false);
-    const snackbarMessage = ref('');
-    const snackbarColor = ref('');
+    const snackbarMessage = ref("");
+    const snackbarColor = ref("");
 
     const handleRegister = async () => {
       if (!name.value || !email.value || !password.value) {
-        snackbarMessage.value = 'Por favor, preencha todos os campos!';
-        snackbarColor.value = 'error';
+        snackbarMessage.value = "Por favor, preencha todos os campos!";
+        snackbarColor.value = "error";
         snackbar.value = true;
         return;
       }
 
       try {
-        const response = await fetch('http://localhost:8080/auth/register', {
-          method: 'POST',
+        const response = await fetch("http://localhost:8080/auth/register", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             name: name.value,
@@ -95,19 +123,27 @@ export default {
         });
 
         if (!response.ok) {
-          throw new Error('Erro ao cadastrar usuário');
+          const errorData = await response.json();
+          if (errorData.message === "Email already exists") {
+            snackbarMessage.value = "O e-mail já está cadastrado!";
+            snackbarColor.value = "error";
+            snackbar.value = true;
+          } else {
+            throw new Error("Erro ao cadastrar usuário");
+          }
+          return;
         }
 
-        snackbarMessage.value = 'Usuário cadastrado com sucesso!';
-        snackbarColor.value = 'success';
+        snackbarMessage.value = "Usuário cadastrado com sucesso!";
+        snackbarColor.value = "success";
         snackbar.value = true;
         setTimeout(() => {
-          router.push('/');
+          router.push("/");
         }, 3000);
-
-
       } catch (error) {
-        console.log("erro: ", error.mensagem)
+        snackbarMessage.value = "Erro ao cadastrar usuário: e-mail já cadastrado!";
+        snackbarColor.value = "error";
+        snackbar.value = true;
       }
     };
 
@@ -137,7 +173,7 @@ export default {
 }
 
 .blue-section {
-  background-image: url('../assets/terra.png');
+  background-image: url("../assets/terra.png");
   background-size: cover;
   background-position: center;
   display: flex;
@@ -214,14 +250,14 @@ export default {
 }
 
 .register-btn {
-  background-color: #2B81C4 !important;
+  background-color: #2b81c4 !important;
   color: white;
   height: 48px;
   font-weight: bold;
 }
 
 .login-link a {
-  color: #2B81C4;
+  color: #2b81c4;
   text-decoration: none;
 }
 

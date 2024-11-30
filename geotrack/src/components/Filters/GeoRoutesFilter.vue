@@ -144,9 +144,9 @@ export default {
           device: user.deviceName,
         }));
 
-        console.log("Sucesso ao buscar usuários: ", this.users);
+
       } catch (error) {
-        console.log("Erro ao buscar usuários: ", error);
+
       }
     },
 
@@ -177,7 +177,7 @@ export default {
         ),
       };
 
-      console.log("Dados enviados: ", requestData);
+
 
       const url = `http://localhost:8080/routes?deviceId=${requestData.deviceId}&dateStart=${requestData.startDate}&dateEnd=${requestData.finalDate}`;
 
@@ -186,7 +186,7 @@ export default {
         if (response.status === 200) {
           const data = await response.data;
 
-          console.log("Rotas recebidas:", data.routes);
+
 
           const dados = {
             routes: data.routes.map((route) => ({
@@ -205,7 +205,7 @@ export default {
           this.$emit("routesReceived", dados);
         }
       } catch (error) {
-        console.log(error);
+
         this.showSnackbar(error.response.data.message, "error");
         if (this.logo == "/src/assets/LogoWhite.svg") {
           this.$emit("initializeMapDark");

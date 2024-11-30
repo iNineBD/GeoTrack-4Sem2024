@@ -48,7 +48,7 @@ const fetchMetrics = async () => {
     const response = await axios.get("http://localhost:8080/metrics");
     metrics.value = response.data;
   } catch (error) {
-    console.error("Erro ao buscar métricas:", error);
+
   }
 };
 

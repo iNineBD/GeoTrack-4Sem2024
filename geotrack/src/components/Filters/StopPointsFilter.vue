@@ -194,9 +194,9 @@ export default {
           deviceId: user.idDevice, // ID do dispositivo
         }));
 
-        console.log("Successfully fetched users:", this.users);
+
       } catch (error) {
-        console.log("Error fetching users:", error);
+
       }
     },
 
@@ -226,7 +226,7 @@ export default {
         finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString("en-CA"), // Data de fim
       };
 
-      console.log("Dados enviados:", requestData);
+
       this.$emit("consult", requestData); // Certifique-se de emitir o evento com os dados
 
       // Simulação do retorno dos postos de parada
@@ -242,7 +242,7 @@ export default {
       this.devices = [];
       this.selectedQuickFilter = null;
 
-      console.log("logo novo: ", this.logo);
+
 
       if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");
@@ -285,7 +285,7 @@ export default {
       if (newValue.length > 5) {
         this.selectedUsers = newValue.slice(0, 5);
       }
-      console.log("users selecionados:", this.selectedUsers);
+
     },
   },
 };
