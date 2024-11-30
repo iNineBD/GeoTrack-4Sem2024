@@ -24,4 +24,4 @@ jobs:
 
     - name: Executar script remoto
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "bash /home/ubuntu/executa.sh"
+        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "sudo su -c 'bash /home/ubuntu/executa.sh'"
