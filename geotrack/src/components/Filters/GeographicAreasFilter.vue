@@ -3,13 +3,21 @@
       box-shadow: none;
       border-radius: 0 0 25px 20px;
       margin-bottom: 0px;
-      height: 362px;
+      height: 371px;
     " color="primary">
     <v-col style="padding: 5px 20px 0px 20px">
-      <!-- Botão do Painel de Informações -->
-      <InfoPanel
-        style="display: flex; justify-content: flex-end; padding-bottom: 10px">
-      </InfoPanel>
+      <v-row style="align-items: center; padding: 0px 0 7px 0; position: relative;">
+        <!-- Texto "Pontos de Parada" centralizado -->
+        <v-col cols="12" style="text-align: center;">
+          <span style="font-size: 23px; font-weight: bold;" color="primary">
+            Aréas Geográficas
+          </span>
+        </v-col>
+        <!-- Botão do Painel de Informações no extremo direito -->
+        <v-col cols="auto" style="position: absolute; right: 0px; top: 32%; transform: translateY(-40%);">
+          <InfoPanel></InfoPanel>
+        </v-col>
+      </v-row>
       <!-- Card das áreas geográficas -->
       <v-card-actions class="d-flex justify-space-between">
         <v-row class="d-flex align-center no-gutters">
