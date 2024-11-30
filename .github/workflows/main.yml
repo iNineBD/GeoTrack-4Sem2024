@@ -25,4 +25,4 @@ jobs:
     # Executar o script no servidor via SSH com permissões elevadas
     - name: SSH into server and run script with sudo
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 'sudo su -c "bash -s" < ./executa.sh'
+        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "sudo -u ubuntu bash /home/ubuntu/executa.sh"
