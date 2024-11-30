@@ -8,8 +8,7 @@
         Sejam bem-vindos ao GeoTrack! Essa página está destinada a solucionar
         possíveis dúvidas sobre como utilizar nossa aplicação. A imagem abaixo é
         referente ao filtro de Áreas Geográficas, onde você pode buscar os
-        Pontos de Parada de um Usuário dentro de uma área específica. Avance
-        para a próxima tela para entender melhor como funciona!
+        Pontos de Parada de um usuário dentro de uma área específica.
       </p>
       <div class="image-container">
         <img
@@ -98,9 +97,8 @@
     <div v-else-if="currentPage === 5">
       <p>
         Aqui você vê o resultado da consulta. Os Pontos de Parada são exibidos
-        no mapa, e abaixo do menu, você encontrará os detalhes, incluindo o nome
-        do usuário, identificação do dispositivo e todos os pontos encontrados
-        no período e área selecionados.
+        no mapa, e abaixo do menu, você encontrará os detalhes sobre onde o usuário passou, a data e quanto tempo ficou
+        parado naquele lugar.
       </p>
       <div class="image-container">
         <img

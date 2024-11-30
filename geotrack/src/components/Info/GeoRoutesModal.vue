@@ -7,9 +7,8 @@
       <p>
         Sejam bem-vindos ao GeoTrack! Essa página está destinada a solucionar
         possíveis dúvidas sobre como utilizar nossa aplicação. A imagem abaixo é
-        referente ao filtro de Rotas, onde você pode buscar as Rotas de um
-        Usuário dentro de um período de 31 dias. Avance para a próxima tela para
-        entender melhor como funciona!
+        referente ao filtro de Rotas, onde você pode buscar as rotas de um
+        suário dentro de um período de 31 dias.
       </p>
       <div class="image-container">
         <img src="../../assets/infoImgs/GeoRoutesModal/rotasInterface.png" alt="Menu Rotas" />
@@ -54,7 +53,7 @@
     <div v-else-if="currentPage === 4">
       <p>
         Quando você seleciona uma rota, aparece um player no qual você pode ver o tempo da rota e a distância
-        percorrida. Com isso, você também verá uma animação percorrendo a rota.
+        percorrida. Com isso, ao clicar no botão play, você também verá uma animação percorrendo a rota.
       </p>
       <div class="image-container">
         <img src="../../assets/infoImgs/GeoRoutesModal/routeSelected.png" alt="Exibição do player" />
