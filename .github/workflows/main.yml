@@ -1,0 +1,27 @@
+name: Deploy Application
+
+on:
+  push:
+    branches:
+      - main # Dispara o workflow em pushes no branch `main`.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configurar repositório
+      uses: actions/checkout@v3
+
+    - name: Configurar chave SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_KEY }}
+
+    - name: Testar conexão SSH
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "echo 'Conexão SSH estabelecida com sucesso!'"
+
+    - name: Executar script remoto
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "bash /home/ubuntu/executa.sh"
