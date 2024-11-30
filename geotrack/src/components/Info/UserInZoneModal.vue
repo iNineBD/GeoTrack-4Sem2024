@@ -19,25 +19,6 @@
     <!-- Página 2 -->
     <div v-else-if="currentPage === 2">
       <p>
-        Para criar uma nova Área Geográfica, clique no ícone de mais (+) e
-        desenhe um círculo no mapa. Após verificar os detalhes, clique em
-        "Salvar" para registrar a área criada.
-      </p>
-      <div class="image-grid">
-        <div class="image-item">
-          <img src="../../assets/infoImgs/UserInZoneModal/criarArea.png" alt="Criação de Área Geográfica" />
-          <p class="image-caption">Exemplo de Criação de Área Geográfica</p>
-        </div>
-        <div class="image-item">
-          <img src="../../assets/infoImgs/GeographicAreasModal/AGSalvarZona.png" alt="Salvando Área Geográfica" />
-          <p class="image-caption">Salvando Área Geográfica</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Página 3 -->
-    <div v-else-if="currentPage === 3">
-      <p>
         Quando você seleciona uma das Áreas Geográficas ela aparecerá no mapa,
         clicando sobre ela você verá opções como "Editar" e "Deletar".
       </p>
@@ -54,7 +35,7 @@
     </div>
 
     <!-- Página 4 -->
-    <div v-else-if="currentPage === 4">
+    <div v-else-if="currentPage === 3">
       <p>
         Aqui você vê o resultado da consulta. Todos os usuários que passaram nesta área são exibidos
         abaixo do menu.
