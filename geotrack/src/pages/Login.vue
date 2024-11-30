@@ -101,8 +101,7 @@ export default {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        snackbarMessage.value = errorData.message;
+        snackbarMessage.value = "Erro ao fazer login: usuário ou senha inválidos";
         snackbarColor.value = 'error';
         snackbar.value = true;
       }
