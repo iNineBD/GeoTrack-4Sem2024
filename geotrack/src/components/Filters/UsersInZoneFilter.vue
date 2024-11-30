@@ -3,7 +3,7 @@
       box-shadow: none;
       border-radius: 0 0 20px 20px;
       margin-bottom: 0px;
-      height: 182px;
+      height: 178px;
     " color="primary">
     <v-col style="padding: 5px 20px 0 20px">
       <v-row style="align-items: center; padding: 0px 0 7px 0; position: relative;">
