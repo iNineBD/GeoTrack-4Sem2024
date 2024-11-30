@@ -1,27 +1,28 @@
-name: Deploy Application
+name: Deploy Frontend
 
 on:
   push:
     branches:
-      - main # Dispara o workflow em pushes no branch `main`.
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Configurar repositório
-      uses: actions/checkout@v3
+    # Checkout do código
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Configurar chave SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_KEY }}
-
-    - name: Testar conexão SSH
+    # Configuração da chave SSH
+    - name: Set up SSH
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "echo 'Conexão SSH estabelecida com sucesso!'"
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 152.67.61.112 >> ~/.ssh/known_hosts  # Adiciona o host ao arquivo known_hosts para evitar prompts de confirmação
 
-    - name: Executar script remoto
+    # Executar o script no servidor via SSH com permissões elevadas
+    - name: SSH into server and run script with sudo
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "sudo su -c 'bash /home/ubuntu/executa.sh'"
+        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 'sudo su -c "bash -s" < ./executa.sh'
