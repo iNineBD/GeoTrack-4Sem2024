@@ -25,6 +25,7 @@ declare module 'vue' {
     StopPointsModal: typeof import('./src/components/Info/StopPointsModal.vue')['default']
     UserInZone: typeof import('./src/components/Menu/UserInZone.vue')['default']
     UserInZoneInformation: typeof import('./src/components/Menu/UserInZoneInformation.vue')['default']
+    UserInZoneModal: typeof import('./src/components/Info/UserInZoneModal.vue')['default']
     UsersInZoneFilter: typeof import('./src/components/Filters/UsersInZoneFilter.vue')['default']
   }
 }
