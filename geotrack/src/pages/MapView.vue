@@ -627,14 +627,7 @@ export default {
 
             showSnackbar(error.response.data.message, "error");
             return { success: false, data: [geoJsonResponses] }
-          } else {
-
-              "Erro ao buscar os dados GeoJSON:",
-              error.response.data
-            );
           }
-        } else {
-
         }
       } finally {
         eventBus.emit("stopIsLoading");
