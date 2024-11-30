@@ -40,8 +40,8 @@
                                     <v-list-item-subtitle>
                                         Tempo parado: {{ " " }}{{
                                             getStopDuration(stopPoints[index].geoJsonDTO.features[featureIndex].geometry.startDate,
-                                                stopPoints[index].geoJsonDTO.features[featureIndex].geometry.endDate) }} minutos
-                                    </v-list-item-subtitle> 
+                                                stopPoints[index].geoJsonDTO.features[featureIndex].geometry.endDate) }}
+                                    </v-list-item-subtitle>
                                 </v-col>
                             </v-row>
                             <v-divider v-if="featureIndex < displayedAddresses[index].length"></v-divider>
@@ -142,10 +142,14 @@ const formatTime = (date: string) => {
 };
 
 const getStopDuration = (startDate: string, endDate: string) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diffInMinutes = Math.floor((end.getTime() - start.getTime()) / 60000); // Converte a diferença para minutos
-    return diffInMinutes;
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
+  const durationMinutes = Math.floor((end - start) / (1000 * 60));
+
+  const hours = Math.floor(durationMinutes / 60);
+  const minutes = durationMinutes % 60;
+
+  return `${hours} hora${hours !== 1 ? 's' : ''} e ${minutes} minuto${minutes !== 1 ? 's' : ''}`;
 };
 
 const goToLocation = (coordinates: [number, number]) => {

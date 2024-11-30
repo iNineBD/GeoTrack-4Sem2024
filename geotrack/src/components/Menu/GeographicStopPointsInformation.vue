@@ -28,7 +28,7 @@
                 </v-list-item-subtitle>
                 <v-list-item-subtitle>
                   Tempo parado: {{ calculateStopDuration(coord.startDate, coord.endDate) }}
-                </v-list-item-subtitle> 
+                </v-list-item-subtitle>
               </v-col>
             </v-row>
             <v-divider v-if="coordIndex < geoStopPoints.coords.length"></v-divider>
@@ -115,11 +115,14 @@ const formatDateRange = (startDate: string, endDate: string) => {
 };
 
 const calculateStopDuration = (startDate: string, endDate: string) => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const durationMinutes = Math.floor((end.getTime() - start.getTime()) / (1000 * 60));
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
+  const durationMinutes = Math.floor((end - start) / (1000 * 60));
 
-  return `${durationMinutes} minuto${durationMinutes !== 1 ? 's' : ''}`;
+  const hours = Math.floor(durationMinutes / 60);
+  const minutes = durationMinutes % 60;
+
+  return `${hours} hora${hours !== 1 ? 's' : ''} e ${minutes} minuto${minutes !== 1 ? 's' : ''}`;
 };
 
 const navigateToStopPoint = (coord: { latitude: number; longitude: number }) => {
