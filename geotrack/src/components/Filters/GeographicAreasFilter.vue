@@ -150,7 +150,7 @@ export default {
       const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
 
-      console.log("teste: ", cachedCircle);
+
 
       return (
         !this.selectedUser ||
@@ -197,9 +197,9 @@ export default {
           device: user.deviceName,
         }));
 
-        console.log("Sucesso ao buscar usuários: ", this.users);
+
       } catch (error) {
-        console.log("Erro ao buscar usuários: ", error);
+
       }
     },
 
@@ -214,15 +214,15 @@ export default {
           longitude: area.center.longitude,
           radius: area.radius,
         }));
-        console.log("Áreas geográficas carregadas:", data);
+
       } catch (error) {
-        console.log("Erro ao buscar áreas geográficas:", error);
+
       }
     },
 
     async handleGeoAreaChange() {
       if (!this.selectedGeoArea) {
-        console.log("Área geográfica não selecionada ou foi limpa");
+
         this.$emit("removeCircle");
         return; // Interrompe a execução da função
       }
@@ -235,7 +235,7 @@ export default {
       );
 
       if (!selectedArea) {
-        console.log("Área geográfica não encontrada");
+
         return;
       }
 
@@ -267,7 +267,7 @@ export default {
         !this.date ||
         (!this.selectedGeoArea && !cachedCircle)
       ) {
-        console.log("Dados incompletos para a consulta");
+
         this.loading = false;
         return;
       }
@@ -277,7 +277,7 @@ export default {
           (area) => area.id === this.selectedGeoArea.id
         );
         if (!selectedArea) {
-          console.log("Área geográfica não encontrada");
+
           this.loading = false;
           return;
         }
@@ -285,7 +285,7 @@ export default {
         selectedArea = cachedCircle;
         selectedArea.latitude = selectedArea.center.latitude;
         selectedArea.longitude = selectedArea.center.longitude;
-        console.log("passooou ", selectedArea);
+
       }
 
       const qtddias = Math.round(
@@ -310,18 +310,18 @@ export default {
         radius: selectedArea.radius,
       };
 
-      console.log("Dados enviados: ", requestData);
+
 
       const url = `http://localhost:8080/stoppointsession/pointsInSession?deviceId=${requestData.deviceId}&startDate=${requestData.startDate}&endDate=${requestData.finalDate}&latitude=${requestData.latitude}&longitude=${requestData.longitude}&radius=${requestData.radius}`;
 
-      console.log("URL: ", url);
+
 
       try {
         const response = await axios.get(url);
         if (response.status === 200) {
           const data = await response.data;
 
-          console.log("Pontos de parada recebidos:", data.stopPoints);
+
 
           const dataCircleAndUser = {
             id: selectedArea.id,
@@ -340,14 +340,14 @@ export default {
             coords: coord, // Definindo corretamente um array para coordenadas
           };
 
-          console.log("DADOS DA CONSULTA AQUI!!!", dados);
+
 
           // Dados enviados para plotar o círculo escolhido
           this.$emit("consult", dataCircleAndUser);
           this.$emit("stopPointsReceived", dados);
         }
       } catch (error) {
-        console.log("Erro ao buscar pontos de parada:", error);
+
         this.showSnackbar(error.response.data.message, "error");
         this.loading = false;
       }
@@ -364,7 +364,7 @@ export default {
       this.radius = null;
       this.circleDrawn = false;
 
-      console.log("logo novo: ", this.selectedGeoArea);
+
 
       localStorage.removeItem("circleDetailsCached");
       localStorage.removeItem("cachedCircleDetails");

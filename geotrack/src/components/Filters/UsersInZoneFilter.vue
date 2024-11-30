@@ -141,15 +141,15 @@ export default {
           longitude: area.center.longitude,
           radius: area.radius,
         }));
-        console.log("Áreas geográficas carregadas:", data);
+
       } catch (error) {
-        console.log("Erro ao buscar áreas geográficas:", error);
+
       }
     },
     // Função para lidar com a mudança de área geográfica
     async handleGeoAreaChange() {
       if (!this.selectedGeoArea) {
-        console.log("Área geográfica não selecionada ou foi limpa");
+
         this.$emit("removeCircle");
         return; // Interrompe a execução da função
       }
@@ -162,7 +162,7 @@ export default {
       );
 
       if (!selectedArea) {
-        console.log("Área geográfica não encontrada");
+
         return;
       }
 
@@ -199,7 +199,7 @@ export default {
           (area) => area.id === this.selectedGeoArea.id
         );
         if (!selectedArea) {
-          console.log("Área geográfica não encontrada");
+
           this.loading = false;
           return;
         }
@@ -213,19 +213,19 @@ export default {
         sessionId: selectedArea.id,
       };
 
-      console.log("Dados enviados: ", requestData);
+
 
       // Montando a URL conforme esperado
       const url = `http://localhost:8080/usersInSession?idSession=${requestData.sessionId}`;
 
-      console.log("URL: ", url);
+
 
       try {
         // Realizando a requisição GET
         const response = await axios.get(url);
         if (response.status === 200) {
           const data = await response.data;
-          console.log("Usuários recebidos:", data.users);
+
           this.loading = false;
 
           const users = {
@@ -235,7 +235,7 @@ export default {
           this.$emit("usersReceived", users);
         }
       } catch (error) {
-        console.log("Erro ao buscar pontos de parada:", error);
+
         this.showSnackbar(error.response.data.message, "error");
         this.loading = false;
       }

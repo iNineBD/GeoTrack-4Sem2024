@@ -23,7 +23,7 @@ const modalsMap: Record<RoutePath, any> = {
 };
 
 const ModalComponent = computed(() => {
-  console.log("Rota atual:", route.path); // Debug para verificar a rota atual
+
   return modalsMap[route.path as RoutePath] || null;
 });
 </script>

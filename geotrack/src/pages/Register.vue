@@ -107,7 +107,7 @@ export default {
 
 
       } catch (error) {
-        console.log("erro: ", error.mensagem)
+
       }
     };
 
