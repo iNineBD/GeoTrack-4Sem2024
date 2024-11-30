@@ -14,7 +14,7 @@
             <v-list-item v-for="(user, userIndex) in userZoneInfo.users" :key="userIndex" style="padding: 0;" color="primary">
               <v-row align="start" no-gutters class="px-2 py-1">
                 <v-col cols="1">
-                  <v-icon color="secondary" class="mr-1 mt-1">mdi-map-marker</v-icon>
+                  <v-icon color="secondary" class="mr-1" style="margin-top: -5px;">mdi-account</v-icon>
                 </v-col>
                 <v-col cols="11">
                   <v-list-item-title>
