@@ -28,4 +28,4 @@ jobs:
 
     - name: Executar script remoto
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "cd /home/ubuntu && source ~/.bashrc && ./executa.sh"
+        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "cd /home/ubuntu && export PATH=$PATH:/home/ubuntu/.nvm/versions/node/v22.11.0/bin/npm && source ~/.bashrc && ./executa.sh"
