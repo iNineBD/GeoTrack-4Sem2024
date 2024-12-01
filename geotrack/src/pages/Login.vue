@@ -101,7 +101,8 @@ export default {
       });
 
       if (!response.ok) {
-        snackbarMessage.value = "Erro ao fazer login: usuário ou senha inválidos";
+        const errorData = await response.json();
+        snackbarMessage.value = errorData.message;
         snackbarColor.value = 'error';
         snackbar.value = true;
       }
@@ -116,7 +117,7 @@ export default {
 
       router.push("/stoppointsfilter");
       } catch (error) {
-
+        
       }
     };
 
