@@ -15,12 +15,12 @@
           >
           <v-card-text>
             <p class="subtitle-1 mb-4 text-body-2 text-center">
-              Preencha os campos abaixo
+              Preencha os campos abaixo:
             </p>
             <v-form @submit.prevent="handleLogin">
               <v-text-field
                 v-model="email"
-                label="Digite seu usuário"
+                label="Digite seu email"
                 required
                 class="login-input mb-2"
                 variant="outlined"
@@ -29,13 +29,16 @@
               ></v-text-field>
 
               <v-text-field
-                v-model="password"
-                label="Digite sua senha"
-                type="password"
-                required
-                class="login-input mb-4"
-                variant="outlined"
-                density="comfortable"
+              v-model="password"
+              :type="passwordVisible ? 'text' : 'password'"
+              label="Digite sua senha"
+              required
+              class="login-input mb-10"
+              variant="outlined"
+              density="comfortable"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="togglePasswordVisibility"
+              style="width: 300px"
               ></v-text-field>
 
               <v-btn type="submit" block class="login-btn" size="large">
@@ -64,10 +67,9 @@
 <script lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import logoGeoTrack from "../assets/GeoTrack-logo.png";
-import logoIto1 from "../assets/ito1-logo.png";
 import logoInine from "../assets/inine-logo.png";
+import logoIto1 from "../assets/ito1-logo.png";
 
 export default {
   name: "Login",
@@ -75,39 +77,55 @@ export default {
     const email = ref("");
     const password = ref("");
     const router = useRouter();
+    const passwordVisible = ref(false);
+    const togglePasswordVisibility = () => {
+      passwordVisible.value = !passwordVisible.value;
+    };
 
     const snackbar = ref(false);
     const snackbarMessage = ref("");
     const snackbarColor = ref("");
 
     const handleLogin = async () => {
+      localStorage.removeItem("token");
       try {
-        const response = await axios.post("http://localhost:8080/auth/login", {
-          email: email.value,
-          password: password.value,
-        });
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+        email: email.value,
+        password: password.value,
+        }),
+      });
 
-        console.info("Login bem-sucedido:", response.data);
-        localStorage.setItem("token", response.data.token);
-
-        snackbarMessage.value = "Login bem-sucedido!";
-        snackbarColor.value = "success";
+      if (!response.ok) {
+        const errorData = await response.json();
+        snackbarMessage.value = errorData.message;
+        snackbarColor.value = 'error';
         snackbar.value = true;
+      }
 
-        router.push("/stoppointsfilter");
+      const data = await response.json();
+
+      localStorage.setItem("token", data.token);
+
+      snackbarMessage.value = "Login bem-sucedido!";
+      snackbarColor.value = "success";
+      snackbar.value = true;
+
+      router.push("/stoppointsfilter");
       } catch (error) {
-        console.error("Erro no login:", error.response?.data || error.message);
 
-        snackbarMessage.value =
-          error.response?.data?.message || "Erro desconhecido no login";
-        snackbarColor.value = "error";
-        snackbar.value = true;
       }
     };
 
     return {
       email,
       password,
+      passwordVisible,
+      togglePasswordVisibility,
       handleLogin,
       logoGeoTrack,
       logoIto1,
@@ -146,11 +164,11 @@ export default {
 
 .yellow-section {
   background-position: center;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
- 
+
   border-radius: 20px;
 }
 

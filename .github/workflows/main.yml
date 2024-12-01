@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main # Dispara o workflow em pushes no branch `main`.
+      - sprint-4
 
 jobs:
   deploy:

@@ -1,16 +1,16 @@
 <template>
   <v-card class="mx-auto" width="100%" style="
       box-shadow: none;
-      border-radius: 0 0 25px 20px;
+      border-radius: 0 0 20px 20px;
       margin-bottom: 0px;
-      height: 371px;
+      height: 178px;
     " color="primary">
-    <v-col style="padding: 5px 20px 0px 20px">
+    <v-col style="padding: 5px 20px 0 20px">
       <v-row style="align-items: center; padding: 0px 0 7px 0; position: relative;">
         <!-- Texto "Pontos de Parada" centralizado -->
         <v-col cols="12" style="text-align: center;">
           <span style="font-size: 23px; font-weight: bold;" color="primary">
-            Aréas Geográficas
+            Usuários na Sessão
           </span>
         </v-col>
         <!-- Botão do Painel de Informações no extremo direito -->
@@ -25,43 +25,16 @@
             <!-- Combobox de áreas geográficas -->
             <v-combobox :disabled="disabledTexts" label="Áreas geográficas" color="secondary" v-model="selectedGeoArea"
               :items="geoAreas" item-value="id" item-title="name" clearable :multiple="false"
-              @update:model-value="handleGeoAreaChange" @click:clear="clearFields" prepend-icon="mdi-map-search">
+              @update:model-value="handleGeoAreaChange" prepend-icon="mdi-map-search">
             </v-combobox>
           </v-col>
 
-          <v-col cols="auto" style="padding: 0px 0px 20px 10px">
-            <div class="icon-container">
-              <v-btn icon @click="drawCircle" class="no-shadow rounded" :disabled="disableDrawButton">
-                <v-icon>mdi-circle-outline</v-icon>
-                <v-icon class="plus-icon">mdi-plus</v-icon>
-              </v-btn>
-            </div>
-          </v-col>
+          
         </v-row>
       </v-card-actions>
-
-      <!-- Users combobox -->
-      <v-combobox v-model="selectedUser" label="Usuário" :items="users" item-title="name" item-value="deviceId"
-        prepend-icon="mdi-filter-variant" clearable :multiple="false" color="secondary">
-      </v-combobox>
-
-      <!-- Date selection -->
-      <v-date-input v-model="date" label="Selecione o período" multiple="range" color="secondary" :max="today"
-        :locale="locale" :format="customDateFormat" placeholder="dd/MM/yyyy" :readonly="dateInputDisabled">
-      </v-date-input>
-
-      <!-- Quick date filters using chips -->
-      <v-col style="padding: 0px; display: flex; justify-content: space-evenly">
-        <v-chip style="margin: 0px 2px !important" size="small" v-for="(filter, index) in quickFilters"
-          :key="filter.label" @click="setQuickFilter(filter.range, index)"
-          :color="selectedQuickFilter === index ? 'primary' : 'primary_light'" :active="selectedQuickFilter === index"
-          filter class="ma-2" variant="flat">
-          {{ filter.label }}
-        </v-chip>
-      </v-col>
     </v-col>
 
-    <v-card-actions class="d-flex justify-space-between" style="padding: 20px 20px 0 20px">
+    <v-card-actions class="d-flex justify-space-between" style="padding: 4px 20px 0 20px">
       <v-row class="d-flex" no-gutters style="justify-content: space-around">
         <v-col cols="7">
           <v-btn :loading="loading" :disabled="ButtonDisabled || loading" class="text-none" color="secondary"
@@ -79,19 +52,16 @@
     </v-card-actions>
   </v-card>
 
-  <!-- Loading progress circular -->
-  <v-col v-if="loadingPage" id="loadingStopPoints" class="d-flex justify-center mt-4">
-    <v-progress-circular color="primary" indeterminate> </v-progress-circular>
-  </v-col>
-
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" top>
     {{ snackbarMessage }}
   </v-snackbar>
+
 </template>
 
 <script>
 import { eventBus } from "@/utils/EventBus";
 import axios from "axios";
+import InfoPanel from "../Info/InfoPanel.vue";
 
 export default {
   data: () => ({
@@ -99,25 +69,8 @@ export default {
     loading: false,
     logo: "/src/assets/Logo.svg",
     date: null,
-    users: [], // Lista de usuários
-    selectedUser: null,
     locale: "pt",
     customDateFormat: "dd/MM/yyyy",
-    quickFilters: [
-      { label: "Hoje", range: [new Date(), new Date()] },
-      {
-        label: "Últimos 3 dias",
-        range: [new Date(Date.now() - 3 * 864e5), new Date()],
-      },
-      {
-        label: "Última semana",
-        range: [new Date(Date.now() - 7 * 864e5), new Date()],
-      },
-      {
-        label: "Último mês",
-        range: [new Date(Date.now() - 30 * 864e5), new Date()],
-      },
-    ],
     selectedQuickFilter: null,
     dateInputDisabled: false,
     geoAreas: [],
@@ -132,7 +85,6 @@ export default {
   }),
 
   mounted() {
-    this.fetchUsers();
     this.fetchGeoAreas();
     eventBus.on("clearSelectedGeoArea", this.clearSelectedGeoArea);
     eventBus.on("stopIsLoading", this.stopIsLoading);
@@ -149,60 +101,35 @@ export default {
     ButtonDisabled() {
       const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
-
-
-
-      return (
-        !this.selectedUser ||
-        !this.date ||
-        (!this.selectedGeoArea && !cachedCircle)
-      );
+      return (!this.selectedGeoArea && !cachedCircle);
     },
   },
 
   methods: {
+    // Função para exibir o snackbar
     showSnackbar(message, color = "success") {
       this.snackbarMessage = message; // Define a mensagem
       this.snackbarColor = color; // Define a cor
       this.snackbar = true; // Torna o snackbar visível
     },
-
+    // Função para limpar a área geográfica selecionada
     clearSelectedGeoArea() {
       this.selectedGeoArea = null;
     },
+    // Função para alterar o logo
     change(newLogo) {
       this.logo = newLogo;
     },
-
+    // Função para parar o loading
     stopIsLoading() {
       this.loading = false;
     },
-
+    //
     async reloadGeoArea() {
       this.selectedGeoArea = null;
       this.fetchGeoAreas();
     },
-
-    async fetchUsers() {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/filters/users?page=0&qtdPage=1000"
-        );
-        const data = response.data;
-
-        // Mapeando a resposta da API para o formato correto
-        this.users = data.listUsers.map((user) => ({
-          name: user.userName.toUpperCase(), // Nome do usuário
-          deviceId: user.idDevice, // ID do dispositivo associado
-          device: user.deviceName,
-        }));
-
-
-      } catch (error) {
-
-      }
-    },
-
+    // Função para buscar as áreas geográficas
     async fetchGeoAreas() {
       try {
         const response = await axios.get("http://localhost:8080/zone");
@@ -219,7 +146,7 @@ export default {
 
       }
     },
-
+    // Função para lidar com a mudança de área geográfica
     async handleGeoAreaChange() {
       if (!this.selectedGeoArea) {
 
@@ -245,7 +172,7 @@ export default {
         radius: selectedArea.radius,
       };
 
-      const dataCircleAndUser = {
+      const dataCircle = {
         id: selectedArea.id,
         name: selectedArea.name,
         latitude: selectedArea.latitude,
@@ -253,7 +180,12 @@ export default {
         radius: selectedArea.radius,
       };
 
-      this.$emit("consult", dataCircleAndUser);
+      this.$emit("consult", dataCircle);
+    },
+    data() {
+      return {
+        loading: false,
+      };
     },
 
     async handleConsult() {
@@ -261,16 +193,6 @@ export default {
       const cachedDetails = localStorage.getItem("cachedCircleDetails");
       const cachedCircle = JSON.parse(cachedDetails);
       let selectedArea = null;
-
-      if (
-        !this.selectedUser ||
-        !this.date ||
-        (!this.selectedGeoArea && !cachedCircle)
-      ) {
-
-        this.loading = false;
-        return;
-      }
 
       if (this.selectedGeoArea) {
         selectedArea = this.geoAreas.find(
@@ -285,66 +207,32 @@ export default {
         selectedArea = cachedCircle;
         selectedArea.latitude = selectedArea.center.latitude;
         selectedArea.longitude = selectedArea.center.longitude;
-
       }
-
-      const qtddias = Math.round(
-        (new Date(this.date[this.date.length - 1]) - new Date(this.date[0])) /
-        (1000 * 60 * 60 * 24)
-      );
-
-      if (qtddias > 31) {
-        this.showSnackbar("Mais que 31 dias selecionados", "error");
-        this.loading = false;
-        return;
-      }
-
+      // Ajustando os dados enviados
       const requestData = {
-        deviceId: this.selectedUser.deviceId,
-        startDate: new Date(this.date[0]).toLocaleDateString("en-CA"),
-        finalDate: new Date(this.date[this.date.length - 1]).toLocaleDateString(
-          "en-CA"
-        ),
-        latitude: selectedArea.latitude,
-        longitude: selectedArea.longitude,
-        radius: selectedArea.radius,
+        sessionId: selectedArea.id,
       };
 
 
 
-      const url = `http://localhost:8080/stoppointsession/pointsInSession?deviceId=${requestData.deviceId}&startDate=${requestData.startDate}&endDate=${requestData.finalDate}&latitude=${requestData.latitude}&longitude=${requestData.longitude}&radius=${requestData.radius}`;
+      // Montando a URL conforme esperado
+      const url = `http://localhost:8080/usersInSession?idSession=${requestData.sessionId}`;
 
 
 
       try {
+        // Realizando a requisição GET
         const response = await axios.get(url);
         if (response.status === 200) {
           const data = await response.data;
 
+          this.loading = false;
 
+          const users = {
+            users: data.users
+          }
 
-          const dataCircleAndUser = {
-            id: selectedArea.id,
-            userName: this.selectedUser.name,
-            name: selectedArea.name,
-            latitude: selectedArea.latitude,
-            longitude: selectedArea.longitude,
-            radius: selectedArea.radius,
-          };
-
-          const coord = data.stopPoints;
-
-          const dados = {
-            userName: this.selectedUser.name,
-            device: this.selectedUser.device,
-            coords: coord, // Definindo corretamente um array para coordenadas
-          };
-
-
-
-          // Dados enviados para plotar o círculo escolhido
-          this.$emit("consult", dataCircleAndUser);
-          this.$emit("stopPointsReceived", dados);
+          this.$emit("usersReceived", users);
         }
       } catch (error) {
 
@@ -353,9 +241,9 @@ export default {
       }
     },
 
+    // Limpa os campos do filtro
     clearFields() {
       this.date = null;
-      this.selectedUser = null;
       this.devices = [];
       this.selectedQuickFilter = null;
       this.selectedGeoArea = null;
@@ -363,11 +251,6 @@ export default {
       this.longitude = null;
       this.radius = null;
       this.circleDrawn = false;
-
-
-
-      localStorage.removeItem("circleDetailsCached");
-      localStorage.removeItem("cachedCircleDetails");
 
       if (this.logo == "/src/assets/LogoWhite.svg") {
         this.$emit("initializeMapDark");
@@ -381,7 +264,6 @@ export default {
     drawCircle() {
       this.$emit("drawCircle");
     },
-
     setQuickFilter(range, index) {
       if (this.selectedQuickFilter === index) {
         this.selectedQuickFilter = null;
