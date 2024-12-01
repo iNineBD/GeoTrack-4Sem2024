@@ -28,4 +28,4 @@ jobs:
 
     - name: Executar script remoto
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "source ~/.bashrc && sudo su -c './executa.sh'"
+        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "source ~/.bashrc && './executa.sh'"
