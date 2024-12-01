@@ -15,7 +15,7 @@
           >
           <v-card-text>
             <p class="subtitle-1 mb-4 text-body-2 text-center">
-              Preencha os campos abaixo
+              Preencha os campos abaixo:
             </p>
             <v-form @submit.prevent="handleLogin">
               <v-text-field
