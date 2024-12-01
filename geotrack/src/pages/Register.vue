@@ -4,55 +4,26 @@
       <v-col class="blue-section" cols="12">
         <v-card class="register-card" elevation="2">
           <div class="logo-container">
-            <img
-              :src="logoGeoTrack"
-              alt="GeoTrack Logo"
-              class="main-logo mb-2"
-            />
+            <img :src="logoGeoTrack" alt="GeoTrack Logo" class="main-logo mb-2" />
           </div>
-          <v-card-title class="text-h5 font-weight-bold text-center"
-            >Cadastro de Usuário</v-card-title
-          >
+          <v-card-title class="text-h5 font-weight-bold text-center">Cadastro de Usuário</v-card-title>
           <v-card-text>
             <p class="subtitle-1 mb-4 text-body-2 text-center">
               Preencha os campos abaixo
             </p>
             <v-form @submit.prevent="handleRegister">
-              <v-text-field
-                v-model="name"
-                label="Nome completo"
-                required
-                class="register-input mb-2"
-                variant="outlined"
-                density="comfortable"
-                style="width: 300px"
-              ></v-text-field>
+              <v-text-field v-model="name" label="Nome completo" required class="register-input mb-2" variant="outlined"
+                density="comfortable" style="width: 300px"></v-text-field>
 
-              <v-text-field
-                v-model="email"
-                label="Email"
-                required
-                class="register-input mb-2"
-                variant="outlined"
-                density="comfortable"
-              ></v-text-field>
+              <v-text-field v-model="email" label="Email" required class="register-input mb-2" variant="outlined"
+                density="comfortable"></v-text-field>
 
-              <v-text-field
-                v-model="password"
-                :type="passwordVisible ? 'text' : 'password'"
-                label="Digite sua senha"
-                required
-                class="login-input mb-10"
-                variant="outlined"
-                density="comfortable"
+              <v-text-field v-model="password" :type="passwordVisible ? 'text' : 'password'" label="Digite sua senha"
+                required class="login-input mb-10" variant="outlined" density="comfortable"
                 :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append-inner="togglePasswordVisibility"
-                style="width: 300px"
-              ></v-text-field>
+                @click:append-inner="togglePasswordVisibility" style="width: 300px"></v-text-field>
 
-              <v-btn type="submit" block class="register-btn" size="large"
-                >Cadastrar</v-btn
-              >
+              <v-btn type="submit" block class="register-btn" size="large">Cadastrar</v-btn>
             </v-form>
             <div class="login text-center mt-4">
               <router-link to="/">Já possui cadastro? Faça login</router-link>
@@ -63,13 +34,7 @@
             <img :src="logoInine" alt="INine Logo" class="partner-logo" />
           </div>
         </v-card>
-        <v-snackbar
-          v-model="snackbar"
-          :color="snackbarColor"
-          top
-          :timeout="3000"
-          class="text-center"
-        >
+        <v-snackbar v-model="snackbar" :color="snackbarColor" top :timeout="3000" class="text-center">
           {{ snackbarMessage }}
         </v-snackbar>
       </v-col>
@@ -93,6 +58,7 @@ export default {
     const password = ref("");
     const router = useRouter();
     const passwordVisible = ref(false);
+    const emailValidate = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const togglePasswordVisibility = () => {
       passwordVisible.value = !passwordVisible.value;
     };
@@ -122,10 +88,24 @@ export default {
           }),
         });
 
+        if (!emailValidate.test(email.value)) {
+          snackbarMessage.value = "Por favor, insira um email válido!";
+          snackbarColor.value = "error";
+          snackbar.value = true;
+          return;
+        }
+
+        if (password.value.length < 6) {
+          snackbarMessage.value = "A senha deve ter no mínimo 6 caracteres!";
+          snackbarColor.value = "error";
+          snackbar.value = true;
+          return;
+        }
+
         if (!response.ok) {
           const errorData = await response.json();
           if (errorData.message === "Email already exists") {
-            snackbarMessage.value = "O e-mail já está cadastrado!";
+            snackbarMessage.value = "E-mail já cadastrado!";
             snackbarColor.value = "error";
             snackbar.value = true;
           } else {
@@ -141,7 +121,7 @@ export default {
           router.push("/");
         }, 3000);
       } catch (error) {
-        snackbarMessage.value = "Erro ao cadastrar usuário: e-mail já cadastrado!";
+        snackbarMessage.value = "E-mail já cadastrado!";
         snackbarColor.value = "error";
         snackbar.value = true;
       }
