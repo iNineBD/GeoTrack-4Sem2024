@@ -100,16 +100,9 @@ export default {
         }),
       });
 
-      if (!email.value || !password.value) {
-        snackbarMessage.value = "Por favor, preencha todos os campos!";
-        snackbarColor.value = "error";
-        snackbar.value = true;
-        return;
-      }
-
       if (!response.ok) {
         const errorData = await response.json();
-        snackbarMessage.value = "Email/Senha incorretos";
+        snackbarMessage.value = errorData.message;
         snackbarColor.value = 'error';
         snackbar.value = true;
       }

@@ -76,53 +76,23 @@ export default {
       }
 
       try {
-        const response = await fetch("http://localhost:8080/auth/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name.value,
-            email: email.value,
-            password: password.value,
-          }),
+        await axios.post('http://localhost:8080/auth/register', {
+          name: name.value,
+          email: email.value,
+          password: password.value,
         });
 
-        if (!emailValidate.test(email.value)) {
-          snackbarMessage.value = "Por favor, insira um email válido!";
-          snackbarColor.value = "error";
-          snackbar.value = true;
-          return;
-        }
-
-        if (password.value.length < 6) {
-          snackbarMessage.value = "A senha deve ter no mínimo 6 caracteres!";
-          snackbarColor.value = "error";
-          snackbar.value = true;
-          return;
-        }
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          if (errorData.message === "Email already exists") {
-            snackbarMessage.value = "E-mail já cadastrado!";
-            snackbarColor.value = "error";
-            snackbar.value = true;
-          } else {
-            throw new Error("Erro ao cadastrar usuário");
-          }
-          return;
-        }
-
-        snackbarMessage.value = "Usuário cadastrado com sucesso!";
-        snackbarColor.value = "success";
+        snackbarMessage.value = 'Usuário cadastrado com sucesso!';
+        snackbarColor.value = 'success';
         snackbar.value = true;
         setTimeout(() => {
-          router.push("/");
+          router.push('/');
         }, 3000);
+        
+
       } catch (error) {
-        snackbarMessage.value = "E-mail já cadastrado!";
-        snackbarColor.value = "error";
+        snackbarMessage.value = error.response?.data?.message || 'Erro ao cadastrar usuário';
+        snackbarColor.value = 'error';
         snackbar.value = true;
       }
     };
