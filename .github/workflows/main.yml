@@ -17,6 +17,10 @@ jobs:
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22'  
 
     - name: Testar conexão SSH
       run: |
@@ -24,4 +28,4 @@ jobs:
 
     - name: Executar script remoto
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "./executa.sh"
+        ssh -o StrictHostKeyChecking=no ubuntu@152.67.61.112 "source ~/.bashrc && sudo su -c './executa.sh'"
