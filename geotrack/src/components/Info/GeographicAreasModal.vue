@@ -45,30 +45,6 @@
     <!-- Página 3 -->
     <div v-else-if="currentPage === 3">
       <p>
-        Quando você seleciona uma das Áreas Geográficas ela aparecerá no mapa,
-        clicando sobre ela você verá opções como "Editar" e "Deletar".
-      </p>
-      <div class="image-grid">
-        <div class="image-item">
-          <img
-            src="../../assets/infoImgs/GeographicAreasModal/AGSelecionarZona.png"
-            alt="Selecionando Área Geográfica"
-          />
-          <p class="image-caption">Selecionando Área Geográfica</p>
-        </div>
-        <div class="image-item">
-          <img
-            src="../../assets/infoImgs/GeographicAreasModal/AGDisplayZona.png"
-            alt="Área Geográfica em Display"
-          />
-          <p class="image-caption">Área Geográfica em Display</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Página 4 -->
-    <div v-else-if="currentPage === 4">
-      <p>
         Com a Área Geográfica ativa, selecione um usuário e use os filtros
         rápidos de data ou o calendário para escolher um período de até 31 dias.
         Após isso, clique em "Consultar" e aguarde os resultados.
@@ -91,8 +67,8 @@
       </div>
     </div>
 
-    <!-- Página 5 -->
-    <div v-else-if="currentPage === 5">
+    <!-- Página 4 -->
+    <div v-else-if="currentPage === 4">
       <p>
         Aqui você vê o resultado da consulta. Os Pontos de Parada são exibidos
         no mapa, e abaixo do menu, você encontrará os detalhes sobre onde o usuário passou, a data e quanto tempo ficou
@@ -134,7 +110,7 @@
 import { ref } from "vue";
 
 const currentPage = ref(1);
-const totalPages = 5;
+const totalPages = 4;
 </script>
 
 <style scoped>
