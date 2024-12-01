@@ -20,7 +20,7 @@
             <v-form @submit.prevent="handleLogin">
               <v-text-field
                 v-model="email"
-                label="Digite seu usuário"
+                label="Digite seu email"
                 required
                 class="login-input mb-2"
                 variant="outlined"
@@ -100,9 +100,16 @@ export default {
         }),
       });
 
+      if (!email.value || !password.value) {
+        snackbarMessage.value = "Por favor, preencha todos os campos!";
+        snackbarColor.value = "error";
+        snackbar.value = true;
+        return;
+      }
+
       if (!response.ok) {
         const errorData = await response.json();
-        snackbarMessage.value = errorData.message;
+        snackbarMessage.value = "Email/Senha incorretos";
         snackbarColor.value = 'error';
         snackbar.value = true;
       }
@@ -117,7 +124,7 @@ export default {
 
       router.push("/stoppointsfilter");
       } catch (error) {
-        
+
       }
     };
 
