@@ -6,9 +6,7 @@
     <div v-if="currentPage === 1">
       <p>
         Sejam bem-vindos ao GeoTrack! Essa página está destinada a solucionar
-        possíveis dúvidas sobre como utilizar nossa aplicação. A imagem abaixo é
-        referente ao filtro de Áreas Geográficas, onde você pode buscar os
-        Pontos de Parada de um usuário dentro de uma área específica.
+        possíveis dúvidas sobre como utilizar nossa aplicação. Aqui temos o filtro de Áreas Geográficas, onde você pode criar, editar, deletar Áreas Geograficas e buscar pelos usuários que contém pontos de parada dentro de uma área específica.
       </p>
       <div class="image-container">
         <img
@@ -22,7 +20,7 @@
     <!-- Página 2 -->
     <div v-else-if="currentPage === 2">
       <p>
-        Para criar uma nova Área Geográfica, clique no ícone de mais (+) e
+        Para criar uma nova Área Geográfica, clique no ícone (+) e
         desenhe um círculo no mapa. Após verificar os detalhes, clique em
         "Salvar" para registrar a área criada.
       </p>
