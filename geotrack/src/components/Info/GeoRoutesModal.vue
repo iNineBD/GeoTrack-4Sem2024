@@ -8,10 +8,13 @@
         Sejam bem-vindos ao GeoTrack! Essa página está destinada a solucionar
         possíveis dúvidas sobre como utilizar nossa aplicação. A imagem abaixo é
         referente ao filtro de Rotas, onde você pode buscar as rotas de um
-        suário dentro de um período de 31 dias.
+        usuário dentro de um período de 31 dias.
       </p>
       <div class="image-container">
-        <img src="../../assets/infoImgs/GeoRoutesModal/rotasInterface.png" alt="Menu Rotas" />
+        <img
+          src="../../assets/infoImgs/GeoRoutesModal/rotasInterface.png"
+          alt="Menu Rotas"
+        />
         <p class="image-caption">Menu Rotas</p>
       </div>
     </div>
@@ -25,11 +28,17 @@
       </p>
       <div class="image-grid">
         <div class="image-item">
-          <img src="../../assets/infoImgs/GeoRoutesModal/RotasSelecionarUsuario.png" alt="Selecionar Usuário" />
+          <img
+            src="../../assets/infoImgs/GeoRoutesModal/RotasSelecionarUsuario.png"
+            alt="Selecionar Usuário"
+          />
           <p class="image-caption">Selecionar Usuário</p>
         </div>
         <div class="image-item">
-          <img src="../../assets/infoImgs/GeoRoutesModal/RotasSelecionarData.png" alt="Selecionar Data" />
+          <img
+            src="../../assets/infoImgs/GeoRoutesModal/RotasSelecionarData.png"
+            alt="Selecionar Data"
+          />
           <p class="image-caption">Selecionar Data</p>
         </div>
       </div>
@@ -44,7 +53,10 @@
         período selecionado, com pontos de início e fim.
       </p>
       <div class="image-container">
-        <img src="../../assets/infoImgs/GeoRoutesModal/RotasDados.png" alt="Dados na Tela" />
+        <img
+          src="../../assets/infoImgs/GeoRoutesModal/RotasDados.png"
+          alt="Dados na Tela"
+        />
         <p class="image-caption">Dados na Tela</p>
       </div>
     </div>
@@ -52,21 +64,33 @@
     <!-- Página 4 -->
     <div v-else-if="currentPage === 4">
       <p>
-        Quando você seleciona uma rota, aparece um player no qual você pode ver o tempo da rota e a distância
-        percorrida. Com isso, ao clicar no botão play, você também verá uma animação percorrendo a rota.
+        Quando você seleciona uma rota, aparece um player no qual você pode ver
+        o tempo da rota e a distância percorrida. Com isso, ao clicar no botão
+        play, você também verá uma animação percorrendo a rota.
       </p>
       <div class="image-container">
-        <img src="../../assets/infoImgs/GeoRoutesModal/routeSelected.png" alt="Exibição do player" />
+        <img
+          src="../../assets/infoImgs/GeoRoutesModal/routeSelected.png"
+          alt="Exibição do player"
+        />
         <p class="image-caption">Exibição do player</p>
       </div>
     </div>
 
     <!-- Navegação -->
     <div class="modal-navigation">
-      <v-btn :disabled="currentPage === 1" @click="currentPage--" class="nav-btn">
+      <v-btn
+        :disabled="currentPage === 1"
+        @click="currentPage--"
+        class="nav-btn"
+      >
         Anterior
       </v-btn>
-      <v-btn :disabled="currentPage === totalPages" @click="currentPage++" class="nav-btn">
+      <v-btn
+        :disabled="currentPage === totalPages"
+        @click="currentPage++"
+        class="nav-btn"
+      >
         Próximo
       </v-btn>
     </div>
